@@ -3,7 +3,19 @@
 // через win32_window.h) — иначе устаревший <winsock.h>, который тот тянет,
 // конфликтует с <winsock2.h>/<iphlpapi.h> ниже. Поэтому канал живёт в своей
 // собственной единице трансляции, а не в flutter_window.cpp.
+// GetIfTable2/MIB_IF_TABLE2 объявлены в <netioapi.h> под защитой
+// `NTDDI_VERSION >= NTDDI_VISTA`. Раннер Flutter версию Windows не задаёт,
+// поэтому объявляем её сами ДО системных заголовков — иначе эти символы
+// просто не попадут в трансляцию (проверено сборкой на Windows CI).
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0A00 // Windows 10
+#endif
+#ifndef NTDDI_VERSION
+#define NTDDI_VERSION 0x0A000000 // NTDDI_WIN10
+#endif
+
 #include <winsock2.h>
+#include <ws2ipdef.h> // SOCKADDR_INET, нужен для типов в netioapi.h
 #include <iphlpapi.h>
 #include <netioapi.h>
 

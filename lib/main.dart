@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/home_shell.dart';
+import 'core/app_activity.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/l10n/locale_provider.dart';
 import 'core/notifications/notification_service.dart';
@@ -55,6 +56,9 @@ class _PulsarAppState extends ConsumerState<PulsarApp> {
 
     ref.listenManual(trafficHistoryProvider, (prev, next) => pushTrayStatus());
     ref.listenManual(usageStatsProvider, (prev, next) => pushTrayStatus());
+
+    // Следим за состоянием окна: когда оно скрыто, анимации встают на паузу.
+    ref.watch(uiActiveProvider);
   }
 
   @override

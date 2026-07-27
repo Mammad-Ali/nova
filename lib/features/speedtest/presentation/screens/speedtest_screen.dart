@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/app_activity.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/l10n/language_button.dart';
 import '../../../../core/l10n/locale_provider.dart';
@@ -83,6 +84,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                     max: s.gaugeMax,
                     color: gaugeColor,
                     active: s.isRunning,
+                    paused: !ref.watch(uiActiveProvider),
                     child: _GaugeCenter(
                       phaseLabel: _phaseLabel(t, s.phase),
                       value: s.isRunning ? s.displayMbps : s.downloadMbps,

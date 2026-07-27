@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/app_activity.dart';
 import '../core/theme/app_theme.dart';
 import '../features/speedtest/presentation/providers/speedtest_provider.dart';
 import '../features/traffic_monitor/presentation/providers/traffic_provider.dart';
@@ -49,6 +50,16 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
 
   @override
   Widget build(BuildContext context) {
+    // Когда окно свёрнуто/не в фокусе — останавливаем анимацию, чтобы не
+    // жечь батарею на невидимых кадрах.
+    final active = ref.watch(uiActiveProvider);
+    if (active && !_ticker.isActive) {
+      _last = Duration.zero;
+      _ticker.start();
+    } else if (!active && _ticker.isActive) {
+      _ticker.stop();
+    }
+
     // Уровень скорости: во время теста — стрелка спидометра, иначе — трафик.
     final st = ref.watch(speedTestControllerProvider);
     final speedFrac =

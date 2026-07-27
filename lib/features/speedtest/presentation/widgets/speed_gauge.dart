@@ -19,6 +19,7 @@ class SpeedGauge extends StatefulWidget {
     required this.child,
     this.color = AppColors.cyan,
     this.active = false,
+    this.paused = false,
   });
 
   final double value;
@@ -28,6 +29,9 @@ class SpeedGauge extends StatefulWidget {
 
   /// Идёт ли тест сейчас (включает «разгон» и усиливает свечение).
   final bool active;
+
+  /// Окно свёрнуто или не в фокусе — анимацию можно остановить ради батареи.
+  final bool paused;
 
   @override
   State<SpeedGauge> createState() => _SpeedGaugeState();
@@ -94,6 +98,17 @@ class _SpeedGaugeState extends State<SpeedGauge>
     _color = Color.lerp(_color, widget.color, 1 - math.exp(-dtc * 5))!;
 
     _anim.update(shown, _phase, _pulse, speed, widget.active, _color);
+  }
+
+  @override
+  void didUpdateWidget(covariant SpeedGauge old) {
+    super.didUpdateWidget(old);
+    if (widget.paused && _ticker.isActive) {
+      _ticker.stop();
+    } else if (!widget.paused && !_ticker.isActive) {
+      _last = Duration.zero; // без этого dt подскочит на всю паузу
+      _ticker.start();
+    }
   }
 
   @override
