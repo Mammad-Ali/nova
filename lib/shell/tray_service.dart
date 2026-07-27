@@ -119,12 +119,16 @@ class TrayService with TrayListener, WindowListener {
 
   // ── TrayListener ──────────────────────────────────────────────────
 
+  /// Вызывается при левом клике по иконке — открывает мини-панель.
+  /// Ставится из main.dart, чтобы сервис не зависел от Riverpod.
+  VoidCallback? onIconTap;
+
   @override
   void onTrayIconMouseDown() {
-    // Windows/Linux: левый клик открывает окно. На macOS клик по иконке
-    // показывает меню (см. onTrayIconRightMouseDown).
-    if (Platform.isMacOS) {
-      trayManager.popUpContextMenu();
+    // Левый клик — мини-панель, правый — меню (см. ниже).
+    final handler = onIconTap;
+    if (handler != null) {
+      handler();
     } else {
       showWindow();
     }

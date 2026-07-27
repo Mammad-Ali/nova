@@ -12,6 +12,7 @@ import 'features/alerts/alerts_watcher.dart';
 import 'features/traffic_monitor/presentation/providers/stability_provider.dart';
 import 'features/traffic_monitor/presentation/providers/traffic_provider.dart';
 import 'features/traffic_monitor/presentation/providers/usage_stats_provider.dart';
+import 'shell/compact_mode.dart';
 import 'shell/tray_service.dart';
 
 Future<void> main() async {
@@ -56,6 +57,10 @@ class _PulsarAppState extends ConsumerState<PulsarApp> {
 
     ref.listenManual(trafficHistoryProvider, (prev, next) => pushTrayStatus());
     ref.listenManual(usageStatsProvider, (prev, next) => pushTrayStatus());
+
+    // Левый клик по иконке в трее открывает/закрывает мини-панель.
+    TrayService.instance.onIconTap =
+        () => ref.read(compactModeProvider.notifier).toggle();
 
     // Следим за состоянием окна: когда оно скрыто, анимации встают на паузу.
     ref.watch(uiActiveProvider);

@@ -120,6 +120,8 @@ class AppStrings {
     required this.throttleLikely,
     required this.throttleLocalCache,
     required this.wifiTitle,
+    required this.compactExpand,
+    required this.compactPanel,
     required this.settings,
     required this.alertsEnable,
     required this.alertMinSpeed,
@@ -237,6 +239,8 @@ class AppStrings {
   final String throttleLikely;
   final String throttleLocalCache;
   final String wifiTitle;
+  final String compactExpand;
+  final String compactPanel;
 
   // Настройки, уведомления, экспорт
   final String settings;
@@ -363,6 +367,8 @@ const _en = AppStrings(
   throttleLikely: 'Video is heavily slowed down',
   throttleLocalCache: 'Provider hosts a local video cache',
   wifiTitle: 'Wi-Fi',
+  compactExpand: 'Open full window',
+  compactPanel: 'Mini panel',
   settings: 'Settings',
   alertsEnable: 'System notifications',
   alertMinSpeed: 'Warn below (Mbps)',
@@ -469,6 +475,8 @@ const _az = AppStrings(
   throttleLikely: 'Video ciddi şəkildə yavaşladılır',
   throttleLocalCache: 'Provayderdə lokal video keş var',
   wifiTitle: 'Wi-Fi',
+  compactExpand: 'Tam pəncərəni aç',
+  compactPanel: 'Mini panel',
   settings: 'Tənzimləmələr',
   alertsEnable: 'Sistem bildirişləri',
   alertMinSpeed: 'Xəbərdarlıq həddi (Mbps)',
@@ -575,6 +583,8 @@ const _ru = AppStrings(
   throttleLikely: 'Видео сильно замедляется',
   throttleLocalCache: 'У провайдера локальный кэш видео',
   wifiTitle: 'Wi-Fi',
+  compactExpand: 'Открыть полное окно',
+  compactPanel: 'Мини-панель',
   settings: 'Настройки',
   alertsEnable: 'Системные уведомления',
   alertMinSpeed: 'Предупреждать ниже (Мбит/с)',

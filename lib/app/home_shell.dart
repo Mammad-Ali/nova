@@ -7,6 +7,8 @@ import '../core/l10n/locale_provider.dart';
 import '../core/theme/app_theme.dart';
 import '../features/speedtest/presentation/screens/speedtest_screen.dart';
 import '../features/traffic_monitor/presentation/screens/traffic_monitor_screen.dart';
+import '../shell/compact_mode.dart';
+import '../shell/compact_panel.dart';
 import 'starfield_background.dart';
 
 /// Корневая оболочка приложения: общий фон + две вкладки в стеклянном navbar.
@@ -25,6 +27,21 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(stringsProvider);
+
+    // В компактном режиме окно превращается в мини-панель под иконкой
+    // меню-бара: те же данные, но без вкладок и рамки.
+    if (ref.watch(compactModeProvider)) {
+      return const Scaffold(
+        backgroundColor: AppColors.bg0,
+        body: Stack(
+          children: [
+            StarfieldBackground(),
+            CompactPanel(),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       extendBody: true,
       backgroundColor: AppColors.bg0,
