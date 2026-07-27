@@ -102,6 +102,23 @@ class AppStrings {
     required this.stabilityOutage,
     required this.pause,
     required this.resume,
+    required this.usageMonth,
+    required this.usageForecast,
+    required this.usageForecastHint,
+    required this.usageByDay,
+    required this.servicesTitle,
+    required this.servicesHint,
+    required this.servicesRefresh,
+    required this.servicesUnreachable,
+    required this.throttleTitle,
+    required this.throttleHint,
+    required this.throttleRun,
+    required this.throttleNeutral,
+    required this.throttleVideo,
+    required this.throttleNone,
+    required this.throttleSuspected,
+    required this.throttleLikely,
+    required this.throttleLocalCache,
     required this.settings,
     required this.alertsEnable,
     required this.alertMinSpeed,
@@ -201,6 +218,23 @@ class AppStrings {
   final String stabilityOutage;
   final String pause;
   final String resume;
+  final String usageMonth;
+  final String usageForecast;
+  final String usageForecastHint;
+  final String usageByDay;
+  final String servicesTitle;
+  final String servicesHint;
+  final String servicesRefresh;
+  final String servicesUnreachable;
+  final String throttleTitle;
+  final String throttleHint;
+  final String throttleRun;
+  final String throttleNeutral;
+  final String throttleVideo;
+  final String throttleNone;
+  final String throttleSuspected;
+  final String throttleLikely;
+  final String throttleLocalCache;
 
   // Настройки, уведомления, экспорт
   final String settings;
@@ -309,6 +343,23 @@ const _en = AppStrings(
   stabilityOutage: 'Connection lost',
   pause: 'Pause',
   resume: 'Resume',
+  usageMonth: 'This month',
+  usageForecast: 'Forecast',
+  usageForecastHint: 'Projected total by the end of the month at the current pace',
+  usageByDay: 'By day',
+  servicesTitle: 'Latency to services',
+  servicesHint: 'Shows where exactly the delay is, not just "the internet is slow"',
+  servicesRefresh: 'Measure again',
+  servicesUnreachable: 'no reply',
+  throttleTitle: 'Video throttling check',
+  throttleHint: 'Compares speed to a neutral CDN and to Netflix servers',
+  throttleRun: 'Check',
+  throttleNeutral: 'Regular CDN',
+  throttleVideo: 'Video CDN',
+  throttleNone: 'No throttling detected',
+  throttleSuspected: 'Video is noticeably slower',
+  throttleLikely: 'Video is heavily slowed down',
+  throttleLocalCache: 'Provider hosts a local video cache',
   settings: 'Settings',
   alertsEnable: 'System notifications',
   alertMinSpeed: 'Warn below (Mbps)',
@@ -397,6 +448,23 @@ const _az = AppStrings(
   stabilityOutage: 'Bağlantı itdi',
   pause: 'Dayandır',
   resume: 'Davam et',
+  usageMonth: 'Bu ay',
+  usageForecast: 'Proqnoz',
+  usageForecastHint: 'İndiki templə ay sonuna gözlənilən ümumi həcm',
+  usageByDay: 'Günlər üzrə',
+  servicesTitle: 'Servislərə gecikmə',
+  servicesHint: 'Gecikmənin harada olduğunu göstərir, sadəcə «internet yavaşdır» deyil',
+  servicesRefresh: 'Yenidən ölç',
+  servicesUnreachable: 'cavab yoxdur',
+  throttleTitle: 'Video məhdudlaşdırma yoxlaması',
+  throttleHint: 'Adi CDN və Netflix serverlərinə sürəti müqayisə edir',
+  throttleRun: 'Yoxla',
+  throttleNeutral: 'Adi CDN',
+  throttleVideo: 'Video CDN',
+  throttleNone: 'Məhdudlaşdırma aşkarlanmadı',
+  throttleSuspected: 'Video nəzərəçarpacaq dərəcədə yavaşdır',
+  throttleLikely: 'Video ciddi şəkildə yavaşladılır',
+  throttleLocalCache: 'Provayderdə lokal video keş var',
   settings: 'Tənzimləmələr',
   alertsEnable: 'Sistem bildirişləri',
   alertMinSpeed: 'Xəbərdarlıq həddi (Mbps)',
@@ -485,6 +553,23 @@ const _ru = AppStrings(
   stabilityOutage: 'Связь потеряна',
   pause: 'Пауза',
   resume: 'Возобновить',
+  usageMonth: 'За месяц',
+  usageForecast: 'Прогноз',
+  usageForecastHint: 'Сколько выйдет к концу месяца при текущем темпе',
+  usageByDay: 'По дням',
+  servicesTitle: 'Пинг до сервисов',
+  servicesHint: 'Показывает, где именно задержка, а не просто «интернет тормозит»',
+  servicesRefresh: 'Замерить заново',
+  servicesUnreachable: 'нет ответа',
+  throttleTitle: 'Проверка на троттлинг видео',
+  throttleHint: 'Сравнивает скорость до обычного CDN и до серверов Netflix',
+  throttleRun: 'Проверить',
+  throttleNeutral: 'Обычный CDN',
+  throttleVideo: 'Видео-CDN',
+  throttleNone: 'Троттлинга не обнаружено',
+  throttleSuspected: 'Видео заметно медленнее',
+  throttleLikely: 'Видео сильно замедляется',
+  throttleLocalCache: 'У провайдера локальный кэш видео',
   settings: 'Настройки',
   alertsEnable: 'Системные уведомления',
   alertMinSpeed: 'Предупреждать ниже (Мбит/с)',

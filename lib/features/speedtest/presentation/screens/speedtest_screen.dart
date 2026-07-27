@@ -6,7 +6,9 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/l10n/language_button.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../services_ping/presentation/service_ping_sheet.dart';
 import '../../../settings/settings_sheet.dart';
+import '../../../throttling/presentation/throttle_card.dart';
 import '../../data/datasources/ip_info.dart';
 import '../../domain/entities/speedtest_models.dart';
 import '../providers/speedtest_history_provider.dart';
@@ -173,6 +175,8 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                   upload: s.uploadMbps!,
                   ping: s.pingMs!,
                 ),
+                const SizedBox(height: 16),
+                const ThrottleCard(),
               ],
               if (s.phase == TestPhase.error) ...[
                 const SizedBox(height: 16),
@@ -239,6 +243,12 @@ class _Title extends StatelessWidget {
           ),
         ),
         const LanguageButton(),
+        IconButton(
+          onPressed: () => showServicePingSheet(context),
+          icon: const Icon(Icons.travel_explore_rounded,
+              color: AppColors.textMid),
+          tooltip: strings.servicesTitle,
+        ),
         IconButton(
           onPressed: () => showSpeedTestHistorySheet(context),
           icon: const Icon(Icons.history_rounded, color: AppColors.textMid),

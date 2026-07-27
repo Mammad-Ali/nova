@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/repositories/daily_usage_repository_impl.dart';
 import '../../data/repositories/usage_stats_repository_impl.dart';
 import '../../domain/entities/usage_stats.dart';
 import 'traffic_provider.dart';
@@ -18,6 +19,11 @@ final usageStatsProvider =
 class UsageStatsNotifier extends Notifier<UsageStats> {
   late final UsageStatsRepository _repo =
       ref.read(usageStatsRepositoryProvider);
+  late final DailyUsageRepository _dailyRepo =
+      ref.read(dailyUsageRepositoryProvider);
+
+  /// Дневные корзины для месячной статистики: 'yyyy-MM-dd' → байты.
+  Map<String, int> _byDay = {};
 
   String _dayKey = '';
   String _hourKey = '';
@@ -58,6 +64,13 @@ class UsageStatsNotifier extends Notifier<UsageStats> {
     // Берём сохранённое только если это тот же день/час — иначе начинаем с нуля.
     if (saved.dayKey == _dayKey) _dayBase = saved.dayBytes;
     if (saved.hourKey == _hourKey) _hourBase = saved.hourBytes;
+
+    _byDay = await _dailyRepo.load();
+    // Если приложение не запускали с прошлой сессии, дневной итог мог не
+    // успеть попасть в корзину — восстанавливаем из неё базу за сегодня.
+    final storedToday = _byDay[_dayKey];
+    if (storedToday != null && storedToday > _dayBase) _dayBase = storedToday;
+
     _emit();
   }
 
@@ -83,15 +96,24 @@ class UsageStatsNotifier extends Notifier<UsageStats> {
   }
 
   void _emit() {
+    final dayTotal = _dayBase + _dayDelta;
+    // Держим корзину текущего дня в актуальном состоянии, чтобы месячная
+    // статистика включала сегодняшний трафик без ожидания смены суток.
+    _byDay[_dayKey] = dayTotal;
+
     state = UsageStats(
       dayKey: _dayKey,
-      dayBytes: _dayBase + _dayDelta,
+      dayBytes: dayTotal,
       hourKey: _hourKey,
       hourBytes: _hourBase + _hourDelta,
+      byDay: Map.unmodifiable(_byDay),
     );
   }
 
-  void _persist() => _repo.save(state);
+  void _persist() {
+    _repo.save(state);
+    _dailyRepo.save(_byDay);
+  }
 
   String _dayKeyOf(DateTime t) =>
       '${t.year}-${_two(t.month)}-${_two(t.day)}';

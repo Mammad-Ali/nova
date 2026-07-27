@@ -9,6 +9,7 @@ import '../../../../core/utils/byte_format.dart';
 import '../providers/traffic_provider.dart';
 import '../providers/usage_stats_provider.dart';
 import '../widgets/live_traffic_chart.dart';
+import '../widgets/monthly_usage_card.dart';
 import '../widgets/stability_card.dart';
 
 /// Вкладка пассивного мониторинга: живой системный трафик Rx/Tx.
@@ -75,6 +76,8 @@ class TrafficMonitorScreen extends ConsumerWidget {
             snapshots: history.snapshots,
             error: feed.hasError ? feed.error : null,
           ),
+          const SizedBox(height: 16),
+          MonthlyUsageCard(strings: t, stats: usage),
           const SizedBox(height: 16),
           StabilityCard(strings: t),
         ],
