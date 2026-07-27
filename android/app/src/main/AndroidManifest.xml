@@ -3,6 +3,9 @@
          не сможет обращаться к сети (debug-манифест получает его автоматически от Flutter). -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Уровень сигнала и скорость линка Wi-Fi. Имя сети (SSID) требует
+         доступа к геопозиции — его не запрашиваем, SSID просто не показываем. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application
         android:label="Pulsar"

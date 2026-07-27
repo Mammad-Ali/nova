@@ -9,6 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../services_ping/presentation/service_ping_sheet.dart';
 import '../../../settings/settings_sheet.dart';
 import '../../../throttling/presentation/throttle_card.dart';
+import '../../../wifi/wifi_chip.dart';
 import '../../data/datasources/ip_info.dart';
 import '../../domain/entities/speedtest_models.dart';
 import '../providers/speedtest_history_provider.dart';
@@ -102,6 +103,8 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                   color: gaugeColor),
               const SizedBox(height: 14),
               _ProviderRow(strings: t, serverName: s.serverName),
+              const SizedBox(height: 8),
+              const WifiChip(),
               const SizedBox(height: 18),
               Row(
                 children: [

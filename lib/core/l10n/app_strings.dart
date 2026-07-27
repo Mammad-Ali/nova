@@ -119,6 +119,7 @@ class AppStrings {
     required this.throttleSuspected,
     required this.throttleLikely,
     required this.throttleLocalCache,
+    required this.wifiTitle,
     required this.settings,
     required this.alertsEnable,
     required this.alertMinSpeed,
@@ -235,6 +236,7 @@ class AppStrings {
   final String throttleSuspected;
   final String throttleLikely;
   final String throttleLocalCache;
+  final String wifiTitle;
 
   // Настройки, уведомления, экспорт
   final String settings;
@@ -360,6 +362,7 @@ const _en = AppStrings(
   throttleSuspected: 'Video is noticeably slower',
   throttleLikely: 'Video is heavily slowed down',
   throttleLocalCache: 'Provider hosts a local video cache',
+  wifiTitle: 'Wi-Fi',
   settings: 'Settings',
   alertsEnable: 'System notifications',
   alertMinSpeed: 'Warn below (Mbps)',
@@ -465,6 +468,7 @@ const _az = AppStrings(
   throttleSuspected: 'Video nəzərəçarpacaq dərəcədə yavaşdır',
   throttleLikely: 'Video ciddi şəkildə yavaşladılır',
   throttleLocalCache: 'Provayderdə lokal video keş var',
+  wifiTitle: 'Wi-Fi',
   settings: 'Tənzimləmələr',
   alertsEnable: 'Sistem bildirişləri',
   alertMinSpeed: 'Xəbərdarlıq həddi (Mbps)',
@@ -570,6 +574,7 @@ const _ru = AppStrings(
   throttleSuspected: 'Видео заметно медленнее',
   throttleLikely: 'Видео сильно замедляется',
   throttleLocalCache: 'У провайдера локальный кэш видео',
+  wifiTitle: 'Wi-Fi',
   settings: 'Настройки',
   alertsEnable: 'Системные уведомления',
   alertMinSpeed: 'Предупреждать ниже (Мбит/с)',

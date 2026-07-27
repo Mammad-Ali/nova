@@ -1,4 +1,5 @@
 import Cocoa
+import CoreWLAN
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow {
@@ -38,6 +39,32 @@ class MainFlutterWindow: NSWindow {
             }
         }
         result([Int64(bitPattern: rx), Int64(bitPattern: tx)])
+    }
+    // --------------------------------------------------------
+
+    // --- Канал Wi-Fi: имя сети, уровень сигнала, скорость линка ---
+    // Важно: начиная с macOS 14 имя сети (SSID) отдаётся только при выданном
+    // доступе к геопозиции, а вот RSSI, скорость линка и канал доступны
+    // всегда — поэтому SSID может быть nil, и это нормально.
+    FlutterMethodChannel(
+        name: "net_pulse/wifi",
+        binaryMessenger: flutterViewController.engine.binaryMessenger
+    ).setMethodCallHandler { call, result in
+        guard call.method == "getInfo" else {
+            result(FlutterMethodNotImplemented); return
+        }
+        guard let iface = CWWiFiClient.shared().interface(), iface.powerOn() else {
+            result(nil) // Wi-Fi выключен или интерфейса нет (Ethernet)
+            return
+        }
+        var info: [String: Any] = [:]
+        if let ssid = iface.ssid() { info["ssid"] = ssid }
+        if let name = iface.interfaceName { info["interface"] = name }
+        info["rssi"] = iface.rssiValue()
+        info["noise"] = iface.noiseMeasurement()
+        info["txRate"] = iface.transmitRate()
+        if let ch = iface.wlanChannel() { info["channel"] = ch.channelNumber }
+        result(info)
     }
     // --------------------------------------------------------
 
