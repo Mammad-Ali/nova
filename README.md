@@ -1,17 +1,56 @@
-# net_pulse
+# Pulsar
 
-A new Flutter project.
+Кроссплатформенное приложение для контроля интернета: активный тест скорости
+и пассивный монитор системного трафика. Android, Windows, macOS.
 
-## Getting Started
+## Возможности
 
-This project is a starting point for a Flutter application.
+**Тест скорости**
+- Замер download / upload / пинга / джиттера через публичные CDN
+- Автопереключение серверов (Cloudflare → Cachefly → Hetzner), если основной
+  недоступен или лимитирует запросы
+- **Пинг под нагрузкой (bufferbloat)** — показывает, насколько растут задержки,
+  когда канал занят: именно это портит игры и звонки
+- Оценка соединения A+…E, личный рекорд, сравнение с прошлым тестом
+- Шкала комфорта: для чего хватит этой скорости (4K, игры, стримы)
+- История тестов, экспорт в CSV, результат картинкой
 
-A few resources to get you started if this is your first Flutter project:
+**Монитор трафика**
+- Системная скорость приёма/отдачи, обновление раз в секунду
+- Статистика за час и за день
+- Монитор стабильности: график задержки и потери пакетов
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+**Оболочка**
+- Иконка в меню-баре (macOS) / трее (Windows) с живой скоростью
+- Уведомления при падении скорости и превышении лимита трафика
+- Три языка: английский, азербайджанский, русский
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Архитектура
+
+Clean Architecture, feature-first. Слои: `presentation → domain ← data`.
+Тест скорости выполняется в отдельном изоляте, чтобы не блокировать интерфейс.
+
+Системный трафик читается нативно через `MethodChannel` `net_pulse/traffic`
+(метод `getCounters` → `[totalRx, totalTx]`):
+
+| Платформа | Источник |
+|-----------|----------|
+| macOS | `getifaddrs` (Swift) |
+| Android | `TrafficStats` (Kotlin) |
+| Windows | `GetIfTable2` (C++) |
+
+## Сборка
+
+```bash
+flutter pub get
+flutter run -d macos      # или -d windows, или устройство Android
+```
+
+Готовые сборки для Android и Windows собираются автоматически в GitHub Actions —
+APK лежит в артефактах запуска (вкладка Actions).
+
+## Тесты
+
+```bash
+flutter test
+```
