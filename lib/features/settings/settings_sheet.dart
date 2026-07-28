@@ -65,14 +65,6 @@ class _SettingsSheet extends ConsumerWidget {
                     ),
                   ),
                 ),
-                _ThemePicker(
-                  label: t.themeLabel,
-                  mode: s.themeMode,
-                  systemLabel: t.themeSystem,
-                  lightLabel: t.themeLight,
-                  darkLabel: t.themeDark,
-                  onChanged: notifier.setThemeMode,
-                ),
                 SwitchListTile(
                   value: s.alertsEnabled,
                   onChanged: notifier.setAlertsEnabled,
@@ -207,69 +199,5 @@ class _NumberFieldState extends State<_NumberField> {
   void _apply(String text) {
     final v = double.tryParse(text.trim().replaceAll(',', '.'));
     widget.onChanged(v != null && v > 0 ? v : null);
-  }
-}
-
-/// Выбор темы: по системе / светлая / тёмная.
-class _ThemePicker extends StatelessWidget {
-  const _ThemePicker({
-    required this.label,
-    required this.mode,
-    required this.systemLabel,
-    required this.lightLabel,
-    required this.darkLabel,
-    required this.onChanged,
-  });
-
-  final String label;
-  final ThemeMode mode;
-  final String systemLabel;
-  final String lightLabel;
-  final String darkLabel;
-  final ValueChanged<ThemeMode> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(color: AppColors.textMid, fontSize: 13),
-          ),
-          const SizedBox(height: 8),
-          SegmentedButton<ThemeMode>(
-            segments: [
-              ButtonSegment(
-                value: ThemeMode.system,
-                icon: const Icon(Icons.brightness_auto_rounded, size: 16),
-                label: Text(systemLabel),
-              ),
-              ButtonSegment(
-                value: ThemeMode.light,
-                icon: const Icon(Icons.light_mode_rounded, size: 16),
-                label: Text(lightLabel),
-              ),
-              ButtonSegment(
-                value: ThemeMode.dark,
-                icon: const Icon(Icons.dark_mode_rounded, size: 16),
-                label: Text(darkLabel),
-              ),
-            ],
-            selected: {mode},
-            showSelectedIcon: false,
-            onSelectionChanged: (v) => onChanged(v.first),
-            style: ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              textStyle: WidgetStatePropertyAll(
-                TextStyle(fontSize: 12, color: AppColors.onGlass),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

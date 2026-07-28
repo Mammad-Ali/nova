@@ -38,7 +38,7 @@ class CompactPanel extends ConsumerWidget {
                   shaderCallback: (r) =>
                       AppColors.primaryGradient.createShader(r),
                   child: Text(
-                    'Pulsar',
+                    'Nova',
                     style: TextStyle(
                       color: AppColors.onGlass,
                       fontSize: 18,
@@ -227,13 +227,16 @@ class _TestButton extends StatelessWidget {
       child: Container(
         height: 44,
         alignment: Alignment.center,
+        // Без заливки и свечения: только тонкая обводка на чёрном.
         decoration: BoxDecoration(
-          gradient: running ? null : AppColors.primaryGradient,
-          color: running ? AppColors.red.withValues(alpha: 0.14) : null,
+          color: running ? AppColors.red.withValues(alpha: 0.10) : null,
           borderRadius: BorderRadius.circular(14),
-          border: running
-              ? Border.all(color: AppColors.red.withValues(alpha: 0.5))
-              : null,
+          border: Border.all(
+            color: running
+                ? AppColors.red.withValues(alpha: 0.55)
+                : Colors.white.withValues(alpha: 0.75),
+            width: 1.2,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

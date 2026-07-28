@@ -158,18 +158,10 @@ class _NavItem extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 260),
           curve: Curves.easeOut,
+          // Активная вкладка — белая «пилюля» с чёрным текстом, без свечения.
           decoration: BoxDecoration(
-            gradient: selected ? AppColors.primaryGradient : null,
+            color: selected ? Colors.white : null,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: AppColors.accentDown.withValues(alpha: 0.30),
-                      blurRadius: 16,
-                      spreadRadius: -3,
-                    ),
-                  ]
-                : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -177,13 +169,13 @@ class _NavItem extends StatelessWidget {
               Icon(
                 icon,
                 size: 20,
-                color: selected ? Colors.white : AppColors.textLo,
+                color: selected ? Colors.black : AppColors.textLo,
               ),
               const SizedBox(width: 8),
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 260),
                 style: TextStyle(
-                  color: selected ? Colors.white : AppColors.textLo,
+                  color: selected ? Colors.black : AppColors.textLo,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),

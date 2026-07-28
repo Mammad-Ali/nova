@@ -7,7 +7,6 @@ import 'core/app_activity.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/l10n/locale_provider.dart';
 import 'core/notifications/notification_service.dart';
-import 'core/settings/app_settings.dart';
 import 'core/theme/app_theme.dart';
 import 'features/alerts/alerts_watcher.dart';
 import 'features/traffic_monitor/presentation/providers/stability_provider.dart';
@@ -23,17 +22,17 @@ Future<void> main() async {
   await TrayService.instance.init();
   await NotificationService.instance.init();
 
-  runApp(const ProviderScope(child: PulsarApp()));
+  runApp(const ProviderScope(child: NovaApp()));
 }
 
-class PulsarApp extends ConsumerStatefulWidget {
-  const PulsarApp({super.key});
+class NovaApp extends ConsumerStatefulWidget {
+  const NovaApp({super.key});
 
   @override
-  ConsumerState<PulsarApp> createState() => _PulsarAppState();
+  ConsumerState<NovaApp> createState() => _NovaAppState();
 }
 
-class _PulsarAppState extends ConsumerState<PulsarApp> {
+class _NovaAppState extends ConsumerState<NovaApp> {
   @override
   void initState() {
     super.initState();
@@ -70,27 +69,10 @@ class _PulsarAppState extends ConsumerState<PulsarApp> {
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeProvider);
-    final mode = ref.watch(appSettingsProvider.select((s) => s.themeMode));
-
-    // Какая палитра активна сейчас: при ThemeMode.system спрашиваем систему.
-    final systemDark =
-        MediaQuery.platformBrightnessOf(context) == Brightness.dark;
-    final isDark = switch (mode) {
-      ThemeMode.dark => true,
-      ThemeMode.light => false,
-      ThemeMode.system => systemDark,
-    };
-
-    // Ставим палитру ДО построения дерева: виджеты и CustomPainter читают
-    // цвета через AppColors, поэтому к моменту отрисовки она должна быть новой.
-    applyPalette(isDark ? kDarkPalette : kLightPalette);
-
     return MaterialApp(
-      title: 'Pulsar',
+      title: 'Nova',
       debugShowCheckedModeBanner: false,
-      theme: buildNetPulseTheme(kLightPalette),
-      darkTheme: buildNetPulseTheme(kDarkPalette),
-      themeMode: mode,
+      theme: buildNovaTheme(),
       locale: locale.locale,
       supportedLocales: AppLocale.values.map((e) => e.locale),
       localizationsDelegates: const [

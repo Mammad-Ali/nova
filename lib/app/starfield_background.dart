@@ -9,13 +9,13 @@ import '../core/theme/app_theme.dart';
 import '../features/speedtest/presentation/providers/speedtest_provider.dart';
 import '../features/traffic_monitor/presentation/providers/traffic_provider.dart';
 
-/// Живой фон «глубокий космос»: три слоя звёзд с параллаксом плюс частицы,
-/// вращающиеся вокруг центра по настоящей орбитальной механике.
+/// Живой фон Nova: чёрное небо, три слоя белых звёзд с параллаксом плюс
+/// белые частицы, вращающиеся вокруг центра по орбитальной механике.
 ///
 /// Физика: на каждую частицу действует притяжение к центру `a = GM/r²`,
 /// интегрирование полуявным методом Эйлера. Курсор работает как источник
 /// отталкивания, поэтому вокруг него образуется «пузырь» пустоты.
-/// Цвет частиц зависит от текущей скорости интернета.
+/// Скорость интернета делает частицы ярче, но цвета на фоне нет.
 class StarfieldBackground extends ConsumerStatefulWidget {
   const StarfieldBackground({super.key});
 
@@ -117,9 +117,9 @@ class _Orbiter {
 }
 
 class _SpaceSim extends ChangeNotifier {
-  // Экономный режим: столько звёзд и частиц просили в настройках дизайна.
-  static const _starCount = 60;
-  static const _orbiterCount = 25;
+  // Плотное звёздное небо: столько объектов просил пользователь.
+  static const _starCount = 250;
+  static const _orbiterCount = 80;
 
   /// Гравитационный параметр (GM). Подобран так, чтобы оборот на средней
   /// орбите занимал ~10-20 секунд: движение заметное, но спокойное.
@@ -257,46 +257,11 @@ class _SpacePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     sim.resize(size);
 
-    // Фон: почти чёрный, с лёгким подъёмом синевы кверху.
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [AppColors.bg1, AppColors.bg0],
-        ).createShader(Offset.zero & size),
-    );
+    // Чистый чёрный фон — как настоящее ночное небо.
+    canvas.drawRect(Offset.zero & size, Paint()..color = AppColors.bg0);
 
-    _drawNebula(canvas, size);
     _drawStars(canvas, size);
     _drawOrbiters(canvas, size);
-  }
-
-  /// Едва различимые облака туманности — дают цвет, не мешая читать текст.
-  void _drawNebula(Canvas canvas, Size size) {
-    final t = sim.time;
-    void cloud(double cx, double cy, double sp, Color color, double base) {
-      final x = (cx + math.sin(t * sp) * 0.05) * size.width;
-      final y = (cy + math.cos(t * sp * 0.7) * 0.04) * size.height;
-      final r = size.longestSide * 0.45;
-      final alpha = (base + 0.06 * sim.level).clamp(0.0, 1.0);
-      canvas.drawCircle(
-        Offset(x, y),
-        r,
-        Paint()
-          ..shader = RadialGradient(
-            colors: [
-              color.withValues(alpha: alpha),
-              color.withValues(alpha: 0.0),
-            ],
-          ).createShader(Rect.fromCircle(center: Offset(x, y), radius: r)),
-      );
-    }
-
-    cloud(0.26, 0.24, 0.05, AppColors.nebulaIndigo, 0.10);
-    cloud(0.78, 0.36, 0.04, AppColors.nebulaViolet, 0.07);
-    cloud(0.5, 0.86, 0.03, AppColors.nebulaPink, 0.05);
   }
 
   /// Три слоя звёзд: дальние почти неподвижны, ближние заметно плывут.
@@ -309,10 +274,8 @@ class _SpacePainter extends CustomPainter {
       final tw = 0.55 + 0.45 * math.sin(sim.time * s.twinkleRate + s.phase);
       // Дальние слои тусклее — это и создаёт ощущение глубины.
       final depth = 0.45 + 0.275 * s.layer;
-      // На светлом «рассветном» небе звёзды тусклее, иначе они выглядят
-      // грязными точками вместо намёка на уходящую ночь.
-      final base = AppColors.isDark ? 0.30 + 0.5 * tw : 0.10 + 0.18 * tw;
-      paint.color = AppColors.starColor.withValues(alpha: base * depth);
+      paint.color =
+          AppColors.starColor.withValues(alpha: (0.30 + 0.55 * tw) * depth);
       canvas.drawCircle(
         Offset(s.x * size.width, y * size.height),
         s.size * (0.9 + 0.2 * tw),
@@ -325,31 +288,13 @@ class _SpacePainter extends CustomPainter {
   void _drawOrbiters(Canvas canvas, Size size) {
     final paint = Paint();
     for (final o in sim.orbiters) {
-      final color = orbitColor((sim.level + o.hueShift).clamp(0.0, 1.0));
-      // Слегка подсвечиваем быстрые частицы — свечения по дизайну минимум.
-      final alpha = (0.35 + 0.4 * sim.level) * o.mass;
-      paint.color = color.withValues(alpha: alpha.clamp(0.0, 0.9));
-      canvas.drawCircle(o.pos, 1.1 + 1.6 * o.mass, paint);
+      // Частицы белые, как звёзды: цвета на фоне нет вообще.
+      final alpha = (0.35 + 0.35 * sim.level) * o.mass;
+      paint.color = AppColors.starColor.withValues(alpha: alpha.clamp(0.0, 0.95));
+      canvas.drawCircle(o.pos, 1.1 + 1.5 * o.mass, paint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _SpacePainter oldDelegate) => false;
-}
-
-/// Цвет частиц по «энергии» 0..1: индиго → фиолет → розовый → тёплый.
-Color orbitColor(double t) {
-  final x = t.clamp(0.0, 1.0);
-  final stops = [
-    (0.0, AppColors.nebulaIndigo),
-    (0.45, AppColors.nebulaViolet),
-    (0.8, AppColors.nebulaPink),
-    (1.0, AppColors.amber),
-  ];
-  for (var i = 0; i < stops.length - 1; i++) {
-    final (p0, c0) = stops[i];
-    final (p1, c1) = stops[i + 1];
-    if (x <= p1) return Color.lerp(c0, c1, (x - p0) / (p1 - p0))!;
-  }
-  return stops.last.$2;
 }

@@ -182,7 +182,7 @@ class ResultSummary extends ConsumerWidget {
     final info = ref.read(ipInfoProvider).asData?.value;
     final grade = gradeForDownload(download);
     final buffer = StringBuffer()
-      ..writeln('Pulsar — speedtest')
+      ..writeln('Nova — speedtest')
       ..writeln('${strings.download}: ${_fmt(download)} Mbps')
       ..writeln('${strings.upload}: ${_fmt(upload)} Mbps')
       ..writeln('${strings.ping}: ${_fmt(ping)} ms')

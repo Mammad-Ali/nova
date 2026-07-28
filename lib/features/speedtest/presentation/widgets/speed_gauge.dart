@@ -3,14 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../../../../app/starfield_background.dart' show orbitColor;
 import '../../../../core/theme/app_theme.dart';
 
-/// Радиальный спидометр на 270° в стиле «глубокий космос».
+/// Радиальный спидометр на 270° с солнечно-жёлтой шкалой.
 ///
 /// Текущее значение показывает тонкий луч от центра к шкале. Вокруг циферблата
-/// по орбитам движутся частицы: чем выше скорость, тем их больше и тем быстрее
-/// они летят. Свечения намеренно минимум — читаемость важнее эффекта.
+/// вращаются жёлтые частицы, и скорость их вращения напрямую зависит от
+/// скорости интернета — чем быстрее канал, тем быстрее крутится «корона».
 class SpeedGauge extends StatefulWidget {
   const SpeedGauge({
     super.key,
@@ -26,7 +25,7 @@ class SpeedGauge extends StatefulWidget {
   final double max;
   final Widget child;
 
-  /// Цвет шкалы. null — взять акцент загрузки из активной палитры.
+  /// Цвет шкалы. null — солнечно-жёлтый акцент приложения.
   final Color? color;
 
   /// Идёт ли тест сейчас (включает «разгон» луча при старте).
@@ -50,12 +49,12 @@ class _SpeedGaugeState extends State<SpeedGauge>
   double _display = 0; // сглаженная доля шкалы
   double _revStart = -1; // время старта «разгона»
   bool _prevActive = false;
-  late Color _color = widget.color ?? AppColors.accentDown;
+  late Color _color = widget.color ?? AppColors.sun;
 
   @override
   void initState() {
     super.initState();
-    _color = widget.color ?? AppColors.accentDown;
+    _color = widget.color ?? AppColors.sun;
     _ticker = createTicker(_tick)..start();
   }
 
@@ -92,10 +91,11 @@ class _SpeedGaugeState extends State<SpeedGauge>
     }
     final shown = math.max(_display, rev);
 
-    _orbit += dtc * (0.10 + shown * 0.55);
+    // Вращение «короны»: в покое едва ползёт, на максимуме — вихрь.
+    _orbit += dtc * (0.05 + shown * 1.6);
     // Плавная смена цвета при переходе фаз (download ↔ upload).
     _color = Color.lerp(
-        _color, widget.color ?? AppColors.accentDown, 1 - math.exp(-dtc * 5))!;
+        _color, widget.color ?? AppColors.sun, 1 - math.exp(-dtc * 5))!;
 
     _anim.update(shown, _orbit, shown, widget.active, _color);
   }
@@ -128,7 +128,7 @@ class _GaugeAnim extends ChangeNotifier {
   double orbit = 0;
   double speed = 0;
   bool active = false;
-  Color color = const Color(0xFF818CF8);
+  Color color = AppColors.sun;
 
   void update(double f, double o, double s, bool a, Color c) {
     fraction = f;
@@ -278,10 +278,10 @@ class _GaugePainter extends CustomPainter {
       final ang = anim.orbit * rate * math.pi * 2 + i * 2.399; // золотой угол
       final pos = center + Offset(math.cos(ang), math.sin(ang)) * rr;
 
-      final color = orbitColor((speed + ring * 0.12).clamp(0.0, 1.0));
-      paint.color = color.withValues(
-          alpha: (0.30 + 0.45 * speed) * (1.0 - ring * 0.2));
-      canvas.drawCircle(pos, 1.4 + 1.1 * speed, paint);
+      // Жёлтые, как солнечная корона; дальние кольца бледнее.
+      paint.color = AppColors.sun
+          .withValues(alpha: (0.35 + 0.45 * speed) * (1.0 - ring * 0.22));
+      canvas.drawCircle(pos, 1.5 + 1.2 * speed, paint);
     }
   }
 

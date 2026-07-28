@@ -74,7 +74,7 @@ Future<Uint8List?> renderShareCard(ShareCardData d) async {
   }
 
   // Заголовок.
-  _text(canvas, 'Pulsar', const Offset(64, 52),
+  _text(canvas, 'Nova', const Offset(64, 52),
       size: 44, weight: FontWeight.w900, color: AppColors.onGlass);
   _text(canvas, d.dateLabel, const Offset(64, 108),
       size: 20, color: AppColors.textLo);

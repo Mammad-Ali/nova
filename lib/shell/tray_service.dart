@@ -40,7 +40,7 @@ class TrayService with TrayListener, WindowListener {
           : 'assets/tray/tray_template.png',
       isTemplate: Platform.isMacOS, // macOS сам перекрасит под тему меню-бара
     );
-    await trayManager.setToolTip('Pulsar');
+    await trayManager.setToolTip('Nova');
     await _rebuildMenu();
 
     _ready = true;
@@ -48,7 +48,7 @@ class TrayService with TrayListener, WindowListener {
 
   Future<void> _rebuildMenu() async {
     await trayManager.setContextMenu(Menu(items: [
-      MenuItem(key: _kShow, label: 'Pulsar'),
+      MenuItem(key: _kShow, label: 'Nova'),
       MenuItem.separator(),
       MenuItem(key: _kQuit, label: 'Quit'),
     ]));
@@ -82,7 +82,7 @@ class TrayService with TrayListener, WindowListener {
 
     final rx = formatRate(rxPerSec);
     final tx = formatRate(txPerSec);
-    final tooltip = 'Pulsar\n'
+    final tooltip = 'Nova\n'
         '↓ ${rx.value} ${rx.unit}   ↑ ${tx.value} ${tx.unit}\n'
         'За час: ${hour.value} ${hour.unit}';
     if (tooltip != _lastTooltip) {

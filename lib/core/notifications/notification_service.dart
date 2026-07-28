@@ -17,7 +17,7 @@ class NotificationService {
   Future<void> init() async {
     if (!_supported || _ready) return;
     try {
-      await localNotifier.setup(appName: 'Pulsar');
+      await localNotifier.setup(appName: 'Nova');
       _ready = true;
     } catch (_) {
       // Без уведомлений приложение работает как обычно.

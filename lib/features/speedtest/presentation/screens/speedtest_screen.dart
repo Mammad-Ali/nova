@@ -61,8 +61,8 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
       }
     });
 
-    final gaugeColor =
-        s.phase == TestPhase.upload ? AppColors.accentUp : AppColors.accentDown;
+    // Шкала всегда солнечно-жёлтая; цветом различаются только метрики ниже.
+    const gaugeColor = AppColors.sun;
     final gaugeValue = s.isRunning ? s.displayMbps : (s.downloadMbps ?? 0);
 
     final showComfort = !s.isRunning &&
@@ -228,7 +228,7 @@ class _Title extends StatelessWidget {
                 shaderCallback: (r) =>
                     AppColors.primaryGradient.createShader(r),
                 child: Text(
-                  'Pulsar',
+                  'Nova',
                   style: TextStyle(
                     color: AppColors.onGlass,
                     fontSize: 32,
@@ -529,22 +529,16 @@ class _ActionButton extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 260),
         height: 62,
+        // Без заливки и свечения: только тонкая обводка на чёрном.
         decoration: BoxDecoration(
-          gradient: running ? null : AppColors.primaryGradient,
-          color: running ? AppColors.red.withValues(alpha: 0.14) : null,
+          color: running ? AppColors.red.withValues(alpha: 0.10) : null,
           borderRadius: BorderRadius.circular(20),
-          border: running
-              ? Border.all(color: AppColors.red.withValues(alpha: 0.5))
-              : null,
-          boxShadow: running
-              ? null
-              : [
-                  BoxShadow(
-                    color: AppColors.nebulaViolet.withValues(alpha: 0.35),
-                    blurRadius: 24,
-                    spreadRadius: -4,
-                  ),
-                ],
+          border: Border.all(
+            color: running
+                ? AppColors.red.withValues(alpha: 0.55)
+                : Colors.white.withValues(alpha: 0.75),
+            width: 1.4,
+          ),
         ),
         alignment: Alignment.center,
         child: Row(
