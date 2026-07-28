@@ -148,10 +148,10 @@ class _GaugePainter extends CustomPainter {
   static const _startDeg = 135.0;
   static const _sweepDeg = 270.0;
 
-  /// Сколько частиц на орбитах: от 6 в покое до 20 на максимуме
-  /// (экономный режим оформления).
-  static const _minOrbiters = 6;
-  static const _maxOrbiters = 20;
+  /// Сколько частиц на орбитах: от 12 в покое до 64 на максимуме —
+  /// во время замера вокруг шкалы закручивается плотная «корона».
+  static const _minOrbiters = 12;
+  static const _maxOrbiters = 64;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -271,16 +271,16 @@ class _GaugePainter extends CustomPainter {
 
     for (var i = 0; i < count; i++) {
       // Три кольца на разных радиусах — простая, но убедительная глубина.
-      final ring = i % 3;
-      final rr = radius * (1.10 + ring * 0.075);
+      final ring = i % 4;
+      final rr = radius * (1.09 + ring * 0.065);
       // Внешние кольца отстают — как настоящие орбиты (дальше = медленнее).
-      final rate = 1.0 - ring * 0.22;
+      final rate = 1.0 - ring * 0.17;
       final ang = anim.orbit * rate * math.pi * 2 + i * 2.399; // золотой угол
       final pos = center + Offset(math.cos(ang), math.sin(ang)) * rr;
 
       // Жёлтые, как солнечная корона; дальние кольца бледнее.
       paint.color = AppColors.sun
-          .withValues(alpha: (0.35 + 0.45 * speed) * (1.0 - ring * 0.22));
+          .withValues(alpha: (0.35 + 0.45 * speed) * (1.0 - ring * 0.17));
       canvas.drawCircle(pos, 1.5 + 1.2 * speed, paint);
     }
   }

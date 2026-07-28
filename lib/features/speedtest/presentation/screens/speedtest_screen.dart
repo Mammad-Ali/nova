@@ -224,23 +224,19 @@ class _Title extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ShaderMask(
-                shaderCallback: (r) =>
-                    AppColors.primaryGradient.createShader(r),
-                child: Text(
-                  'Nova',
-                  style: TextStyle(
-                    color: AppColors.onGlass,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                  ),
+              Text(
+                'Nova',
+                style: TextStyle(
+                  color: AppColors.sun,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 strings.speedtestSubtitle,
-                style: TextStyle(color: AppColors.textLo, fontSize: 14),
+                style: TextStyle(color: AppColors.onGlass, fontSize: 14),
               ),
             ],
           ),

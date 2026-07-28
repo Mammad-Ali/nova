@@ -106,23 +106,19 @@ class _Header extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ShaderMask(
-                shaderCallback: (r) =>
-                    AppColors.primaryGradient.createShader(r),
-                child: Text(
-                  strings.tabMonitor,
-                  style: TextStyle(
-                    color: AppColors.onGlass,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
+              Text(
+                strings.tabMonitor,
+                style: TextStyle(
+                  color: AppColors.sun,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 strings.monitorSubtitle,
-                style: TextStyle(color: AppColors.textLo, fontSize: 14),
+                style: TextStyle(color: AppColors.onGlass, fontSize: 14),
               ),
             ],
           ),

@@ -34,16 +34,12 @@ class CompactPanel extends ConsumerWidget {
           DragToMoveArea(
             child: Row(
               children: [
-                ShaderMask(
-                  shaderCallback: (r) =>
-                      AppColors.primaryGradient.createShader(r),
-                  child: Text(
-                    'Nova',
-                    style: TextStyle(
-                      color: AppColors.onGlass,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                    ),
+                Text(
+                  'Nova',
+                  style: TextStyle(
+                    color: AppColors.sun,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
                 const Spacer(),
