@@ -36,13 +36,41 @@ jobs:
           cache: true
       - run: flutter pub get
 
+      # Ключ подписи хранится в секретах репозитория: сам файл в git не
+      # лежит. Без него сборка не падает, а просто уходит на debug-подпись.
+      - name: Restore release keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "Секрет с ключом не задан — сборка уйдёт на debug-подпись."
+            exit 0
+          fi
+          mkdir -p android/keys
+          echo "$KEYSTORE_B64" | base64 --decode > android/keys/nova-release.p12
+          cat > android/key.properties <<EOF
+          storeFile=keys/nova-release.p12
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=nova
+          keyPassword=$KEYSTORE_PASSWORD
+          EOF
+          echo "Ключ восстановлен."
+
       # Разбиваем по ABI: каждый APK меньше и ставится быстрее.
-      # Сборка debug-подписью — для установки «для себя» этого достаточно.
       - name: Build APK
         run: flutter build apk --release --split-per-abi
 
       - name: Build universal APK
         run: flutter build apk --release
+
+      # Подтверждаем, что APK подписан нашим ключом, а не отладочным:
+      # у отладочного в сертификате стоит CN=Android Debug.
+      - name: Verify signature
+        run: |
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs \
+            build/app/outputs/flutter-apk/app-release.apk | grep -i "Signer #1 certificate DN"
 
       - uses: actions/upload-artifact@v4
         with:
