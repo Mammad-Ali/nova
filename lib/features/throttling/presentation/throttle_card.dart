@@ -36,19 +36,19 @@ class ThrottleCard extends ConsumerWidget {
                   t.throttleTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
               if (s.running)
-                const SizedBox(
+                SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: AppColors.teal),
+                      strokeWidth: 2, color: AppColors.accentAlt),
                 )
               else
                 TextButton(
@@ -61,8 +61,8 @@ class ThrottleCard extends ConsumerWidget {
                   ),
                   child: Text(
                     result == null ? t.throttleRun : t.servicesRefresh,
-                    style: const TextStyle(
-                        color: AppColors.teal,
+                    style: TextStyle(
+                        color: AppColors.accentAlt,
                         fontSize: 12,
                         fontWeight: FontWeight.w600),
                   ),
@@ -72,13 +72,13 @@ class ThrottleCard extends ConsumerWidget {
           const SizedBox(height: 6),
           Text(
             t.throttleHint,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+            style: TextStyle(color: AppColors.textLo, fontSize: 11),
           ),
           if (s.error != null) ...[
             const SizedBox(height: 12),
             Text(
               s.error!,
-              style: const TextStyle(color: AppColors.red, fontSize: 12),
+              style: TextStyle(color: AppColors.red, fontSize: 12),
             ),
           ],
           if (result != null) ...[
@@ -90,7 +90,7 @@ class ThrottleCard extends ConsumerWidget {
                     label: t.throttleNeutral,
                     mbps: result.neutralMbps,
                     peak: _peak(result),
-                    color: AppColors.cyan,
+                    color: AppColors.accentDown,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -144,7 +144,7 @@ class ThrottleCard extends ConsumerWidget {
                 '${t.serverLabel}: ${result.videoHost}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: AppColors.textLo, fontSize: 10),
+                style: TextStyle(color: AppColors.textLo, fontSize: 10),
               ),
             ],
           ],
@@ -180,7 +180,7 @@ class _Bar extends StatelessWidget {
           label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+          style: TextStyle(color: AppColors.textLo, fontSize: 11),
         ),
         const SizedBox(height: 4),
         Text(
@@ -197,7 +197,7 @@ class _Bar extends StatelessWidget {
           child: Stack(
             children: [
               Container(
-                  height: 8, color: Colors.white.withValues(alpha: 0.05)),
+                  height: 8, color: AppColors.onGlass.withValues(alpha: 0.05)),
               FractionallySizedBox(
                 widthFactor: frac,
                 child: Container(height: 8, color: color),

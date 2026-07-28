@@ -9,10 +9,13 @@ import '../core/theme/app_theme.dart';
 import '../features/speedtest/presentation/providers/speedtest_provider.dart';
 import '../features/traffic_monitor/presentation/providers/traffic_provider.dart';
 
-/// Живой фон: дрейфующее звёздное поле поверх мягких волн «северного сияния».
+/// Живой фон «глубокий космос»: три слоя звёзд с параллаксом плюс частицы,
+/// вращающиеся вокруг центра по настоящей орбитальной механике.
 ///
-/// Двигается всегда (не только во время теста); скорость подсвечивает сияние
-/// ярче и чуть разгоняет звёзды.
+/// Физика: на каждую частицу действует притяжение к центру `a = GM/r²`,
+/// интегрирование полуявным методом Эйлера. Курсор работает как источник
+/// отталкивания, поэтому вокруг него образуется «пузырь» пустоты.
+/// Цвет частиц зависит от текущей скорости интернета.
 class StarfieldBackground extends ConsumerStatefulWidget {
   const StarfieldBackground({super.key});
 
@@ -24,8 +27,7 @@ class StarfieldBackground extends ConsumerStatefulWidget {
 class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
-  final _anim = _BgAnim();
-  final List<_Star> _stars = _buildStars(110);
+  final _sim = _SpaceSim();
   Duration _last = Duration.zero;
 
   @override
@@ -37,7 +39,7 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
   @override
   void dispose() {
     _ticker.dispose();
-    _anim.dispose();
+    _sim.dispose();
     super.dispose();
   }
 
@@ -45,13 +47,12 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
     final dt =
         _last == Duration.zero ? 0.016 : (elapsed - _last).inMicroseconds / 1e6;
     _last = elapsed;
-    _anim.advance(dt.clamp(0.0, 0.05));
+    _sim.step(dt.clamp(0.0, 0.05));
   }
 
   @override
   Widget build(BuildContext context) {
-    // Когда окно свёрнуто/не в фокусе — останавливаем анимацию, чтобы не
-    // жечь батарею на невидимых кадрах.
+    // Пока окно свёрнуто или не в фокусе — не жжём батарею на невидимых кадрах.
     final active = ref.watch(uiActiveProvider);
     if (active && !_ticker.isActive) {
       _last = Duration.zero;
@@ -60,142 +61,295 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
       _ticker.stop();
     }
 
-    // Уровень скорости: во время теста — стрелка спидометра, иначе — трафик.
+    // Уровень «энергии»: во время теста — стрелка спидометра, иначе трафик.
     final st = ref.watch(speedTestControllerProvider);
     final speedFrac =
         st.gaugeMax > 0 ? (st.displayMbps / st.gaugeMax).clamp(0.0, 1.0) : 0.0;
     final hist = ref.watch(trafficHistoryProvider);
     final rate = (hist.currentRxPerSec + hist.currentTxPerSec).toDouble();
     final trafficFrac = (rate / (12.5 * 1024 * 1024)).clamp(0.0, 1.0);
-    _anim.level = math.max(speedFrac, trafficFrac).toDouble();
+    _sim.level = math.max(speedFrac, trafficFrac).toDouble();
 
     return Positioned.fill(
-      child: RepaintBoundary(
-        child: CustomPaint(
-          painter: _StarfieldPainter(_anim, _stars),
+      child: MouseRegion(
+        opaque: false,
+        onHover: (e) => _sim.cursor = e.localPosition,
+        onExit: (_) => _sim.cursor = null,
+        child: Listener(
+          behavior: HitTestBehavior.translucent,
+          onPointerMove: (e) => _sim.cursor = e.localPosition,
+          onPointerUp: (_) => _sim.cursor = null,
+          child: RepaintBoundary(
+            child: CustomPaint(painter: _SpacePainter(_sim)),
+          ),
         ),
       ),
     );
   }
 }
 
-class _BgAnim extends ChangeNotifier {
+// ─────────────────────────── симуляция ───────────────────────────
+
+/// Звезда фонового слоя. Позиция нормирована (0..1), чтобы переживать
+/// изменение размера окна.
+class _Star {
+  _Star(this.x, this.y, this.size, this.twinkleRate, this.phase, this.layer);
+
+  final double x, y;
+  final double size;
+  final double twinkleRate;
+  final double phase;
+
+  /// 0 — самый дальний слой, 2 — ближний. Задаёт скорость параллакса.
+  final int layer;
+}
+
+/// Частица на орбите. Координаты и скорость — в пикселях.
+class _Orbiter {
+  _Orbiter(this.pos, this.vel, this.mass, this.hueShift);
+
+  Offset pos;
+  Offset vel;
+  final double mass;
+
+  /// Небольшой сдвиг по палитре, чтобы частицы не были одного цвета.
+  final double hueShift;
+}
+
+class _SpaceSim extends ChangeNotifier {
+  // Экономный режим: столько звёзд и частиц просили в настройках дизайна.
+  static const _starCount = 60;
+  static const _orbiterCount = 25;
+
+  /// Гравитационный параметр (GM). Подобран так, чтобы оборот на средней
+  /// орбите занимал ~10-20 секунд: движение заметное, но спокойное.
+  static const _gm = 26000.0;
+
+  /// Смягчение в знаменателе: не даёт ускорению уйти в бесконечность,
+  /// когда частица подходит вплотную к центру.
+  static const _softening = 40.0;
+
+  /// Сила и радиус отталкивания от курсора.
+  static const _cursorPush = 42000.0;
+  static const _cursorRadius = 130.0;
+
+  final math.Random _rnd = math.Random(11);
+  final List<_Star> stars = [];
+  final List<_Orbiter> orbiters = [];
+
+  Size _size = Size.zero;
   double time = 0;
   double level = 0;
+  Offset? cursor;
 
-  /// Накопленный дрейф звёзд. Интегрируем по dt, а не считаем как время ×
-  /// скорость — иначе при изменении скорости позиция скачком «прыгает».
+  /// Накопленный дрейф слоёв. Интегрируем по dt (а не считаем как
+  /// время × скорость) — иначе при смене скорости звёзды прыгают.
   double drift = 0;
 
-  void advance(double dt) {
+  _SpaceSim() {
+    for (var i = 0; i < _starCount; i++) {
+      final layer = i % 3; // равномерно по трём слоям глубины
+      final big = _rnd.nextDouble() < 0.12;
+      stars.add(_Star(
+        _rnd.nextDouble(),
+        _rnd.nextDouble(),
+        (big ? 1.5 + _rnd.nextDouble() * 1.4 : 0.5 + _rnd.nextDouble() * 0.9) *
+            (0.7 + layer * 0.25), // ближние слои крупнее
+        0.4 + _rnd.nextDouble() * 2.0,
+        _rnd.nextDouble() * math.pi * 2,
+        layer,
+      ));
+    }
+  }
+
+  /// Скорость дрейфа слоя — основа параллакса: дальние почти стоят.
+  static double layerSpeed(int layer) => switch (layer) {
+        0 => 0.25,
+        1 => 0.6,
+        _ => 1.0,
+      };
+
+  void step(double dt) {
     time += dt;
-    drift += dt * (0.015 + level * 0.05);
+    drift += dt * (0.006 + level * 0.02);
+
+    if (_size != Size.zero) {
+      final center = Offset(_size.width / 2, _size.height * 0.42);
+      final maxR = _size.longestSide * 0.62;
+
+      for (final o in orbiters) {
+        // Притяжение к центру: a = GM / (r² + soft²), направлено к центру.
+        final toCenter = center - o.pos;
+        final r2 = toCenter.distanceSquared + _softening * _softening;
+        final invR = 1.0 / math.sqrt(r2);
+        final accMag = _gm / r2;
+        var ax = toCenter.dx * invR * accMag;
+        var ay = toCenter.dy * invR * accMag;
+
+        // Курсор расталкивает частицы: a = k / (d² + soft), от курсора.
+        final c = cursor;
+        if (c != null) {
+          final away = o.pos - c;
+          final d = away.distance;
+          if (d < _cursorRadius && d > 0.001) {
+            final push = _cursorPush / (d * d + 400);
+            ax += away.dx / d * push;
+            ay += away.dy / d * push;
+          }
+        }
+
+        // Полуявный метод Эйлера: сначала скорость, потом позиция — он
+        // устойчивее обычного Эйлера и не «раскручивает» круговые орбиты.
+        o.vel = Offset(o.vel.dx + ax * dt, o.vel.dy + ay * dt);
+        o.pos = o.pos + o.vel * dt;
+
+        // Мягко возвращаем улетевшие частицы, чтобы поле не пустело.
+        final dist = (o.pos - center).distance;
+        if (dist > maxR) {
+          final back = (center - o.pos) / dist;
+          o.vel = o.vel * 0.9 + back * 40;
+        }
+      }
+    }
+
     notifyListeners();
+  }
+
+  /// Раскладывает частицы по орбитам под размер холста.
+  void resize(Size size) {
+    if (size.isEmpty || (size == _size && orbiters.isNotEmpty)) return;
+    _size = size;
+    if (orbiters.isNotEmpty) return; // при ресайзе орбиты не пересоздаём
+
+    final center = Offset(size.width / 2, size.height * 0.42);
+    final minR = size.shortestSide * 0.16;
+    final maxR = size.shortestSide * 0.52;
+
+    for (var i = 0; i < _orbiterCount; i++) {
+      final angle = _rnd.nextDouble() * math.pi * 2;
+      final radius = minR + _rnd.nextDouble() * (maxR - minR);
+      final pos = center + Offset(math.cos(angle), math.sin(angle)) * radius;
+
+      // Круговая скорость v = sqrt(GM/r), перпендикулярно радиусу.
+      // Разброс множителя даёт эллипсы вместо идеальных окружностей.
+      final v = math.sqrt(_gm / radius) * (0.88 + _rnd.nextDouble() * 0.24);
+      final dir = _rnd.nextBool() ? 1.0 : -1.0; // часть летит в обратную сторону
+      final vel = Offset(-math.sin(angle), math.cos(angle)) * v * dir;
+
+      orbiters.add(_Orbiter(
+        pos,
+        vel,
+        0.6 + _rnd.nextDouble() * 0.8,
+        _rnd.nextDouble() * 0.35,
+      ));
+    }
   }
 }
 
-class _Star {
-  _Star(this.x, this.y, this.size, this.speed, this.phase, this.twinkle);
-  final double x, y; // 0..1
-  final double size;
-  final double speed; // множитель дрейфа
-  final double phase;
-  final double twinkle;
-}
+// ─────────────────────────── отрисовка ───────────────────────────
 
-List<_Star> _buildStars(int n) {
-  final rnd = math.Random(7);
-  return List.generate(n, (_) {
-    final big = rnd.nextDouble() < 0.14;
-    return _Star(
-      rnd.nextDouble(),
-      rnd.nextDouble(),
-      big ? 1.6 + rnd.nextDouble() * 1.8 : 0.5 + rnd.nextDouble() * 1.1,
-      0.4 + rnd.nextDouble() * 1.2,
-      rnd.nextDouble() * math.pi * 2,
-      0.5 + rnd.nextDouble() * 2.5,
-    );
-  });
-}
+class _SpacePainter extends CustomPainter {
+  _SpacePainter(this.sim) : super(repaint: sim);
 
-class _StarfieldPainter extends CustomPainter {
-  _StarfieldPainter(this.anim, this.stars) : super(repaint: anim);
-
-  final _BgAnim anim;
-  final List<_Star> stars;
+  final _SpaceSim sim;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final w = size.width, h = size.height;
-    final t = anim.time;
-    final level = anim.level;
+    sim.resize(size);
 
-    // Базовый градиент.
+    // Фон: почти чёрный, с лёгким подъёмом синевы кверху.
     canvas.drawRect(
       Offset.zero & size,
       Paint()
-        ..shader = const LinearGradient(
+        ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [AppColors.bg1, AppColors.bg0],
         ).createShader(Offset.zero & size),
     );
 
-    // Волны северного сияния — три мягких пятна, дрейфуют и «дышат».
-    _aurora(canvas, w, h, t, level, AppColors.auroraGreen,
-        cx: 0.28, cy: 0.30, dx: 0.06, dy: 0.05, sp: 0.35, base: 0.10);
-    _aurora(canvas, w, h, t, level, AppColors.auroraViolet,
-        cx: 0.74, cy: 0.34, dx: 0.07, dy: 0.06, sp: 0.27, base: 0.10);
-    _aurora(canvas, w, h, t, level, AppColors.auroraTeal,
-        cx: 0.5, cy: 0.82, dx: 0.08, dy: 0.04, sp: 0.22, base: 0.08);
+    _drawNebula(canvas, size);
+    _drawStars(canvas, size);
+    _drawOrbiters(canvas, size);
+  }
 
-    // Звёзды.
-    final starPaint = Paint();
-    for (final s in stars) {
-      // Медленный дрейф вверх с оборачиванием (дрейф уже проинтегрирован).
-      final y = ((s.y - anim.drift * s.speed) % 1.0 + 1.0) % 1.0;
-      final x = (s.x + math.sin(t * 0.05 * s.speed + s.phase) * 0.01) % 1.0;
+  /// Едва различимые облака туманности — дают цвет, не мешая читать текст.
+  void _drawNebula(Canvas canvas, Size size) {
+    final t = sim.time;
+    void cloud(double cx, double cy, double sp, Color color, double base) {
+      final x = (cx + math.sin(t * sp) * 0.05) * size.width;
+      final y = (cy + math.cos(t * sp * 0.7) * 0.04) * size.height;
+      final r = size.longestSide * 0.45;
+      final alpha = (base + 0.06 * sim.level).clamp(0.0, 1.0);
+      canvas.drawCircle(
+        Offset(x, y),
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            colors: [
+              color.withValues(alpha: alpha),
+              color.withValues(alpha: 0.0),
+            ],
+          ).createShader(Rect.fromCircle(center: Offset(x, y), radius: r)),
+      );
+    }
 
-      final tw = 0.55 + 0.45 * math.sin(t * s.twinkle + s.phase);
-      final alpha = (0.25 + 0.6 * tw) * (0.7 + 0.3 * level);
-      starPaint.color = Colors.white.withValues(alpha: alpha.clamp(0.0, 1.0));
-      final r = s.size * (0.85 + 0.3 * tw);
-      canvas.drawCircle(Offset(x * w, y * h), r, starPaint);
+    cloud(0.26, 0.24, 0.05, AppColors.nebulaIndigo, 0.10);
+    cloud(0.78, 0.36, 0.04, AppColors.nebulaViolet, 0.07);
+    cloud(0.5, 0.86, 0.03, AppColors.nebulaPink, 0.05);
+  }
+
+  /// Три слоя звёзд: дальние почти неподвижны, ближние заметно плывут.
+  void _drawStars(Canvas canvas, Size size) {
+    final paint = Paint();
+    for (final s in sim.stars) {
+      final speed = _SpaceSim.layerSpeed(s.layer);
+      final y = ((s.y - sim.drift * speed) % 1.0 + 1.0) % 1.0;
+
+      final tw = 0.55 + 0.45 * math.sin(sim.time * s.twinkleRate + s.phase);
+      // Дальние слои тусклее — это и создаёт ощущение глубины.
+      final depth = 0.45 + 0.275 * s.layer;
+      // На светлом «рассветном» небе звёзды тусклее, иначе они выглядят
+      // грязными точками вместо намёка на уходящую ночь.
+      final base = AppColors.isDark ? 0.30 + 0.5 * tw : 0.10 + 0.18 * tw;
+      paint.color = AppColors.starColor.withValues(alpha: base * depth);
+      canvas.drawCircle(
+        Offset(s.x * size.width, y * size.height),
+        s.size * (0.9 + 0.2 * tw),
+        paint,
+      );
     }
   }
 
-  void _aurora(
-    Canvas canvas,
-    double w,
-    double h,
-    double t,
-    double level,
-    Color color, {
-    required double cx,
-    required double cy,
-    required double dx,
-    required double dy,
-    required double sp,
-    required double base,
-  }) {
-    final x = (cx + math.sin(t * sp) * dx) * w;
-    final y = (cy + math.cos(t * sp * 0.8) * dy) * h;
-    final breathe = 0.5 + 0.5 * math.sin(t * sp * 1.3);
-    final radius = math.min(w, h) * (0.42 + 0.05 * breathe);
-    final alpha = (base + 0.22 * level) * (0.7 + 0.3 * breathe);
-    canvas.drawCircle(
-      Offset(x, y),
-      radius,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [
-            color.withValues(alpha: alpha.clamp(0.0, 1.0)),
-            color.withValues(alpha: 0.0),
-          ],
-        ).createShader(Rect.fromCircle(center: Offset(x, y), radius: radius)),
-    );
+  /// Частицы на орбитах. Цвет — по текущей скорости интернета.
+  void _drawOrbiters(Canvas canvas, Size size) {
+    final paint = Paint();
+    for (final o in sim.orbiters) {
+      final color = orbitColor((sim.level + o.hueShift).clamp(0.0, 1.0));
+      // Слегка подсвечиваем быстрые частицы — свечения по дизайну минимум.
+      final alpha = (0.35 + 0.4 * sim.level) * o.mass;
+      paint.color = color.withValues(alpha: alpha.clamp(0.0, 0.9));
+      canvas.drawCircle(o.pos, 1.1 + 1.6 * o.mass, paint);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant _StarfieldPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _SpacePainter oldDelegate) => false;
+}
+
+/// Цвет частиц по «энергии» 0..1: индиго → фиолет → розовый → тёплый.
+Color orbitColor(double t) {
+  final x = t.clamp(0.0, 1.0);
+  final stops = [
+    (0.0, AppColors.nebulaIndigo),
+    (0.45, AppColors.nebulaViolet),
+    (0.8, AppColors.nebulaPink),
+    (1.0, AppColors.amber),
+  ];
+  for (var i = 0; i < stops.length - 1; i++) {
+    final (p0, c0) = stops[i];
+    final (p1, c1) = stops[i + 1];
+    if (x <= p1) return Color.lerp(c0, c1, (x - p0) / (p1 - p0))!;
+  }
+  return stops.last.$2;
 }

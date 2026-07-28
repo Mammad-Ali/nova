@@ -62,7 +62,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
     });
 
     final gaugeColor =
-        s.phase == TestPhase.upload ? AppColors.violet : AppColors.cyan;
+        s.phase == TestPhase.upload ? AppColors.accentUp : AppColors.accentDown;
     final gaugeValue = s.isRunning ? s.displayMbps : (s.downloadMbps ?? 0);
 
     final showComfort = !s.isRunning &&
@@ -124,7 +124,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                       label: t.jitter,
                       value: s.jitterMs,
                       unit: 'ms',
-                      accent: AppColors.blue,
+                      accent: AppColors.accentInfo,
                     ),
                   ),
                 ],
@@ -138,7 +138,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                       label: t.download,
                       value: s.downloadMbps,
                       unit: 'Mbps',
-                      accent: AppColors.cyan,
+                      accent: AppColors.accentDown,
                       highlight: true,
                     ),
                   ),
@@ -149,7 +149,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                       label: t.upload,
                       value: s.uploadMbps,
                       unit: 'Mbps',
-                      accent: AppColors.violet,
+                      accent: AppColors.accentUp,
                     ),
                   ),
                 ],
@@ -227,10 +227,10 @@ class _Title extends StatelessWidget {
               ShaderMask(
                 shaderCallback: (r) =>
                     AppColors.primaryGradient.createShader(r),
-                child: const Text(
+                child: Text(
                   'Pulsar',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.onGlass,
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
@@ -240,7 +240,7 @@ class _Title extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 strings.speedtestSubtitle,
-                style: const TextStyle(color: AppColors.textLo, fontSize: 14),
+                style: TextStyle(color: AppColors.textLo, fontSize: 14),
               ),
             ],
           ),
@@ -248,18 +248,18 @@ class _Title extends StatelessWidget {
         const LanguageButton(),
         IconButton(
           onPressed: () => showServicePingSheet(context),
-          icon: const Icon(Icons.travel_explore_rounded,
+          icon: Icon(Icons.travel_explore_rounded,
               color: AppColors.textMid),
           tooltip: strings.servicesTitle,
         ),
         IconButton(
           onPressed: () => showSpeedTestHistorySheet(context),
-          icon: const Icon(Icons.history_rounded, color: AppColors.textMid),
+          icon: Icon(Icons.history_rounded, color: AppColors.textMid),
           tooltip: strings.historyTitle,
         ),
         IconButton(
           onPressed: () => showSettingsSheet(context),
-          icon: const Icon(Icons.tune_rounded, color: AppColors.textMid),
+          icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
           tooltip: strings.settings,
         ),
       ],
@@ -313,8 +313,8 @@ class _GaugeCenter extends StatelessWidget {
           fit: BoxFit.scaleDown,
           child: Text(
             _fmtMbps(value),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppColors.onGlass,
               fontSize: 64,
               fontWeight: FontWeight.w800,
               height: 1.0,
@@ -322,7 +322,7 @@ class _GaugeCenter extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        const Text(
+        Text(
           'Mbps',
           style: TextStyle(
             color: AppColors.textLo,
@@ -355,7 +355,7 @@ class _PhaseBar extends StatelessWidget {
       child: LinearProgressIndicator(
         value: active ? progress.clamp(0.0, 1.0) : 0,
         minHeight: 6,
-        backgroundColor: Colors.white.withValues(alpha: 0.06),
+        backgroundColor: AppColors.onGlass.withValues(alpha: 0.06),
         valueColor: AlwaysStoppedAnimation(color),
       ),
     );
@@ -381,8 +381,8 @@ class _MetricCard extends StatelessWidget {
   final Color accent;
   final bool highlight;
 
-  static const _numStyle = TextStyle(
-    color: Colors.white,
+  static final _numStyle = TextStyle(
+    color: AppColors.onGlass,
     fontSize: 26,
     fontWeight: FontWeight.w700,
   );
@@ -408,7 +408,7 @@ class _MetricCard extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMid,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -425,7 +425,7 @@ class _MetricCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 value == null
-                    ? const Text('—', style: _numStyle)
+                    ? Text('—', style: _numStyle)
                     // Барабанчик цифр (odometer).
                     : OdometerText(value: value!, decimals: 1, style: _numStyle),
                 const SizedBox(width: 5),
@@ -477,25 +477,25 @@ class _ProviderRow extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.04),
+          color: AppColors.onGlass.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          border: Border.all(color: AppColors.onGlass.withValues(alpha: 0.08)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.dns_rounded, size: 15, color: AppColors.cyan),
+            Icon(Icons.dns_rounded, size: 15, color: AppColors.accentDown),
             const SizedBox(width: 8),
             Text(
               '${strings.providerLabel}: ',
-              style: const TextStyle(color: AppColors.textLo, fontSize: 12),
+              style: TextStyle(color: AppColors.textLo, fontSize: 12),
             ),
             Flexible(
               child: Text(
                 text,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textHi,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -540,7 +540,7 @@ class _ActionButton extends StatelessWidget {
               ? null
               : [
                   BoxShadow(
-                    color: AppColors.auroraTeal.withValues(alpha: 0.35),
+                    color: AppColors.nebulaViolet.withValues(alpha: 0.35),
                     blurRadius: 24,
                     spreadRadius: -4,
                   ),
@@ -585,13 +585,13 @@ class _ErrorBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline_rounded,
+          Icon(Icons.error_outline_rounded,
               color: AppColors.red, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: AppColors.textMid, fontSize: 13),
+              style: TextStyle(color: AppColors.textMid, fontSize: 13),
             ),
           ),
         ],

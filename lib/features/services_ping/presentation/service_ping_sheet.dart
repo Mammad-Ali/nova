@@ -25,11 +25,11 @@ class _ServicePingSheet extends ConsumerWidget {
     final s = ref.watch(servicePingProvider);
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.bg1,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         border: Border.fromBorderSide(
-          BorderSide(color: Colors.white12, width: 1),
+          BorderSide(color: AppColors.onGlass.withValues(alpha: 0.12), width: 1),
         ),
       ),
       child: SafeArea(
@@ -44,7 +44,7 @@ class _ServicePingSheet extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: AppColors.onGlass.withValues(alpha: 0.24),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -55,26 +55,26 @@ class _ServicePingSheet extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         t.servicesTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColors.onGlass,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                     if (s.running)
-                      const SizedBox(
+                      SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.teal,
+                          color: AppColors.accentAlt,
                         ),
                       )
                     else
                       IconButton(
                         onPressed: ref.read(servicePingProvider.notifier).run,
-                        icon: const Icon(Icons.refresh_rounded,
+                        icon: Icon(Icons.refresh_rounded,
                             color: AppColors.textMid),
                         tooltip: t.servicesRefresh,
                       ),
@@ -88,15 +88,15 @@ class _ServicePingSheet extends ConsumerWidget {
                   child: Text(
                     t.servicesHint,
                     style:
-                        const TextStyle(color: AppColors.textLo, fontSize: 12),
+                        TextStyle(color: AppColors.textLo, fontSize: 12),
                   ),
                 ),
               ),
               const SizedBox(height: 12),
               if (s.results.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(32),
-                  child: CircularProgressIndicator(color: AppColors.teal),
+                  child: CircularProgressIndicator(color: AppColors.accentAlt),
                 )
               else
                 ListView.builder(
@@ -140,8 +140,8 @@ class _ServiceRow extends StatelessWidget {
               ping.target.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: AppColors.onGlass,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -152,7 +152,7 @@ class _ServiceRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: Stack(
                 children: [
-                  Container(height: 8, color: Colors.white.withValues(alpha: 0.05)),
+                  Container(height: 8, color: AppColors.onGlass.withValues(alpha: 0.05)),
                   FractionallySizedBox(
                     widthFactor: frac,
                     child: Container(height: 8, color: color),
@@ -186,7 +186,7 @@ class _ServiceRow extends StatelessWidget {
 
 Color _qualityColor(PingQuality q) => switch (q) {
       PingQuality.great => AppColors.green,
-      PingQuality.good => AppColors.teal,
+      PingQuality.good => AppColors.accentAlt,
       PingQuality.fair => AppColors.amber,
       PingQuality.poor => AppColors.red,
       PingQuality.failed => AppColors.textLo,

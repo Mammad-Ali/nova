@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/byte_format.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/network_snapshot.dart';
 import '../providers/traffic_provider.dart' show TrafficHistoryNotifier;
 
@@ -45,7 +46,7 @@ class LiveTrafficChart extends StatelessWidget {
           drawVerticalLine: false,
           horizontalInterval: gridStep,
           getDrawingHorizontalLine: (_) =>
-              FlLine(color: Colors.white.withValues(alpha: 0.05), strokeWidth: 1),
+              FlLine(color: AppColors.onGlass.withValues(alpha: 0.05), strokeWidth: 1),
         ),
         titlesData: FlTitlesData(
           topTitles:
@@ -67,7 +68,7 @@ class LiveTrafficChart extends StatelessWidget {
                   child: Text(
                     '${f.value} ${f.unit}',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.35),
+                      color: AppColors.onGlass.withValues(alpha: 0.35),
                       fontSize: 10,
                     ),
                   ),

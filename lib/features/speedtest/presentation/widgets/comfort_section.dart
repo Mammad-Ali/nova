@@ -35,8 +35,8 @@ class ComfortSection extends StatelessWidget {
         children: [
           Text(
             strings.comfortTitle,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppColors.onGlass,
               fontSize: 15,
               fontWeight: FontWeight.w700,
             ),
@@ -67,7 +67,7 @@ class _ComfortRow extends StatelessWidget {
           Expanded(
             child: Text(
               _activityLabel(strings, item.activity),
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(color: AppColors.onGlass, fontSize: 14),
             ),
           ),
           _LevelPill(color: color, label: _levelLabel(strings, item.level)),
@@ -106,7 +106,7 @@ class _LevelPill extends StatelessWidget {
 Color _levelColor(ComfortLevel level) => switch (level) {
       ComfortLevel.poor => AppColors.red,
       ComfortLevel.ok => AppColors.amber,
-      ComfortLevel.good => AppColors.cyan,
+      ComfortLevel.good => AppColors.accentDown,
       ComfortLevel.great => AppColors.green,
     };
 

@@ -26,10 +26,10 @@ class _SettingsSheet extends ConsumerWidget {
     final notifier = ref.read(appSettingsProvider.notifier);
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.bg1,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border.fromBorderSide(BorderSide(color: Colors.white12)),
+        border: Border.fromBorderSide(BorderSide(color: AppColors.onGlass.withValues(alpha: 0.12))),
       ),
       child: SafeArea(
         top: false,
@@ -47,7 +47,7 @@ class _SettingsSheet extends ConsumerWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white24,
+                    color: AppColors.onGlass.withValues(alpha: 0.24),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -57,21 +57,29 @@ class _SettingsSheet extends ConsumerWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       t.settings,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppColors.onGlass,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ),
+                _ThemePicker(
+                  label: t.themeLabel,
+                  mode: s.themeMode,
+                  systemLabel: t.themeSystem,
+                  lightLabel: t.themeLight,
+                  darkLabel: t.themeDark,
+                  onChanged: notifier.setThemeMode,
+                ),
                 SwitchListTile(
                   value: s.alertsEnabled,
                   onChanged: notifier.setAlertsEnabled,
-                  activeThumbColor: AppColors.auroraTeal,
+                  activeThumbColor: AppColors.nebulaViolet,
                   title: Text(
                     t.alertsEnable,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: AppColors.onGlass, fontSize: 14),
                   ),
                 ),
                 _NumberField(
@@ -88,13 +96,13 @@ class _SettingsSheet extends ConsumerWidget {
                   enabled: s.alertsEnabled,
                   onChanged: notifier.setDailyLimit,
                 ),
-                const Divider(color: Colors.white12, height: 28),
+                Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                 ListTile(
-                  leading: const Icon(Icons.table_view_rounded,
-                      color: AppColors.auroraTeal),
+                  leading: Icon(Icons.table_view_rounded,
+                      color: AppColors.nebulaViolet),
                   title: Text(
                     t.exportCsv,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: AppColors.onGlass, fontSize: 14),
                   ),
                   onTap: () => _exportCsv(context, ref),
                 ),
@@ -174,17 +182,17 @@ class _NumberFieldState extends State<_NumberField> {
               enabled: widget.enabled,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               textAlign: TextAlign.end,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.onGlass),
               decoration: InputDecoration(
                 hintText: widget.hint,
                 hintStyle:
-                    const TextStyle(color: AppColors.textLo, fontSize: 12),
+                    TextStyle(color: AppColors.textLo, fontSize: 12),
                 isDense: true,
-                enabledBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white24),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.onGlass.withValues(alpha: 0.24)),
                 ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.auroraTeal),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.nebulaViolet),
                 ),
               ),
               onSubmitted: _apply,
@@ -199,5 +207,69 @@ class _NumberFieldState extends State<_NumberField> {
   void _apply(String text) {
     final v = double.tryParse(text.trim().replaceAll(',', '.'));
     widget.onChanged(v != null && v > 0 ? v : null);
+  }
+}
+
+/// Выбор темы: по системе / светлая / тёмная.
+class _ThemePicker extends StatelessWidget {
+  const _ThemePicker({
+    required this.label,
+    required this.mode,
+    required this.systemLabel,
+    required this.lightLabel,
+    required this.darkLabel,
+    required this.onChanged,
+  });
+
+  final String label;
+  final ThemeMode mode;
+  final String systemLabel;
+  final String lightLabel;
+  final String darkLabel;
+  final ValueChanged<ThemeMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: AppColors.textMid, fontSize: 13),
+          ),
+          const SizedBox(height: 8),
+          SegmentedButton<ThemeMode>(
+            segments: [
+              ButtonSegment(
+                value: ThemeMode.system,
+                icon: const Icon(Icons.brightness_auto_rounded, size: 16),
+                label: Text(systemLabel),
+              ),
+              ButtonSegment(
+                value: ThemeMode.light,
+                icon: const Icon(Icons.light_mode_rounded, size: 16),
+                label: Text(lightLabel),
+              ),
+              ButtonSegment(
+                value: ThemeMode.dark,
+                icon: const Icon(Icons.dark_mode_rounded, size: 16),
+                label: Text(darkLabel),
+              ),
+            ],
+            selected: {mode},
+            showSelectedIcon: false,
+            onSelectionChanged: (v) => onChanged(v.first),
+            style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              textStyle: WidgetStatePropertyAll(
+                TextStyle(fontSize: 12, color: AppColors.onGlass),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

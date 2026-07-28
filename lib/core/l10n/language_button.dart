@@ -14,7 +14,7 @@ class LanguageButton extends ConsumerWidget {
     final t = ref.watch(stringsProvider);
     return IconButton(
       onPressed: () => _showPicker(context, ref),
-      icon: const Icon(Icons.language_rounded, color: AppColors.textMid),
+      icon: Icon(Icons.language_rounded, color: AppColors.textMid),
       tooltip: t.language,
     );
   }
@@ -26,11 +26,11 @@ class LanguageButton extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.bg1,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           border: Border.fromBorderSide(
-            BorderSide(color: Colors.white12, width: 1),
+            BorderSide(color: AppColors.onGlass.withValues(alpha: 0.12), width: 1),
           ),
         ),
         child: SafeArea(
@@ -47,7 +47,7 @@ class LanguageButton extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: AppColors.onGlass.withValues(alpha: 0.24),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -57,8 +57,8 @@ class LanguageButton extends ConsumerWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     t.language,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColors.onGlass,
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
@@ -102,12 +102,12 @@ class _LanguageTile extends StatelessWidget {
       title: Text(
         locale.nativeName,
         style: TextStyle(
-          color: selected ? AppColors.cyan : Colors.white,
+          color: selected ? AppColors.accentDown : AppColors.onGlass,
           fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
         ),
       ),
       trailing: selected
-          ? const Icon(Icons.check_circle_rounded, color: AppColors.cyan)
+          ? Icon(Icons.check_circle_rounded, color: AppColors.accentDown)
           : null,
     );
   }

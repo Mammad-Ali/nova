@@ -110,6 +110,10 @@ class AppStrings {
     required this.servicesHint,
     required this.servicesRefresh,
     required this.servicesUnreachable,
+    required this.themeLabel,
+    required this.themeSystem,
+    required this.themeLight,
+    required this.themeDark,
     required this.throttleTitle,
     required this.throttleHint,
     required this.throttleRun,
@@ -229,6 +233,10 @@ class AppStrings {
   final String servicesHint;
   final String servicesRefresh;
   final String servicesUnreachable;
+  final String themeLabel;
+  final String themeSystem;
+  final String themeLight;
+  final String themeDark;
   final String throttleTitle;
   final String throttleHint;
   final String throttleRun;
@@ -357,6 +365,10 @@ const _en = AppStrings(
   servicesHint: 'Shows where exactly the delay is, not just "the internet is slow"',
   servicesRefresh: 'Measure again',
   servicesUnreachable: 'no reply',
+  themeLabel: 'Appearance',
+  themeSystem: 'Auto',
+  themeLight: 'Light',
+  themeDark: 'Dark',
   throttleTitle: 'Video throttling check',
   throttleHint: 'Compares speed to a neutral CDN and to Netflix servers',
   throttleRun: 'Check',
@@ -465,6 +477,10 @@ const _az = AppStrings(
   servicesHint: 'Gecikmənin harada olduğunu göstərir, sadəcə «internet yavaşdır» deyil',
   servicesRefresh: 'Yenidən ölç',
   servicesUnreachable: 'cavab yoxdur',
+  themeLabel: 'Görünüş',
+  themeSystem: 'Avto',
+  themeLight: 'İşıqlı',
+  themeDark: 'Qaranlıq',
   throttleTitle: 'Video məhdudlaşdırma yoxlaması',
   throttleHint: 'Adi CDN və Netflix serverlərinə sürəti müqayisə edir',
   throttleRun: 'Yoxla',
@@ -573,6 +589,10 @@ const _ru = AppStrings(
   servicesHint: 'Показывает, где именно задержка, а не просто «интернет тормозит»',
   servicesRefresh: 'Замерить заново',
   servicesUnreachable: 'нет ответа',
+  themeLabel: 'Оформление',
+  themeSystem: 'Авто',
+  themeLight: 'Светлая',
+  themeDark: 'Тёмная',
   throttleTitle: 'Проверка на троттлинг видео',
   throttleHint: 'Сравнивает скорость до обычного CDN и до серверов Netflix',
   throttleRun: 'Проверить',

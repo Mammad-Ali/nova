@@ -40,8 +40,8 @@ class BufferbloatCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   strings.bloatTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                   ),
@@ -60,7 +60,7 @@ class BufferbloatCard extends StatelessWidget {
                   color: AppColors.textMid,
                 ),
               ),
-              const Icon(Icons.arrow_forward_rounded,
+              Icon(Icons.arrow_forward_rounded,
                   size: 16, color: AppColors.textLo),
               Expanded(
                 child: _Value(
@@ -89,7 +89,7 @@ class BufferbloatCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             strings.bloatHint,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+            style: TextStyle(color: AppColors.textLo, fontSize: 11),
           ),
         ],
       ),
@@ -106,7 +106,7 @@ class BufferbloatCard extends StatelessWidget {
 
 Color _levelColor(BloatLevel l) => switch (l) {
       BloatLevel.excellent => AppColors.green,
-      BloatLevel.good => AppColors.cyan,
+      BloatLevel.good => AppColors.accentDown,
       BloatLevel.fair => AppColors.amber,
       BloatLevel.poor => AppColors.red,
     };
@@ -133,7 +133,7 @@ class _Value extends StatelessWidget {
           label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+          style: TextStyle(color: AppColors.textLo, fontSize: 11),
         ),
         const SizedBox(height: 3),
         FittedBox(
@@ -152,7 +152,7 @@ class _Value extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 3),
-              const Text('ms',
+              Text('ms',
                   style: TextStyle(color: AppColors.textLo, fontSize: 11)),
             ],
           ),
@@ -187,7 +187,7 @@ class _BloatBar extends StatelessWidget {
           children: [
             Expanded(
               flex: (idleFrac * 1000).round().clamp(1, 1000),
-              child: Container(color: Colors.white.withValues(alpha: 0.18)),
+              child: Container(color: AppColors.onGlass.withValues(alpha: 0.18)),
             ),
             Expanded(
               flex: ((1 - idleFrac) * 1000).round().clamp(1, 1000),

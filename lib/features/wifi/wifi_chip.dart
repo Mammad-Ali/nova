@@ -37,9 +37,9 @@ class WifiChip extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.04),
+          color: AppColors.onGlass.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          border: Border.all(color: AppColors.onGlass.withValues(alpha: 0.08)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -48,14 +48,14 @@ class WifiChip extends ConsumerWidget {
             const SizedBox(width: 8),
             Text(
               '${t.wifiTitle}: ',
-              style: const TextStyle(color: AppColors.textLo, fontSize: 12),
+              style: TextStyle(color: AppColors.textLo, fontSize: 12),
             ),
             Flexible(
               child: Text(
                 parts.join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textHi,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

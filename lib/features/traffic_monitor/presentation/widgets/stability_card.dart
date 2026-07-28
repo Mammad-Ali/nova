@@ -24,7 +24,7 @@ class StabilityCard extends ConsumerWidget {
         : (loss < 5 ? AppColors.amber : AppColors.red);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+      padding: EdgeInsets.fromLTRB(18, 16, 18, 14),
       decoration: glassCard(glow: outage ? AppColors.red : null),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,16 +34,16 @@ class StabilityCard extends ConsumerWidget {
               Icon(
                 outage ? Icons.wifi_off_rounded : Icons.network_check_rounded,
                 size: 18,
-                color: outage ? AppColors.red : AppColors.teal,
+                color: outage ? AppColors.red : AppColors.accentAlt,
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: Text(
                   strings.stabilityTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                   ),
@@ -61,13 +61,13 @@ class StabilityCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Row(
             children: [
               _Stat(
                 label: strings.ping,
                 value: _ms(s.currentMs),
-                color: Colors.white,
+                color: AppColors.onGlass,
                 big: true,
               ),
               _Stat(label: strings.stabilityAvg, value: _ms(s.avgMs)),
@@ -79,21 +79,21 @@ class StabilityCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           SizedBox(
             height: 62,
             child: _PingChart(samples: s.samples),
           ),
           if (outage) ...[
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Row(
               children: [
-                const Icon(Icons.error_outline_rounded,
+                Icon(Icons.error_outline_rounded,
                     size: 15, color: AppColors.red),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Text(
                   '${strings.stabilityOutage} · ${s.currentOutage}',
-                  style: const TextStyle(color: AppColors.red, fontSize: 12),
+                  style: TextStyle(color: AppColors.red, fontSize: 12),
                 ),
               ],
             ),
@@ -111,13 +111,15 @@ class _Stat extends StatelessWidget {
   const _Stat({
     required this.label,
     required this.value,
-    this.color = AppColors.textMid,
+    this.color,
     this.big = false,
   });
 
   final String label;
   final String value;
-  final Color color;
+
+  /// null — обычный приглушённый текст из активной палитры.
+  final Color? color;
   final bool big;
 
   @override
@@ -130,7 +132,7 @@ class _Stat extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 10),
+            style: TextStyle(color: AppColors.textLo, fontSize: 10),
           ),
           const SizedBox(height: 2),
           FittedBox(
@@ -139,7 +141,7 @@ class _Stat extends StatelessWidget {
             child: Text(
               value,
               style: TextStyle(
-                color: color,
+                color: color ?? AppColors.textMid,
                 fontSize: big ? 19 : 14,
                 fontWeight: big ? FontWeight.w800 : FontWeight.w600,
               ),
@@ -159,7 +161,7 @@ class _PingChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (samples.isEmpty) {
-      return const Center(
+      return Center(
         child: Text('…', style: TextStyle(color: AppColors.textLo)),
       );
     }
@@ -212,7 +214,7 @@ class _PingPainter extends CustomPainter {
       final h = (rtt / peak).clamp(0.04, 1.0) * size.height;
       // Цвет по величине задержки: бирюза → жёлтый → красный.
       paint.color = rtt < 60
-          ? AppColors.teal
+          ? AppColors.accentAlt
           : (rtt < 150 ? AppColors.amber : AppColors.red);
       canvas.drawRRect(
         RRect.fromRectAndRadius(

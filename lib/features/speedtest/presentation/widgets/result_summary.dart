@@ -60,8 +60,8 @@ class ResultSummary extends ConsumerWidget {
               Expanded(
                 child: Text(
                   strings.overall,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                   ),
@@ -99,7 +99,7 @@ class ResultSummary extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.emoji_events_rounded,
+                        Icon(Icons.emoji_events_rounded,
                             size: 14, color: AppColors.amber),
                         const SizedBox(width: 6),
                         Flexible(
@@ -107,7 +107,7 @@ class ResultSummary extends ConsumerWidget {
                             '${strings.personalBest}: ${_fmt(personalBest)} Mbps',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textMid,
                               fontSize: 12,
                             ),
@@ -260,7 +260,7 @@ class _RecordChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.amber,
           fontSize: 11,
           fontWeight: FontWeight.w800,
@@ -295,9 +295,9 @@ class _DeltaChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
+        color: AppColors.onGlass.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: AppColors.onGlass.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +306,7 @@ class _DeltaChip extends StatelessWidget {
             '$label · $suffix',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+            style: TextStyle(color: AppColors.textLo, fontSize: 11),
           ),
           const SizedBox(height: 3),
           Row(
@@ -348,7 +348,7 @@ class _IconAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onTap,
-      icon: Icon(icon, size: 18, color: AppColors.auroraTeal),
+      icon: Icon(icon, size: 18, color: AppColors.nebulaViolet),
       tooltip: label,
       visualDensity: VisualDensity.compact,
       padding: const EdgeInsets.all(6),
@@ -359,8 +359,8 @@ class _IconAction extends StatelessWidget {
 
 Color _tierColor(SpeedTier tier) => switch (tier) {
       SpeedTier.blazing => AppColors.green,
-      SpeedTier.fast => AppColors.cyan,
-      SpeedTier.good => AppColors.blue,
+      SpeedTier.fast => AppColors.accentDown,
+      SpeedTier.good => AppColors.accentInfo,
       SpeedTier.moderate => AppColors.amber,
       SpeedTier.slow => AppColors.red,
     };

@@ -52,15 +52,15 @@ Future<Uint8List?> renderShareCard(ShareCardData d) async {
   canvas.drawRect(
     const Rect.fromLTWH(0, 0, w, h),
     Paint()
-      ..shader = const LinearGradient(
+      ..shader = LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [Color(0xFF0D1730), AppColors.bg0],
       ).createShader(const Rect.fromLTWH(0, 0, w, h)),
   );
-  _blob(canvas, const Offset(180, 120), 320, AppColors.auroraGreen, 0.20);
-  _blob(canvas, const Offset(1050, 180), 300, AppColors.auroraViolet, 0.18);
-  _blob(canvas, const Offset(600, 640), 380, AppColors.auroraTeal, 0.14);
+  _blob(canvas, const Offset(180, 120), 320, AppColors.nebulaIndigo, 0.20);
+  _blob(canvas, const Offset(1050, 180), 300, AppColors.nebulaPink, 0.18);
+  _blob(canvas, const Offset(600, 640), 380, AppColors.nebulaViolet, 0.14);
 
   // Звёзды для узнаваемости стиля.
   final rnd = math.Random(11);
@@ -69,13 +69,13 @@ Future<Uint8List?> renderShareCard(ShareCardData d) async {
     final x = rnd.nextDouble() * w;
     final y = rnd.nextDouble() * h;
     final r = rnd.nextDouble() * 1.6 + 0.4;
-    star.color = Colors.white.withValues(alpha: rnd.nextDouble() * 0.5 + 0.1);
+    star.color = AppColors.onGlass.withValues(alpha: rnd.nextDouble() * 0.5 + 0.1);
     canvas.drawCircle(Offset(x, y), r, star);
   }
 
   // Заголовок.
   _text(canvas, 'Pulsar', const Offset(64, 52),
-      size: 44, weight: FontWeight.w900, color: Colors.white);
+      size: 44, weight: FontWeight.w900, color: AppColors.onGlass);
   _text(canvas, d.dateLabel, const Offset(64, 108),
       size: 20, color: AppColors.textLo);
 
@@ -84,25 +84,25 @@ Future<Uint8List?> renderShareCard(ShareCardData d) async {
       RRect.fromRectAndRadius(const Rect.fromLTWH(1000, 48, 136, 136),
           const Radius.circular(28));
   canvas.drawRRect(
-      gradeRect, Paint()..color = AppColors.auroraTeal.withValues(alpha: 0.16));
+      gradeRect, Paint()..color = AppColors.nebulaViolet.withValues(alpha: 0.16));
   canvas.drawRRect(
     gradeRect,
     Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3
-      ..color = AppColors.auroraTeal.withValues(alpha: 0.6),
+      ..color = AppColors.nebulaViolet.withValues(alpha: 0.6),
   );
   _text(canvas, d.grade, const Offset(1068, 116),
       size: 64,
       weight: FontWeight.w900,
-      color: AppColors.auroraTeal,
+      color: AppColors.nebulaViolet,
       center: true);
 
   // Две крупные цифры: загрузка и отдача.
   _bigMetric(canvas, const Offset(64, 210), d.downloadLabel, d.downloadMbps,
-      AppColors.auroraTeal, '↓');
+      AppColors.nebulaViolet, '↓');
   _bigMetric(canvas, const Offset(620, 210), d.uploadLabel, d.uploadMbps,
-      AppColors.auroraViolet, '↑');
+      AppColors.nebulaPink, '↑');
 
   // Пинг и джиттер.
   _smallMetric(canvas, const Offset(64, 430), d.pingLabel, d.pingMs);
@@ -154,7 +154,7 @@ void _smallMetric(Canvas c, Offset at, String label, double value) {
   _text(c, label, at, size: 22, color: AppColors.textLo);
   final v = value >= 100 ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
   _text(c, '$v ms', at + const Offset(0, 30),
-      size: 40, weight: FontWeight.w700, color: Colors.white);
+      size: 40, weight: FontWeight.w700, color: AppColors.onGlass);
 }
 
 void _text(

@@ -31,7 +31,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     // В компактном режиме окно превращается в мини-панель под иконкой
     // меню-бара: те же данные, но без вкладок и рамки.
     if (ref.watch(compactModeProvider)) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.bg0,
         body: Stack(
           children: [
@@ -108,9 +108,9 @@ class _GlassNavBar extends StatelessWidget {
               height: 66,
               padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
+                color: AppColors.onGlass.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                border: Border.all(color: AppColors.onGlass.withValues(alpha: 0.10)),
               ),
               child: Row(
                 children: [
@@ -164,7 +164,7 @@ class _NavItem extends StatelessWidget {
             boxShadow: selected
                 ? [
                     BoxShadow(
-                      color: AppColors.cyan.withValues(alpha: 0.30),
+                      color: AppColors.accentDown.withValues(alpha: 0.30),
                       blurRadius: 16,
                       spreadRadius: -3,
                     ),

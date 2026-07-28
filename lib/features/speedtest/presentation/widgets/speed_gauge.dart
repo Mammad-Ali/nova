@@ -3,31 +3,33 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../../../../app/starfield_background.dart' show orbitColor;
 import '../../../../core/theme/app_theme.dart';
 
-/// Живой радиальный спидометр на 270°.
+/// Радиальный спидометр на 270° в стиле «глубокий космос».
 ///
-/// По кольцу единым потоком в одну сторону летят светящиеся «кометы», цвет
-/// которых постоянно переливается синий→циан→зелёный→золото (перелив идёт
-/// всегда, а скорость лишь ускоряет и делает ярче). При старте теста стрелка
-/// эффектно «разгоняется» с нуля, а смена фаз плавно перекрашивает дугу.
+/// Текущее значение показывает тонкий луч от центра к шкале. Вокруг циферблата
+/// по орбитам движутся частицы: чем выше скорость, тем их больше и тем быстрее
+/// они летят. Свечения намеренно минимум — читаемость важнее эффекта.
 class SpeedGauge extends StatefulWidget {
   const SpeedGauge({
     super.key,
     required this.value,
     required this.max,
     required this.child,
-    this.color = AppColors.cyan,
+    this.color,
     this.active = false,
     this.paused = false,
   });
 
   final double value;
   final double max;
-  final Color color;
   final Widget child;
 
-  /// Идёт ли тест сейчас (включает «разгон» и усиливает свечение).
+  /// Цвет шкалы. null — взять акцент загрузки из активной палитры.
+  final Color? color;
+
+  /// Идёт ли тест сейчас (включает «разгон» луча при старте).
   final bool active;
 
   /// Окно свёрнуто или не в фокусе — анимацию можно остановить ради батареи.
@@ -44,17 +46,16 @@ class _SpeedGaugeState extends State<SpeedGauge>
 
   Duration _last = Duration.zero;
   double _clock = 0; // абсолютное время, сек
-  double _phase = 0; // бег частиц
-  double _pulse = 0; // пульсация ядра
-  double _display = 0; // сглаженная доля стрелки
+  double _orbit = 0; // фаза орбитального движения
+  double _display = 0; // сглаженная доля шкалы
   double _revStart = -1; // время старта «разгона»
   bool _prevActive = false;
-  late Color _color = widget.color;
+  late Color _color = widget.color ?? AppColors.accentDown;
 
   @override
   void initState() {
     super.initState();
-    _color = widget.color;
+    _color = widget.color ?? AppColors.accentDown;
     _ticker = createTicker(_tick)..start();
   }
 
@@ -77,7 +78,7 @@ class _SpeedGaugeState extends State<SpeedGauge>
         : (widget.value / widget.max).clamp(0.0, 1.0).toDouble();
     _display += (target - _display) * (1 - math.exp(-dtc * 6));
 
-    // «Разгон» стрелки при старте теста: короткий взмах 0→1→факт.
+    // «Разгон» луча при старте теста: короткий взмах 0 → 1 → факт.
     if (widget.active && !_prevActive) _revStart = _clock;
     _prevActive = widget.active;
     var rev = 0.0;
@@ -90,14 +91,13 @@ class _SpeedGaugeState extends State<SpeedGauge>
       }
     }
     final shown = math.max(_display, rev);
-    final speed = shown;
 
-    _phase = (_phase + dtc * (0.08 + speed * 1.9)) % 1.0;
-    _pulse = (_pulse + dtc * (0.6 + speed * 3.0)) % (2 * math.pi);
-    // Плавная смена цвета при переходе фаз (download↔upload).
-    _color = Color.lerp(_color, widget.color, 1 - math.exp(-dtc * 5))!;
+    _orbit += dtc * (0.10 + shown * 0.55);
+    // Плавная смена цвета при переходе фаз (download ↔ upload).
+    _color = Color.lerp(
+        _color, widget.color ?? AppColors.accentDown, 1 - math.exp(-dtc * 5))!;
 
-    _anim.update(shown, _phase, _pulse, speed, widget.active, _color);
+    _anim.update(shown, _orbit, shown, widget.active, _color);
   }
 
   @override
@@ -125,17 +125,14 @@ class _SpeedGaugeState extends State<SpeedGauge>
 
 class _GaugeAnim extends ChangeNotifier {
   double fraction = 0;
-  double phase = 0;
-  double pulse = 0;
+  double orbit = 0;
   double speed = 0;
   bool active = false;
-  Color color = AppColors.cyan;
+  Color color = const Color(0xFF818CF8);
 
-  void update(
-      double f, double p, double pu, double s, bool a, Color c) {
+  void update(double f, double o, double s, bool a, Color c) {
     fraction = f;
-    phase = p;
-    pulse = pu;
+    orbit = o;
     speed = s;
     active = a;
     color = c;
@@ -151,6 +148,11 @@ class _GaugePainter extends CustomPainter {
   static const _startDeg = 135.0;
   static const _sweepDeg = 270.0;
 
+  /// Сколько частиц на орбитах: от 6 в покое до 20 на максимуме
+  /// (экономный режим оформления).
+  static const _minOrbiters = 6;
+  static const _maxOrbiters = 20;
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
@@ -161,22 +163,10 @@ class _GaugePainter extends CustomPainter {
     final f = anim.fraction.clamp(0.0, 1.0);
     final speed = anim.speed;
     final baseColor = anim.color;
-    final hot = Color.lerp(baseColor, speedColor(speed), 0.6)!;
 
-    // Пульсирующее ядро (за текстом).
-    final pulseT = (math.sin(anim.pulse) + 1) / 2;
-    final coreR = radius * (0.5 + 0.05 * pulseT);
-    final coreAlpha = (0.05 + 0.22 * speed) * (0.6 + 0.4 * pulseT);
-    canvas.drawCircle(
-      center,
-      coreR,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [hot.withValues(alpha: coreAlpha), hot.withValues(alpha: 0)],
-        ).createShader(Rect.fromCircle(center: center, radius: coreR)),
-    );
+    _drawOrbiters(canvas, center, radius, speed);
 
-    // Дорожка.
+    // Дорожка шкалы.
     canvas.drawArc(
       rect,
       start,
@@ -184,25 +174,23 @@ class _GaugePainter extends CustomPainter {
       false,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 16
+        ..strokeWidth = 14
         ..strokeCap = StrokeCap.round
-        ..color = Colors.white.withValues(alpha: 0.05),
+        ..color = AppColors.onGlass.withValues(alpha: 0.05),
     );
 
     // Тики.
     final tick = Paint()
-      ..color = Colors.white.withValues(alpha: 0.14)
-      ..strokeWidth = 2;
+      ..color = AppColors.onGlass.withValues(alpha: 0.13)
+      ..strokeWidth = 1.6;
     for (var i = 0; i <= 9; i++) {
       final a = start + sweep * (i / 9);
       final d = Offset(math.cos(a), math.sin(a));
-      canvas.drawLine(center + d * (radius - 10), center + d * (radius - 1), tick);
+      canvas.drawLine(
+          center + d * (radius - 9), center + d * (radius - 1), tick);
     }
 
-    // Кометы единым потоком с постоянным переливом цвета.
-    _drawComets(canvas, center, radius, start, sweep, speed);
-
-    // Дуга прогресса.
+    // Заполненная часть шкалы.
     canvas.drawArc(
       rect,
       start,
@@ -210,99 +198,93 @@ class _GaugePainter extends CustomPainter {
       false,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 16
+        ..strokeWidth = 14
         ..strokeCap = StrokeCap.round
         ..shader = SweepGradient(
           startAngle: start,
           endAngle: start + sweep,
           colors: [
-            baseColor.withValues(alpha: 0.5),
+            baseColor.withValues(alpha: 0.45),
             baseColor,
-            Color.lerp(baseColor, Colors.white, 0.6)!,
+            Color.lerp(baseColor, Colors.white, 0.45)!,
           ],
           stops: const [0.0, 0.7, 1.0],
         ).createShader(rect),
     );
 
-    // Светящаяся голова дуги.
-    if (f > 0.001) {
-      final a = start + sweep * f;
-      final p = center + Offset(math.cos(a), math.sin(a)) * radius;
-      canvas.drawCircle(
-        p,
-        12 + 6 * speed,
-        Paint()
-          ..color = hot.withValues(alpha: 0.4)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
-      );
-      canvas.drawCircle(p, 5, Paint()..color = Colors.white);
-    }
+    _drawRay(canvas, center, radius, start, sweep, f, baseColor, speed);
   }
 
-  void _drawComets(
+  /// Тонкий луч-указатель от центра к текущему делению шкалы.
+  void _drawRay(
     Canvas canvas,
     Offset center,
     double radius,
     double start,
     double sweep,
+    double f,
+    Color color,
     double speed,
   ) {
-    const perRing = 8;
-    final rings = [radius, radius * 0.86, radius * 0.72];
-    final tailSteps = (3 + speed * 9).round();
-    final baseAlpha = (anim.active ? 0.22 : 0.13) + speed * 0.55;
+    final a = start + sweep * f;
+    final dir = Offset(math.cos(a), math.sin(a));
+    final from = center + dir * (radius * 0.20);
+    final to = center + dir * (radius - 7);
 
-    for (var r = 0; r < rings.length; r++) {
-      final rr = rings[r];
-      final ringFade = 1.0 - r * 0.20;
-      for (var i = 0; i < perRing; i++) {
-        // Единое направление для всех колец.
-        final headFrac = (((i / perRing) + anim.phase + r * 0.11) % 1.0);
-        for (var k = 0; k < tailSteps; k++) {
-          final frac = headFrac - k * 0.011;
-          if (frac < 0 || frac > 1) continue;
-          final a = start + sweep * frac;
-          final pos = center + Offset(math.cos(a), math.sin(a)) * rr;
-          final tt = 1 - k / tailSteps;
+    // Луч сужается к центру: у шкалы ярче и толще, у ступицы почти исчезает.
+    canvas.drawLine(
+      from,
+      to,
+      Paint()
+        ..shader = LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.0),
+            color.withValues(alpha: 0.85),
+          ],
+        ).createShader(Rect.fromPoints(from, to))
+        ..strokeWidth = 2.2
+        ..strokeCap = StrokeCap.round,
+    );
 
-          // Постоянный перелив: положение + время + скорость, треугольная
-          // развёртка палитры (плавная петля синий↔золото).
-          final ct = (frac * 0.6 + anim.phase * 0.8 + speed * 0.4 + r * 0.2) % 1.0;
-          final tri = 1 - (2 * ct - 1).abs();
-          final base = speedColor(tri);
+    // Крошечная метка на конце — единственное свечение на циферблате.
+    canvas.drawCircle(
+      to,
+      3.0 + 1.5 * speed,
+      Paint()..color = Color.lerp(color, Colors.white, 0.6)!,
+    );
 
-          final dotAlpha = (baseAlpha * tt * ringFade).clamp(0.0, 1.0);
-          final col = Color.lerp(base, Colors.white, 0.55 * tt)!;
-          canvas.drawCircle(
-            pos,
-            0.7 + 2.8 * tt,
-            Paint()..color = col.withValues(alpha: dotAlpha),
-          );
-        }
-      }
+    // Ступица.
+    canvas.drawCircle(
+      center,
+      3.0,
+      Paint()..color = AppColors.onGlass.withValues(alpha: 0.5),
+    );
+  }
+
+  /// Частицы на круговых орбитах вокруг циферблата. Чем выше скорость,
+  /// тем их больше и тем плотнее кольцо.
+  void _drawOrbiters(
+      Canvas canvas, Offset center, double radius, double speed) {
+    final count =
+        (_minOrbiters + (_maxOrbiters - _minOrbiters) * speed).round();
+    final paint = Paint();
+
+    for (var i = 0; i < count; i++) {
+      // Три кольца на разных радиусах — простая, но убедительная глубина.
+      final ring = i % 3;
+      final rr = radius * (1.10 + ring * 0.075);
+      // Внешние кольца отстают — как настоящие орбиты (дальше = медленнее).
+      final rate = 1.0 - ring * 0.22;
+      final ang = anim.orbit * rate * math.pi * 2 + i * 2.399; // золотой угол
+      final pos = center + Offset(math.cos(ang), math.sin(ang)) * rr;
+
+      final color = orbitColor((speed + ring * 0.12).clamp(0.0, 1.0));
+      paint.color = color.withValues(
+          alpha: (0.30 + 0.45 * speed) * (1.0 - ring * 0.2));
+      canvas.drawCircle(pos, 1.4 + 1.1 * speed, paint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _GaugePainter oldDelegate) => false;
-}
-
-/// Цвет по значению 0..1: синий → циан → зелёный → золотой.
-Color speedColor(double t) {
-  final x = t.clamp(0.0, 1.0);
-  const stops = [
-    (0.0, Color(0xFF3B82F6)),
-    (0.4, Color(0xFF22D3EE)),
-    (0.72, Color(0xFF34D399)),
-    (1.0, Color(0xFFFBBF24)),
-  ];
-  for (var i = 0; i < stops.length - 1; i++) {
-    final (p0, c0) = stops[i];
-    final (p1, c1) = stops[i + 1];
-    if (x <= p1) {
-      final k = (x - p0) / (p1 - p0);
-      return Color.lerp(c0, c1, k)!;
-    }
-  }
-  return stops.last.$2;
 }

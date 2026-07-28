@@ -37,10 +37,10 @@ class CompactPanel extends ConsumerWidget {
                 ShaderMask(
                   shaderCallback: (r) =>
                       AppColors.primaryGradient.createShader(r),
-                  child: const Text(
+                  child: Text(
                     'Pulsar',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.onGlass,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                     ),
@@ -52,7 +52,7 @@ class CompactPanel extends ConsumerWidget {
                   iconSize: 18,
                   visualDensity: VisualDensity.compact,
                   tooltip: t.compactExpand,
-                  icon: const Icon(Icons.open_in_full_rounded,
+                  icon: Icon(Icons.open_in_full_rounded,
                       color: AppColors.textMid),
                 ),
               ],
@@ -64,7 +64,7 @@ class CompactPanel extends ConsumerWidget {
               Expanded(
                 child: _MiniTile(
                   icon: Icons.south_rounded,
-                  color: AppColors.cyan,
+                  color: AppColors.accentDown,
                   bytesPerSec: history.currentRxPerSec,
                 ),
               ),
@@ -72,7 +72,7 @@ class CompactPanel extends ConsumerWidget {
               Expanded(
                 child: _MiniTile(
                   icon: Icons.north_rounded,
-                  color: AppColors.violet,
+                  color: AppColors.accentUp,
                   bytesPerSec: history.currentTxPerSec,
                 ),
               ),
@@ -87,7 +87,7 @@ class CompactPanel extends ConsumerWidget {
                   ? Center(
                       child: Text(
                         t.waitingFirst,
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: AppColors.textLo, fontSize: 11),
                       ),
                     )
@@ -154,8 +154,8 @@ class _MiniTile extends StatelessWidget {
                 children: [
                   Text(
                     r.value,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColors.onGlass,
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                     ),
@@ -192,12 +192,12 @@ class _Usage extends StatelessWidget {
         Text(label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 10)),
+            style: TextStyle(color: AppColors.textLo, fontSize: 10)),
         const SizedBox(height: 1),
         Text(
           '${f.value} ${f.unit}',
-          style: const TextStyle(
-              color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+          style: TextStyle(
+              color: AppColors.onGlass, fontSize: 13, fontWeight: FontWeight.w700),
         ),
       ],
     );

@@ -43,7 +43,7 @@ class TrafficMonitorScreen extends ConsumerWidget {
                   peakLabel: t.peak,
                   sessionLabel: t.session,
                   icon: Icons.south_rounded,
-                  accent: AppColors.cyan,
+                  accent: AppColors.accentDown,
                   bytesPerSec: history.currentRxPerSec,
                   peakBytesPerSec: history.peakRxPerSec,
                   sessionBytes: history.sessionRxBytes,
@@ -56,7 +56,7 @@ class TrafficMonitorScreen extends ConsumerWidget {
                   peakLabel: t.peak,
                   sessionLabel: t.session,
                   icon: Icons.north_rounded,
-                  accent: AppColors.violet,
+                  accent: AppColors.accentUp,
                   bytesPerSec: history.currentTxPerSec,
                   peakBytesPerSec: history.peakTxPerSec,
                   sessionBytes: history.sessionTxBytes,
@@ -111,8 +111,8 @@ class _Header extends StatelessWidget {
                     AppColors.primaryGradient.createShader(r),
                 child: Text(
                   strings.tabMonitor,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 30,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
@@ -122,7 +122,7 @@ class _Header extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 strings.monitorSubtitle,
-                style: const TextStyle(color: AppColors.textLo, fontSize: 14),
+                style: TextStyle(color: AppColors.textLo, fontSize: 14),
               ),
             ],
           ),
@@ -131,7 +131,7 @@ class _Header extends StatelessWidget {
         const LanguageButton(),
         IconButton(
           onPressed: onReset,
-          icon: const Icon(Icons.restart_alt_rounded, color: AppColors.textMid),
+          icon: Icon(Icons.restart_alt_rounded, color: AppColors.textMid),
           tooltip: strings.resetSession,
         ),
       ],
@@ -157,7 +157,7 @@ class _LiveBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (isLive)
-            const _PulsingDot(color: AppColors.green)
+            _PulsingDot(color: AppColors.green)
           else
             Container(
               width: 8,
@@ -257,7 +257,7 @@ class _UsageStrip extends StatelessWidget {
               Container(
                 width: 1,
                 height: 34,
-                color: Colors.white.withValues(alpha: 0.08),
+                color: AppColors.onGlass.withValues(alpha: 0.08),
               ),
               Expanded(
                 child: _UsageCell(
@@ -271,7 +271,7 @@ class _UsageStrip extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             strings.usageNote,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 10),
+            style: TextStyle(color: AppColors.textLo, fontSize: 10),
           ),
         ],
       ),
@@ -302,13 +302,13 @@ class _UsageCell extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+              style: TextStyle(color: AppColors.textLo, fontSize: 11),
             ),
             const SizedBox(height: 1),
             Text(
               '${f.value} ${f.unit}',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: AppColors.onGlass,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
@@ -373,7 +373,7 @@ class _SpeedTile extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textMid,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -393,8 +393,8 @@ class _SpeedTile extends StatelessWidget {
               children: [
                 Text(
                   rate.value,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
                     height: 1.0,
@@ -445,7 +445,7 @@ class _MiniStat extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textLo,
               fontSize: 10,
               fontWeight: FontWeight.w600,
@@ -457,7 +457,7 @@ class _MiniStat extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textMid,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -498,16 +498,16 @@ class _ChartCard extends StatelessWidget {
                   strings.last2min,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              _Legend(color: AppColors.cyan, label: strings.download),
+              _Legend(color: AppColors.accentDown, label: strings.download),
               const SizedBox(width: 14),
-              _Legend(color: AppColors.violet, label: strings.upload),
+              _Legend(color: AppColors.accentUp, label: strings.upload),
             ],
           ),
           const SizedBox(height: 18),
@@ -555,7 +555,7 @@ class _Legend extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(color: AppColors.textMid, fontSize: 12),
+          style: TextStyle(color: AppColors.textMid, fontSize: 12),
         ),
       ],
     );
@@ -578,7 +578,7 @@ class _CenteredHint extends StatelessWidget {
           Text(
             text,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 13),
+            style: TextStyle(color: AppColors.textLo, fontSize: 13),
           ),
         ],
       ),

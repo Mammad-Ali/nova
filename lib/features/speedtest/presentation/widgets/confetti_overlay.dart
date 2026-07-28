@@ -32,10 +32,10 @@ class _ConfettiOverlayState extends State<ConfettiOverlay>
   Duration _last = Duration.zero;
   int _seen = 0;
 
-  static const _colors = [
-    AppColors.auroraGreen,
-    AppColors.auroraTeal,
-    AppColors.auroraViolet,
+  static final _colors = [
+    AppColors.nebulaIndigo,
+    AppColors.nebulaViolet,
+    AppColors.nebulaPink,
     AppColors.amber,
     Colors.white,
   ];

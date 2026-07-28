@@ -34,11 +34,11 @@ class _HistorySheet extends ConsumerWidget {
       expand: false,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.bg1,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.fromBorderSide(
-              BorderSide(color: Colors.white12, width: 1),
+              BorderSide(color: AppColors.onGlass.withValues(alpha: 0.12), width: 1),
             ),
           ),
           child: Column(
@@ -48,7 +48,7 @@ class _HistorySheet extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: AppColors.onGlass.withValues(alpha: 0.24),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -59,8 +59,8 @@ class _HistorySheet extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         t.historyTitle,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColors.onGlass,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -70,10 +70,10 @@ class _HistorySheet extends ConsumerWidget {
                       TextButton.icon(
                         onPressed: () =>
                             ref.read(speedTestHistoryProvider.notifier).clear(),
-                        icon: const Icon(Icons.delete_outline_rounded,
+                        icon: Icon(Icons.delete_outline_rounded,
                             size: 18, color: AppColors.red),
                         label: Text(t.historyClear,
-                            style: const TextStyle(color: AppColors.red)),
+                            style: TextStyle(color: AppColors.red)),
                       ),
                   ],
                 ),
@@ -114,11 +114,11 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.history_rounded, color: AppColors.textLo, size: 34),
+          Icon(Icons.history_rounded, color: AppColors.textLo, size: 34),
           const SizedBox(height: 10),
           Text(
             text,
-            style: const TextStyle(color: AppColors.textLo, fontSize: 13),
+            style: TextStyle(color: AppColors.textLo, fontSize: 13),
           ),
         ],
       ),
@@ -161,8 +161,8 @@ class _TrendChart extends StatelessWidget {
           borderData: FlBorderData(show: false),
           lineTouchData: const LineTouchData(enabled: false),
           lineBarsData: [
-            _line(downSpots, AppColors.cyan),
-            _line(upSpots, AppColors.violet),
+            _line(downSpots, AppColors.accentDown),
+            _line(upSpots, AppColors.accentUp),
           ],
         ),
         duration: Duration.zero,
@@ -216,7 +216,7 @@ class _HistoryRow extends StatelessWidget {
             flex: 3,
             child: Text(
               _fmtDate(record.timestamp),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textMid,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -227,7 +227,7 @@ class _HistoryRow extends StatelessWidget {
             flex: 3,
             child: _statChip(
               Icons.south_rounded,
-              AppColors.cyan,
+              AppColors.accentDown,
               record.downloadMbps,
             ),
           ),
@@ -235,7 +235,7 @@ class _HistoryRow extends StatelessWidget {
             flex: 3,
             child: _statChip(
               Icons.north_rounded,
-              AppColors.violet,
+              AppColors.accentUp,
               record.uploadMbps,
             ),
           ),
@@ -244,7 +244,7 @@ class _HistoryRow extends StatelessWidget {
             child: Text(
               '${record.pingMs.toStringAsFixed(0)} мс',
               textAlign: TextAlign.end,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textLo,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -263,8 +263,8 @@ class _HistoryRow extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           mbps >= 100 ? mbps.toStringAsFixed(0) : mbps.toStringAsFixed(1),
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: AppColors.onGlass,
             fontSize: 13,
             fontWeight: FontWeight.w700,
           ),

@@ -31,16 +31,16 @@ class MonthlyUsageCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.calendar_month_rounded,
-                  size: 18, color: AppColors.violet),
+              Icon(Icons.calendar_month_rounded,
+                  size: 18, color: AppColors.accentUp),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   strings.usageMonth,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                   ),
@@ -48,8 +48,8 @@ class MonthlyUsageCard extends StatelessWidget {
               ),
               Text(
                 '${month.value} ${month.unit}',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: AppColors.onGlass,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                 ),
@@ -64,7 +64,7 @@ class MonthlyUsageCard extends StatelessWidget {
             const SizedBox(height: 14),
             Text(
               strings.usageByDay,
-              style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+              style: TextStyle(color: AppColors.textLo, fontSize: 11),
             ),
             const SizedBox(height: 8),
             SizedBox(height: 54, child: _DayBars(days: days)),
@@ -86,14 +86,14 @@ class _ForecastRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
+        color: AppColors.onGlass.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: AppColors.onGlass.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.trending_up_rounded,
-              size: 16, color: AppColors.teal),
+          Icon(Icons.trending_up_rounded,
+              size: 16, color: AppColors.accentAlt),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -101,13 +101,13 @@ class _ForecastRow extends StatelessWidget {
               children: [
                 Text(
                   strings.usageForecast,
-                  style: const TextStyle(color: AppColors.textLo, fontSize: 11),
+                  style: TextStyle(color: AppColors.textLo, fontSize: 11),
                 ),
                 const SizedBox(height: 1),
                 Text(
                   strings.usageForecastHint,
                   maxLines: 2,
-                  style: const TextStyle(color: AppColors.textLo, fontSize: 10),
+                  style: TextStyle(color: AppColors.textLo, fontSize: 10),
                 ),
               ],
             ),
@@ -115,8 +115,8 @@ class _ForecastRow extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             '~${f.value} ${f.unit}',
-            style: const TextStyle(
-              color: AppColors.teal,
+            style: TextStyle(
+              color: AppColors.accentAlt,
               fontSize: 17,
               fontWeight: FontWeight.w800,
             ),
@@ -158,8 +158,8 @@ class _DayBars extends StatelessWidget {
                   height: (d.value / peak).clamp(0.03, 1.0) * 54,
                   decoration: BoxDecoration(
                     color: d.key == todayKey
-                        ? AppColors.violet
-                        : AppColors.violet.withValues(alpha: 0.45),
+                        ? AppColors.accentUp
+                        : AppColors.accentUp.withValues(alpha: 0.45),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
