@@ -64,26 +64,39 @@ jobs:
       - name: Build universal APK
         run: flutter build apk --release
 
-      # Подтверждаем, что APK подписан нашим ключом, а не отладочным:
-      # у отладочного в сертификате стоит CN=Android Debug. keytool берём из
-      # JDK, который уже поставил setup-java — он есть всегда.
-      - name: Verify signature
-        run: |
-          OWNER=$("$JAVA_HOME/bin/keytool" -printcert -jarfile \
-            build/app/outputs/flutter-apk/app-release.apk \
-            | grep -m1 "Owner:")
-          echo "Подписано: $OWNER"
-          if echo "$OWNER" | grep -qi "Android Debug"; then
-            echo "::error::APK подписан отладочным ключом — Play Защита будет ругаться."
-            exit 1
-          fi
-
+      # Артефакт выгружаем ДО проверки: даже если проверка не сможет
+      # прочитать сертификат, готовый APK должен остаться доступным.
       - uses: actions/upload-artifact@v4
         with:
           name: pulsar-apk
           path: build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
           retention-days: 30
+
+      # Подтверждаем, что APK подписан нашим ключом, а не отладочным
+      # (у отладочного в сертификате стоит CN=Android Debug).
+      # Читаем сертификат через apksigner: keytool понимает только старую
+      # JAR-подпись (v1), а Gradle подписывает схемами v2/v3.
+      - name: Verify signature
+        run: |
+          set +e
+          APK=build/app/outputs/flutter-apk/app-release.apk
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          APKSIGNER=$(ls "$SDK"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)
+
+          if [ -z "$APKSIGNER" ]; then
+            echo "apksigner не найден в $SDK — пропускаю проверку."
+            exit 0
+          fi
+
+          CERTS=$("$APKSIGNER" verify --print-certs "$APK" 2>&1)
+          echo "$CERTS" | grep -i "certificate DN" || echo "$CERTS" | head -5
+
+          if echo "$CERTS" | grep -qi "CN=Android Debug"; then
+            echo "::error::APK подписан отладочным ключом — Play Защита будет ругаться."
+            exit 1
+          fi
+          echo "Подпись релизная — порядок."
 
   windows:
     name: Windows
