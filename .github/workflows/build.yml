@@ -68,7 +68,7 @@ jobs:
       # прочитать сертификат, готовый APK должен остаться доступным.
       - uses: actions/upload-artifact@v4
         with:
-          name: pulsar-apk
+          name: nova-apk
           path: build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
           retention-days: 30
@@ -109,9 +109,18 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build windows --release
+
+      # Кладём инструкцию рядом с exe: без неё неочевидно, что архив нужно
+      # сначала распаковать, а на предупреждение SmartScreen — нажать
+      # «Подробнее → Выполнить в любом случае».
+      - name: Add readme
+        run: |
+          copy tool\windows_readme.txt "build\windows\x64\runner\Release\ЧИТАЙ МЕНЯ.txt"
+        shell: cmd
+
       - uses: actions/upload-artifact@v4
         with:
-          name: pulsar-windows
+          name: nova-windows
           path: build/windows/x64/runner/Release/
           if-no-files-found: error
           retention-days: 30
