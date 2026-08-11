@@ -110,17 +110,22 @@ jobs:
       - run: flutter pub get
       - run: flutter build windows --release
 
-      # Кладём инструкцию рядом с exe: без неё неочевидно, что архив нужно
-      # сначала распаковать, а на предупреждение SmartScreen — нажать
-      # «Подробнее → Выполнить в любом случае».
-      - name: Add readme
+      # Собираем один установщик вместо папки с exe и библиотеками: так
+      # пользователю очевидно, на что нажимать.
+      - name: Build installer
+        shell: pwsh
         run: |
-          copy tool\windows_readme.txt "build\windows\x64\runner\Release\ЧИТАЙ МЕНЯ.txt"
-        shell: cmd
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress
+          }
+          & $iscc windows\installer\nova.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC вернул $LASTEXITCODE" }
+          Get-ChildItem build\windows\installer
 
       - uses: actions/upload-artifact@v4
         with:
-          name: nova-windows
-          path: build/windows/x64/runner/Release/
+          name: nova-windows-setup
+          path: build/windows/installer/Nova-Setup.exe
           if-no-files-found: error
           retention-days: 30
