@@ -1,10 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Активный speedtest делает HTTP-запросы; без этого разрешения release-сборка
-         не сможет обращаться к сети (debug-манифест получает его автоматически от Flutter). -->
+    <!-- The speed test makes HTTP requests; without this permission a release
+         build cannot reach the network (Flutter adds it to the debug manifest
+         automatically). -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <!-- Уровень сигнала и скорость линка Wi-Fi. Имя сети (SSID) требует
-         доступа к геопозиции — его не запрашиваем, SSID просто не показываем. -->
+    <!-- Wi-Fi signal strength and link rate. The SSID would require location
+         access, which we don't request — the SSID is simply not shown. -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application

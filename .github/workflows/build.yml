@@ -1,16 +1,17 @@
 name: Build
 
-# Собирает Android APK (и проверяет код) в облаке GitHub — локальный
-# Android SDK для этого не нужен. Готовый APK лежит в артефактах запуска.
+# Builds the Android APK and the Windows installer in the cloud, so no local
+# Android SDK or Windows machine is required. Results are attached to each run
+# as artifacts.
 on:
   push:
     branches: [main]
   pull_request:
-  workflow_dispatch: # можно запустить вручную кнопкой в разделе Actions
+  workflow_dispatch: # allows running the workflow manually from the Actions tab
 
 jobs:
   analyze:
-    name: Анализ и тесты
+    name: Analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,15 +37,16 @@ jobs:
           cache: true
       - run: flutter pub get
 
-      # Ключ подписи хранится в секретах репозитория: сам файл в git не
-      # лежит. Без него сборка не падает, а просто уходит на debug-подпись.
+      # The signing key lives in repository secrets; the file itself is never
+      # committed. Without it the build still succeeds, falling back to the
+      # debug signature.
       - name: Restore release keystore
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           if [ -z "$KEYSTORE_B64" ]; then
-            echo "Секрет с ключом не задан — сборка уйдёт на debug-подпись."
+            echo "No keystore secret set — falling back to the debug signature."
             exit 0
           fi
           mkdir -p android/keys
@@ -55,17 +57,17 @@ jobs:
           keyAlias=nova
           keyPassword=$KEYSTORE_PASSWORD
           EOF
-          echo "Ключ восстановлен."
+          echo "Keystore restored."
 
-      # Разбиваем по ABI: каждый APK меньше и ставится быстрее.
+      # Split per ABI: each APK is smaller and installs faster.
       - name: Build APK
         run: flutter build apk --release --split-per-abi
 
       - name: Build universal APK
         run: flutter build apk --release
 
-      # Артефакт выгружаем ДО проверки: даже если проверка не сможет
-      # прочитать сертификат, готовый APK должен остаться доступным.
+      # Upload before verifying: even if the certificate cannot be read, the
+      # finished APK must stay available.
       - uses: actions/upload-artifact@v4
         with:
           name: nova-apk
@@ -73,10 +75,10 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # Подтверждаем, что APK подписан нашим ключом, а не отладочным
-      # (у отладочного в сертификате стоит CN=Android Debug).
-      # Читаем сертификат через apksigner: keytool понимает только старую
-      # JAR-подпись (v1), а Gradle подписывает схемами v2/v3.
+      # Confirm the APK carries the release key rather than the debug one
+      # (the debug certificate reads CN=Android Debug).
+      # apksigner is required here: keytool only understands the legacy JAR
+      # signature (v1), while Gradle signs with schemes v2/v3.
       - name: Verify signature
         run: |
           set +e
@@ -85,7 +87,7 @@ jobs:
           APKSIGNER=$(ls "$SDK"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -1)
 
           if [ -z "$APKSIGNER" ]; then
-            echo "apksigner не найден в $SDK — пропускаю проверку."
+            echo "apksigner not found in $SDK — skipping verification."
             exit 0
           fi
 
@@ -93,10 +95,10 @@ jobs:
           echo "$CERTS" | grep -i "certificate DN" || echo "$CERTS" | head -5
 
           if echo "$CERTS" | grep -qi "CN=Android Debug"; then
-            echo "::error::APK подписан отладочным ключом — Play Защита будет ругаться."
+            echo "::error::APK is signed with the debug key — Play Protect will flag it."
             exit 1
           fi
-          echo "Подпись релизная — порядок."
+          echo "Release signature confirmed."
 
   windows:
     name: Windows
@@ -110,8 +112,8 @@ jobs:
       - run: flutter pub get
       - run: flutter build windows --release
 
-      # Собираем один установщик вместо папки с exe и библиотеками: так
-      # пользователю очевидно, на что нажимать.
+      # Ship a single installer instead of a folder of DLLs, so it is obvious
+      # what to click.
       - name: Build installer
         shell: pwsh
         run: |
@@ -120,7 +122,7 @@ jobs:
             choco install innosetup -y --no-progress
           }
           & $iscc windows\installer\nova.iss
-          if ($LASTEXITCODE -ne 0) { throw "ISCC вернул $LASTEXITCODE" }
+          if ($LASTEXITCODE -ne 0) { throw "ISCC exited with $LASTEXITCODE" }
           Get-ChildItem build\windows\installer
 
       - uses: actions/upload-artifact@v4

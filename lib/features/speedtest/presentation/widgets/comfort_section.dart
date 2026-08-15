@@ -4,7 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/comfort.dart';
 
-/// Карточка «для чего хватит этой скорости» — список активностей с оценкой.
+/// The "what this speed is good for" card: a list of activities with ratings.
 class ComfortSection extends StatelessWidget {
   const ComfortSection({
     super.key,

@@ -1,5 +1,5 @@
-/// Накопленный трафик за текущий час и день (Rx+Tx, байты) плюс история
-/// по дням — из неё считаются месячный итог и прогноз расхода.
+/// Traffic accumulated over the current hour and day (Rx+Tx, bytes) plus a
+/// per-day history, from which the monthly total and forecast are derived.
 class UsageStats {
   const UsageStats({
     required this.dayKey,
@@ -16,22 +16,22 @@ class UsageStats {
         hourBytes = 0,
         byDay = const {};
 
-  /// Ключ дня, формат yyyy-MM-dd.
+  /// Day key, formatted yyyy-MM-dd.
   final String dayKey;
   final int dayBytes;
 
-  /// Ключ часа, формат yyyy-MM-dd-HH.
+  /// Hour key, formatted yyyy-MM-dd-HH.
   final String hourKey;
   final int hourBytes;
 
-  /// Трафик по дням: 'yyyy-MM-dd' → байты. Включает сегодняшний день.
+  /// Traffic per day: 'yyyy-MM-dd' → bytes. Includes today.
   final Map<String, int> byDay;
 
-  /// Префикс текущего месяца, 'yyyy-MM'.
+  /// Current month prefix, 'yyyy-MM'.
   String get _monthPrefix =>
       dayKey.length >= 7 ? dayKey.substring(0, 7) : '';
 
-  /// Дни текущего месяца, по возрастанию даты.
+  /// Days of the current month, oldest first.
   List<MapEntry<String, int>> get currentMonthDays {
     final prefix = _monthPrefix;
     if (prefix.isEmpty) return const [];
@@ -40,7 +40,7 @@ class UsageStats {
     return entries;
   }
 
-  /// Суммарный трафик за текущий месяц.
+  /// Total traffic for the current month.
   int get monthBytes {
     var sum = 0;
     for (final e in currentMonthDays) {
@@ -49,16 +49,16 @@ class UsageStats {
     return sum;
   }
 
-  /// Прогноз расхода к концу месяца по текущему темпу.
+  /// Projected usage by the end of the month at the current pace.
   ///
-  /// Считаем среднее за прошедшую часть месяца (с дробным «сегодня», чтобы
-  /// утром прогноз не завышался) и умножаем на длину месяца.
-  /// null — если данных ещё слишком мало, чтобы прогноз был осмысленным.
+  /// Averages over the elapsed part of the month (today counted as a
+  /// fraction, so mornings don't inflate the estimate) and scales it to the
+  /// month's length. Returns null while there is too little data to be useful.
   int? get monthForecastBytes {
     final now = DateTime.now();
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
     final elapsed = (now.day - 1) + (now.hour * 60 + now.minute) / 1440.0;
-    if (elapsed < 0.2 || monthBytes <= 0) return null; // рано прогнозировать
+    if (elapsed < 0.2 || monthBytes <= 0) return null; // too early to forecast
     return (monthBytes / elapsed * daysInMonth).round();
   }
 }

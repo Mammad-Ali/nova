@@ -1,5 +1,5 @@
-/// Один замер задержки. [rttMs] == null означает, что ответа не было —
-/// то есть пакет потерян / связь на мгновение пропала.
+/// A single latency sample. [rttMs] == null means no reply arrived — the
+/// packet was lost or the link dropped for a moment.
 class PingSample {
   const PingSample({required this.timestamp, this.rttMs});
 

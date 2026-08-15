@@ -1,7 +1,7 @@
-/// Насколько сильно «распухает» канал под нагрузкой.
+/// How badly the link swells under load.
 enum BloatLevel { excellent, good, fair, poor }
 
-/// Результат оценки bufferbloat.
+/// Outcome of the bufferbloat assessment.
 class BufferbloatResult {
   const BufferbloatResult({
     required this.idlePingMs,
@@ -13,7 +13,7 @@ class BufferbloatResult {
   final double loadedPingMs;
   final BloatLevel level;
 
-  /// Прирост задержки под нагрузкой (мс). Именно он портит игры и звонки.
+  /// Added latency under load (ms). This is what ruins games and calls.
   double get increaseMs =>
       (loadedPingMs - idlePingMs) < 0 ? 0 : loadedPingMs - idlePingMs;
 
@@ -25,10 +25,10 @@ class BufferbloatResult {
       };
 }
 
-/// Классифицирует bufferbloat по приросту задержки под нагрузкой.
+/// Classifies bufferbloat by how much latency the load adds.
 ///
-/// Пороги близки к общепринятым в тестах вроде Waveform: до 30 мс прироста —
-/// отлично, свыше 200 мс — канал захлёбывается.
+/// Thresholds follow the conventions of tests like Waveform: under 30 ms of
+/// added delay is excellent, beyond 200 ms the link is choking.
 BufferbloatResult evaluateBufferbloat({
   required double idlePingMs,
   required double loadedPingMs,

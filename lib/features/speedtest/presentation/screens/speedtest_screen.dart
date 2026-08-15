@@ -22,7 +22,7 @@ import '../widgets/odometer_text.dart';
 import '../widgets/result_summary.dart';
 import '../widgets/speed_gauge.dart';
 
-/// Вкладка активного теста скорости — «максимальная скорость интернета».
+/// The active speed test tab — measures the connection's peak throughput.
 class SpeedTestScreen extends ConsumerStatefulWidget {
   const SpeedTestScreen({super.key});
 
@@ -45,7 +45,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
     final s = ref.watch(speedTestControllerProvider);
     final ctrl = ref.read(speedTestControllerProvider.notifier);
 
-    // Салют конфетти, если только что побит личный рекорд скорости.
+    // Fire confetti when a personal best has just been beaten.
     ref.listen(speedTestControllerProvider, (prev, next) {
       final justFinished = next.phase == TestPhase.done &&
           (prev == null || prev.phase != TestPhase.done);
@@ -61,7 +61,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
       }
     });
 
-    // Шкала всегда солнечно-жёлтая; цветом различаются только метрики ниже.
+    // The gauge is always sun yellow; only the metrics below use colour.
     const gaugeColor = AppColors.sun;
     final gaugeValue = s.isRunning ? s.displayMbps : (s.downloadMbps ?? 0);
 
@@ -209,7 +209,7 @@ String _phaseLabel(AppStrings t, TestPhase p) => switch (p) {
       TestPhase.error => t.phaseError,
     };
 
-// ─────────────────────────── заголовок ───────────────────────────
+// ─────────────────────────── heading ─────────────────────────────
 
 class _Title extends StatelessWidget {
   const _Title({required this.strings});
@@ -263,7 +263,7 @@ class _Title extends StatelessWidget {
   }
 }
 
-// ─────────────────────── центр спидометра ────────────────────────
+// ─────────────────────── gauge centre ────────────────────────────
 
 class _GaugeCenter extends StatelessWidget {
   const _GaugeCenter({
@@ -280,7 +280,7 @@ class _GaugeCenter extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Плавная смена подписи фазы.
+        // Cross-fade the phase label.
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 320),
           transitionBuilder: (child, anim) => FadeTransition(
@@ -332,7 +332,7 @@ class _GaugeCenter extends StatelessWidget {
   }
 }
 
-// ─────────────────────── прогресс фазы ────────────────────────────
+// ─────────────────────── phase progress ──────────────────────────
 
 class _PhaseBar extends StatelessWidget {
   const _PhaseBar({
@@ -358,7 +358,7 @@ class _PhaseBar extends StatelessWidget {
   }
 }
 
-// ─────────────────────── карточка метрики ─────────────────────────
+// ─────────────────────── metric card ─────────────────────────────
 
 class _MetricCard extends StatelessWidget {
   const _MetricCard({
@@ -422,7 +422,7 @@ class _MetricCard extends StatelessWidget {
               children: [
                 value == null
                     ? Text('—', style: _numStyle)
-                    // Барабанчик цифр (odometer).
+                    // Odometer-style digits.
                     : OdometerText(value: value!, decimals: 1, style: _numStyle),
                 const SizedBox(width: 5),
                 Text(
@@ -442,12 +442,12 @@ class _MetricCard extends StatelessWidget {
   }
 }
 
-/// Строка с провайдером (ISP) и местоположением — из [ipInfoProvider].
+/// Row showing the ISP and location, sourced from [ipInfoProvider].
 class _ProviderRow extends ConsumerWidget {
   const _ProviderRow({required this.strings, this.serverName});
   final AppStrings strings;
 
-  /// Сервер, выбранный движком (может отличаться, если основной недоступен).
+  /// Server chosen by the engine (may differ if the primary was unreachable).
   final String? serverName;
 
   @override
@@ -505,7 +505,7 @@ class _ProviderRow extends ConsumerWidget {
   }
 }
 
-// ─────────────────────── кнопка старт/стоп ────────────────────────
+// ─────────────────────── start / stop button ─────────────────────
 
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
@@ -525,7 +525,7 @@ class _ActionButton extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 260),
         height: 62,
-        // Без заливки и свечения: только тонкая обводка на чёрном.
+        // No fill and no glow: just a thin outline on black.
         decoration: BoxDecoration(
           color: running ? AppColors.red.withValues(alpha: 0.10) : null,
           borderRadius: BorderRadius.circular(20),

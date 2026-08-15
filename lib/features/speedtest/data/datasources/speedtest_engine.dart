@@ -7,23 +7,23 @@ import 'dart:typed_data';
 import '../../domain/entities/speedtest_models.dart';
 import 'speedtest_servers.dart';
 
-/// Управляет фоновым изолятом, который прогоняет полный speedtest и стримит
-/// [SpeedTestProgress] в UI-изолят. Позволяет отменить тест на лету, не
-/// блокируя интерфейс и не оставляя открытых сокетов.
+/// Drives a background isolate that runs the full speed test and streams
+/// [SpeedTestProgress] back to the UI isolate. The test can be cancelled
+/// mid-flight without blocking the UI or leaking open sockets.
 class SpeedTestEngine {
   Isolate? _isolate;
   ReceivePort? _fromIsolate;
   SendPort? _control;
   StreamController<SpeedTestProgress>? _out;
 
-  /// Запускает тест и возвращает поток событий прогресса.
+  /// Starts the test and returns a stream of progress events.
   Stream<SpeedTestProgress> run() {
     final out = _out = StreamController<SpeedTestProgress>();
 
     _fromIsolate = ReceivePort()
       ..listen((msg) {
         if (msg is SendPort) {
-          // Первое сообщение — управляющий порт изолята (для отмены).
+          // First message is the isolate's control port, used to cancel.
           _control = msg;
         } else if (msg is SpeedTestProgress) {
           if (!out.isClosed) out.add(msg);
@@ -47,10 +47,10 @@ class SpeedTestEngine {
     return out.stream;
   }
 
-  /// Мягкая отмена: просим изолят закрыть сокеты и выйти.
+  /// Graceful cancel: ask the isolate to close its sockets and exit.
   void cancel() {
     _control?.send('cancel');
-    // Подстраховка: если изолят завис в сети — принудительно снимем его.
+    // Safety net: if the isolate is stuck on the network, kill it.
     Future<void>.delayed(const Duration(milliseconds: 700), _dispose);
   }
 
@@ -68,10 +68,10 @@ class SpeedTestEngine {
 
 // ─────────────────────────── isolate side ───────────────────────────
 
-/// Точка входа изолята. Настраивает управляющий порт и запускает прогон.
+/// Isolate entry point. Sets up the control port and starts the run.
 Future<void> _isolateEntry(SendPort toMain) async {
   final control = ReceivePort();
-  toMain.send(control.sendPort); // отдаём порт для команды 'cancel'
+  toMain.send(control.sendPort); // hand over the port for 'cancel'
 
   var cancelled = false;
   control.listen((m) {
@@ -89,7 +89,7 @@ Future<void> _isolateEntry(SendPort toMain) async {
   }
 }
 
-/// Бросается, когда сервер ответил не тем, чего мы ждём (429, 5xx и т.п.).
+/// Thrown when a server answers with something unexpected (429, 5xx, ...).
 class _ServerUnavailable implements Exception {
   _ServerUnavailable(this.status);
   final int status;
@@ -97,36 +97,36 @@ class _ServerUnavailable implements Exception {
   String toString() => 'server responded $status';
 }
 
-/// Вся сетевая логика теста. Работает целиком внутри фонового изолята.
+/// All the test's network logic. Runs entirely inside the background isolate.
 class _Runner {
   _Runner({required this.emit, required this.cancelled});
 
   final void Function(SpeedTestProgress) emit;
   final bool Function() cancelled;
 
-  static const _connections = 4; // параллельные соединения
-  static const _ewmaAlpha = 0.25; // сглаживание стрелки
+  static const _connections = 4; // parallel connections
+  static const _ewmaAlpha = 0.25; // needle smoothing
   static const _phaseDuration = Duration(seconds: 8);
-  static const _rampUp = Duration(milliseconds: 1500); // разгон TCP
+  static const _rampUp = Duration(milliseconds: 1500); // TCP ramp-up
 
   double? _ping, _jitter, _download, _upload, _loadedPing;
   SpeedTestServer? _server;
 
-  /// RTT, собранные во время скачивания (для bufferbloat).
+  /// Round-trip times sampled while downloading (used for bufferbloat).
   final List<double> _loadedRtts = [];
 
-  /// Один общий буфер для отдачи (генерим случайные байты ровно раз,
-  /// чтобы не жечь CPU в горячем цикле и обойти сжатие на стороне сервера).
-  late final Uint8List _uploadBuffer = _makeBuffer(1 << 20); // 1 МБ
+  /// A single shared upload buffer. Random bytes are generated exactly once
+  /// to keep the hot loop cheap and to defeat server-side compression.
+  late final Uint8List _uploadBuffer = _makeBuffer(1 << 20); // 1 MB
 
   Future<void> run() async {
-    // Выбираем живой сервер: перебираем по приоритету, пока не ответит.
+    // Pick a reachable server: walk the list by priority until one answers.
     _server = await _selectServer();
     if (_server == null) {
       emit(const SpeedTestProgress(
         phase: TestPhase.error,
-        error: 'Не удалось связаться ни с одним тестовым сервером. '
-            'Проверьте подключение к интернету.',
+        error: 'Could not reach any test server. '
+            'Check your internet connection.',
       ));
       return;
     }
@@ -158,10 +158,10 @@ class _Runner {
     ));
   }
 
-  // ── Выбор сервера ─────────────────────────────────────────────────
+  // ── Server selection ──────────────────────────────────────────────
   //
-  // Пробуем каждый источник крошечным запросом. Первый, кто ответит 200/206,
-  // и становится рабочим — так тест переживает лимиты вроде HTTP 429.
+  // Probe each source with a tiny request. The first one answering 200/206
+  // wins, so the test survives rate limits such as HTTP 429.
   Future<SpeedTestServer?> _selectServer() async {
     for (final server in kSpeedTestServers) {
       if (cancelled()) return null;
@@ -173,7 +173,7 @@ class _Runner {
         if (range != null) req.headers.set(HttpHeaders.rangeHeader, range);
         final resp = await req.close().timeout(const Duration(seconds: 8));
         final ok = resp.statusCode == 200 || resp.statusCode == 206;
-        // Забираем немного данных, чтобы убедиться, что поток реально идёт.
+        // Pull a little data to confirm bytes actually flow.
         var got = 0;
         await for (final chunk in resp) {
           got += chunk.length;
@@ -181,7 +181,7 @@ class _Runner {
         }
         if (ok && got > 0) return server;
       } catch (_) {
-        // Сервер недоступен — пробуем следующий.
+        // Server unreachable — try the next one.
       } finally {
         client.close(force: true);
       }
@@ -189,7 +189,7 @@ class _Runner {
     return null;
   }
 
-  // ── Пинг и джиттер ────────────────────────────────────────────────
+  // ── Ping and jitter ───────────────────────────────────────────────
   Future<(double, double)> _measurePing() async {
     emit(SpeedTestProgress(
         phase: TestPhase.ping, serverName: _server?.name));
@@ -197,7 +197,7 @@ class _Runner {
     final client = HttpClient()
       ..connectionTimeout = const Duration(seconds: 6);
 
-    await _probe(client, server); // прогрев: поглощает DNS + TLS handshake
+    await _probe(client, server); // warm-up: absorbs DNS + TLS handshake
 
     const samples = 18;
     final rtts = <double>[];
@@ -219,7 +219,7 @@ class _Runner {
     return (_median(List.of(rtts)), _meanAbsDeviation(rtts));
   }
 
-  /// Крошечный запрос; возвращает RTT в мс или null при ошибке.
+  /// Tiny request; returns the round-trip time in ms, or null on failure.
   Future<double?> _probe(HttpClient c, SpeedTestServer server) async {
     try {
       final sw = Stopwatch()..start();
@@ -235,13 +235,13 @@ class _Runner {
     }
   }
 
-  // ── Пропускная способность (download / upload) ────────────────────
+  // ── Throughput (download / upload) ────────────────────────────────
   Future<double> _measureThroughput({required bool isUpload}) async {
     final server = _server!;
     final phase = isUpload ? TestPhase.upload : TestPhase.download;
 
-    // Отдачу поддерживает не каждый источник. Если у выбранного её нет,
-    // берём первый сервер из списка, который умеет POST.
+    // Not every source accepts uploads. If the chosen one doesn't, fall back
+    // to the first server in the list that supports POST.
     final upServer = isUpload ? _serverForUpload(server) : server;
     if (isUpload && upServer == null) return 0;
 
@@ -257,8 +257,8 @@ class _Runner {
     final deadline = started.add(_phaseDuration);
     final measureFrom = started.add(_rampUp);
 
-    var totalBytes = 0; // всё за фазу — для мгновенной скорости
-    var measuredBytes = 0; // только после разгона — для итога
+    var totalBytes = 0; // whole phase — drives the live readout
+    var measuredBytes = 0; // post ramp-up only — drives the final number
     DateTime? measuredStart;
 
     void count(int n) {
@@ -270,8 +270,8 @@ class _Runner {
       }
     }
 
-    // Сэмплер: раз в 200 мс считает мгновенную скорость, сглаживает EWMA
-    // и шлёт событие для стрелки спидометра.
+    // Sampler: every 200 ms computes the instantaneous rate, smooths it with
+    // an EWMA and emits an event for the gauge.
     var smoothed = 0.0;
     var lastBytes = 0;
     var lastTick = DateTime.now();
@@ -279,7 +279,7 @@ class _Runner {
       final now = DateTime.now();
       final dt = now.difference(lastTick).inMicroseconds / 1e6;
       if (dt <= 0) return;
-      final inst = (totalBytes - lastBytes) * 8 / dt / 1e6; // Мбит/с
+      final inst = (totalBytes - lastBytes) * 8 / dt / 1e6; // Mbps
       lastBytes = totalBytes;
       lastTick = now;
       smoothed =
@@ -298,15 +298,15 @@ class _Runner {
       ));
     });
 
-    // Во время скачивания параллельно меряем задержку — это и есть
-    // bufferbloat: насколько канал «распухает» под нагрузкой.
+    // While downloading we measure latency in parallel — that is bufferbloat:
+    // how much the link swells under load.
     Timer? bloatProbe;
     HttpClient? probeClient;
     if (!isUpload) {
       probeClient = HttpClient()
         ..connectionTimeout = const Duration(seconds: 5);
       bloatProbe = Timer.periodic(const Duration(milliseconds: 350), (_) async {
-        if (DateTime.now().isBefore(measureFrom)) return; // ждём разгона
+        if (DateTime.now().isBefore(measureFrom)) return; // wait for ramp-up
         final rtt = await _probe(probeClient!, server);
         if (rtt != null) _loadedRtts.add(rtt);
       });
@@ -325,8 +325,8 @@ class _Runner {
           }
         }
       } catch (_) {
-        // Обрыв соединения или отказ сервера — воркер просто завершится,
-        // остальные продолжат качать.
+        // A dropped connection or a server refusal just ends this worker;
+        // the others keep pulling.
       } finally {
         client.close(force: true);
       }
@@ -340,7 +340,7 @@ class _Runner {
     final elapsed = measuredStart == null
         ? 1.0
         : DateTime.now().difference(measuredStart!).inMicroseconds / 1e6;
-    return measuredBytes * 8 / (elapsed <= 0 ? 1 : elapsed) / 1e6; // Мбит/с
+    return measuredBytes * 8 / (elapsed <= 0 ? 1 : elapsed) / 1e6; // Mbps
   }
 
   Future<void> _downloadOnce(
@@ -354,8 +354,8 @@ class _Runner {
     if (range != null) req.headers.set(HttpHeaders.rangeHeader, range);
     final resp = await req.close();
 
-    // 200 — обычный ответ, 206 — частичный (Range). Всё прочее (например,
-    // 429 при лимите) данными не считаем.
+    // 200 is a normal response, 206 a partial one (Range). Anything else
+    // (a 429 rate limit, say) does not count as data.
     if (resp.statusCode != 200 && resp.statusCode != 206) {
       await resp.drain<void>();
       throw _ServerUnavailable(resp.statusCode);
@@ -363,7 +363,7 @@ class _Runner {
     await for (final data in resp) {
       count(data.length);
       if (cancelled() || !DateTime.now().isBefore(deadline)) {
-        break; // прерываем стрим → подписка отменяется, сокет закроется
+        break; // breaking the stream cancels the subscription and closes it
       }
     }
   }
@@ -374,7 +374,7 @@ class _Runner {
     void Function(int) count,
     DateTime deadline,
   ) async {
-    const chunksPerReq = 8; // 8 МБ на запрос
+    const chunksPerReq = 8; // 8 MB per request
     final buf = _uploadBuffer;
     final req = await c.postUrl(Uri.parse(server.uploadUrl!));
     req.headers.contentType = ContentType.binary;
@@ -382,20 +382,20 @@ class _Runner {
 
     for (var i = 0; i < chunksPerReq; i++) {
       if (cancelled() || !DateTime.now().isBefore(deadline)) {
-        req.abort(); // прерываем — соединение закроется принудительно
+        req.abort(); // abort forces the connection closed
         return;
       }
       req.add(buf);
       count(buf.length);
-      await req.flush(); // backpressure: счётчик ~ следует за сетью
+      await req.flush(); // backpressure: the counter tracks the wire
     }
     final resp = await req.close();
     await resp.drain<void>();
   }
 
-  // ── Утилиты ───────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────
 
-  /// Сервер для отдачи: текущий, если умеет POST, иначе первый подходящий.
+  /// Upload server: the current one if it accepts POST, else the first that does.
   SpeedTestServer? _serverForUpload(SpeedTestServer current) {
     if (current.uploadUrl != null) return current;
     for (final s in kSpeedTestServers) {

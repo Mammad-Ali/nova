@@ -9,8 +9,8 @@ final speedTestHistoryProvider =
     NotifierProvider<SpeedTestHistoryNotifier, List<SpeedTestRecord>>(
         SpeedTestHistoryNotifier.new);
 
-/// Список сохранённых результатов, старые → новые. Хранится на диске через
-/// [SpeedTestHistoryRepository]; каждое изменение сразу сохраняется.
+/// Stored results, oldest to newest. Persisted through
+/// [SpeedTestHistoryRepository]; every change is written out immediately.
 class SpeedTestHistoryNotifier extends Notifier<List<SpeedTestRecord>> {
   late final SpeedTestHistoryRepository _repo =
       ref.read(speedTestHistoryRepositoryProvider);

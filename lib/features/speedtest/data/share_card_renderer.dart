@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 
-/// Данные для карточки-картинки с результатом теста.
+/// Data for the shareable result image.
 class ShareCardData {
   const ShareCardData({
     required this.downloadMbps,
@@ -32,23 +32,23 @@ class ShareCardData {
   final String? serverName;
   final String dateLabel;
 
-  // Локализованные подписи.
+  // Localised labels.
   final String downloadLabel;
   final String uploadLabel;
   final String pingLabel;
   final String jitterLabel;
 }
 
-/// Рисует карточку результата и возвращает PNG-байты.
+/// Renders the result card and returns PNG bytes.
 ///
-/// Рисуем прямо на Canvas, а не снимаем виджет с экрана: так картинка не
-/// зависит от текущего состояния UI, размера окна и темы.
+/// Drawn straight onto a Canvas rather than captured from a widget, so the
+/// image doesn't depend on the current UI state, window size or theme.
 Future<Uint8List?> renderShareCard(ShareCardData d) async {
   const w = 1200.0, h = 630.0;
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, w, h));
 
-  // Фон: тёмный градиент + мягкие пятна «северного сияния».
+  // Background: a dark gradient with soft coloured blooms.
   canvas.drawRect(
     const Rect.fromLTWH(0, 0, w, h),
     Paint()
@@ -62,7 +62,7 @@ Future<Uint8List?> renderShareCard(ShareCardData d) async {
   _blob(canvas, const Offset(1050, 180), 300, AppColors.nebulaPink, 0.18);
   _blob(canvas, const Offset(600, 640), 380, AppColors.nebulaViolet, 0.14);
 
-  // Звёзды для узнаваемости стиля.
+  // Stars, to keep the style recognisable.
   final rnd = math.Random(11);
   final star = Paint();
   for (var i = 0; i < 90; i++) {
@@ -73,13 +73,13 @@ Future<Uint8List?> renderShareCard(ShareCardData d) async {
     canvas.drawCircle(Offset(x, y), r, star);
   }
 
-  // Заголовок.
+  // Heading.
   _text(canvas, 'Nova', const Offset(64, 52),
       size: 44, weight: FontWeight.w900, color: AppColors.onGlass);
   _text(canvas, d.dateLabel, const Offset(64, 108),
       size: 20, color: AppColors.textLo);
 
-  // Плашка с оценкой справа.
+  // Grade badge on the right.
   final gradeRect =
       RRect.fromRectAndRadius(const Rect.fromLTWH(1000, 48, 136, 136),
           const Radius.circular(28));
@@ -98,17 +98,17 @@ Future<Uint8List?> renderShareCard(ShareCardData d) async {
       color: AppColors.nebulaViolet,
       center: true);
 
-  // Две крупные цифры: загрузка и отдача.
+  // The two headline figures: download and upload.
   _bigMetric(canvas, const Offset(64, 210), d.downloadLabel, d.downloadMbps,
       AppColors.nebulaViolet, '↓');
   _bigMetric(canvas, const Offset(620, 210), d.uploadLabel, d.uploadMbps,
       AppColors.nebulaPink, '↑');
 
-  // Пинг и джиттер.
+  // Ping and jitter.
   _smallMetric(canvas, const Offset(64, 430), d.pingLabel, d.pingMs);
   _smallMetric(canvas, const Offset(340, 430), d.jitterLabel, d.jitterMs);
 
-  // Подвал: провайдер и сервер.
+  // Footer: provider and server.
   final footer = [
     if (d.provider != null && d.provider!.isNotEmpty) d.provider,
     if (d.serverName != null) d.serverName,
@@ -146,7 +146,7 @@ void _bigMetric(
   final v = value >= 100 ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
   _text(c, v, at + const Offset(0, 40),
       size: 104, weight: FontWeight.w900, color: color);
-  // Ширина числа заранее неизвестна — «Mbps» ставим под ним.
+  // The number's width isn't known up front, so "Mbps" goes underneath.
   _text(c, 'Mbps', at + const Offset(4, 158), size: 26, color: AppColors.textLo);
 }
 

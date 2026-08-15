@@ -8,10 +8,10 @@ import '../speedtest/domain/entities/speedtest_models.dart';
 import '../speedtest/presentation/providers/speedtest_provider.dart';
 import '../traffic_monitor/presentation/providers/usage_stats_provider.dart';
 
-/// Следит за результатами тестов и дневным трафиком; шлёт системные
-/// уведомления, когда сработали заданные пользователем пороги.
+/// Watches test results and daily traffic, sending system notifications when
+/// the user's thresholds are crossed.
 ///
-/// Провайдер держится живым из [main], иначе слушать было бы некому.
+/// Kept alive from [main]; otherwise nothing would be listening.
 final alertsWatcherProvider = Provider<AlertsWatcher>((ref) {
   final w = AlertsWatcher(ref);
   w.start();
@@ -22,7 +22,7 @@ class AlertsWatcher {
   AlertsWatcher(this.ref);
   final Ref ref;
 
-  /// Чтобы не слать одно и то же уведомление повторно.
+  /// Prevents sending the same notification twice.
   String? _limitNotifiedForDay;
   TestPhase? _prevPhase;
 
@@ -64,7 +64,7 @@ class AlertsWatcher {
     final limitBytes = limitGb * 1024 * 1024 * 1024;
     if (dayBytes < limitBytes) return;
 
-    _limitNotifiedForDay = dayKey; // один раз в сутки
+    _limitNotifiedForDay = dayKey; // once per day
     final t = ref.read(stringsProvider);
     final usedGb = dayBytes / (1024 * 1024 * 1024);
     NotificationService.instance.show(

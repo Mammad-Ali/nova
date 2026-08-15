@@ -1,14 +1,14 @@
-/// Категория скорости для итоговой оценки.
+/// Speed tier behind the final grade.
 enum SpeedTier { blazing, fast, good, moderate, slow }
 
-/// Буквенная оценка + категория по скорости загрузки.
+/// A letter grade plus the tier, derived from download speed.
 class SpeedGrade {
   const SpeedGrade(this.letter, this.tier);
   final String letter;
   final SpeedTier tier;
 }
 
-/// Считает оценку по download (Мбит/с).
+/// Computes the grade from download speed (Mbps).
 SpeedGrade gradeForDownload(double mbps) {
   if (mbps >= 300) return const SpeedGrade('A+', SpeedTier.blazing);
   if (mbps >= 150) return const SpeedGrade('A', SpeedTier.blazing);

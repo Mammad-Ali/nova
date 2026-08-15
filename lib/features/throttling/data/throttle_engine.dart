@@ -6,16 +6,16 @@ import 'dart:isolate';
 import '../../speedtest/data/datasources/speedtest_servers.dart';
 import '../domain/throttle_result.dart';
 
-/// Проверяет, не режет ли провайдер видеотрафик: меряет скорость до
-/// нейтрального CDN и до видео-CDN Netflix, затем сравнивает.
+/// Checks whether the ISP throttles video: measures throughput against a
+/// neutral CDN and against Netflix's video CDN, then compares the two.
 ///
-/// Работает в отдельном изоляте — как и основной тест скорости, чтобы
-/// подсчёт байтов не подтормаживал интерфейс.
+/// Runs in its own isolate, like the main speed test, so byte counting never
+/// stutters the UI.
 class ThrottleEngine {
   Isolate? _isolate;
   ReceivePort? _port;
 
-  /// Возвращает результат или бросает исключение с понятным текстом.
+  /// Returns the result, or throws with a human-readable message.
   Future<ThrottleResult> run() async {
     final port = _port = ReceivePort();
     final completer = Completer<ThrottleResult>();
@@ -34,7 +34,7 @@ class ThrottleEngine {
       const Duration(seconds: 40),
       onTimeout: () {
         _dispose();
-        throw 'Проверка не уложилась во время';
+        throw 'The check timed out';
       },
     );
   }
@@ -56,15 +56,15 @@ const _connections = 2;
 
 Future<void> _entry(SendPort toMain) async {
   try {
-    // 1. Видео-CDN: fast.com отдаёт ссылки на ближайшие серверы Netflix.
+    // 1. Video CDN: fast.com hands out URLs for the nearest Netflix servers.
     final videoUrls = await _fastComTargets();
     if (videoUrls.isEmpty) {
-      toMain.send('Не удалось получить адрес видео-сервера');
+      toMain.send('Could not obtain a video server address');
       return;
     }
     final videoMbps = await _measure(videoUrls);
 
-    // 2. Нейтральный CDN — тот же источник, что и в основном тесте.
+    // 2. Neutral CDN — the same source the main test uses.
     final neutral = kSpeedTestServers.first;
     final neutralMbps = await _measure(
       List.filled(_connections, neutral.chunkUrl()),
@@ -82,8 +82,8 @@ Future<void> _entry(SendPort toMain) async {
   }
 }
 
-/// Публичный API fast.com (тот же, что использует их веб-клиент) —
-/// возвращает адреса ближайших серверов Netflix Open Connect.
+/// fast.com's public API — the one their own web client uses. Returns URLs
+/// of the nearest Netflix Open Connect servers.
 Future<List<String>> _fastComTargets() async {
   final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
   try {
@@ -102,11 +102,11 @@ Future<List<String>> _fastComTargets() async {
   }
 }
 
-/// Качает по указанным URL в несколько потоков и возвращает Мбит/с.
+/// Downloads from the given URLs over several connections and returns Mbps.
 Future<double> _measure(List<String> urls, {String? rangeHeader}) async {
   final started = DateTime.now();
   final deadline = started.add(_phase);
-  // Первую секунду не считаем — TCP ещё разгоняется.
+  // Skip the first second: TCP is still ramping up.
   final measureFrom = started.add(const Duration(milliseconds: 1000));
 
   var bytes = 0;
@@ -130,8 +130,8 @@ Future<double> _measure(List<String> urls, {String? rangeHeader}) async {
         if (rangeHeader != null) {
           req.headers.set(HttpHeaders.rangeHeader, rangeHeader);
         } else {
-          // Netflix отдаёт файл целиком; ограничиваем куском, чтобы не
-          // тянуть лишнее после дедлайна.
+          // Netflix serves the whole file; cap the chunk so we don't keep
+          // pulling past the deadline.
           req.headers.set(HttpHeaders.rangeHeader, 'bytes=0-9999999');
         }
         final resp = await req.close();
@@ -145,13 +145,13 @@ Future<double> _measure(List<String> urls, {String? rangeHeader}) async {
         }
       }
     } catch (_) {
-      // Обрыв — воркер просто заканчивает работу.
+      // On a drop the worker simply finishes.
     } finally {
       client.close(force: true);
     }
   }
 
-  // Раскладываем URL по воркерам (их может быть меньше, чем соединений).
+  // Spread URLs across workers (there may be fewer URLs than connections).
   final jobs = [
     for (var i = 0; i < _connections; i++) worker(urls[i % urls.length]),
   ];

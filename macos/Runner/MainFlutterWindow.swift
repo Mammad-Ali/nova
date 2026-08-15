@@ -9,12 +9,12 @@ class MainFlutterWindow: NSWindow {
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
 
-    // Регистрация плагинов (shared_preferences, window_manager, tray_manager,
-    // local_notifier, file_selector). Без этой строки ни один плагин не
-    // подключается и его канал падает с MissingPluginException.
+    // Plugin registration (shared_preferences, window_manager, tray_manager,
+    // local_notifier, file_selector). Without this line no plugin is wired up
+    // and every plugin channel fails with MissingPluginException.
     RegisterGeneratedPlugins(registry: flutterViewController)
 
-    // --- Канал связи (MethodChannel) с сетевой картой macOS ---
+    // --- MethodChannel exposing macOS network interface counters ---
     FlutterMethodChannel(
         name: "net_pulse/traffic",
         binaryMessenger: flutterViewController.engine.binaryMessenger
@@ -42,10 +42,10 @@ class MainFlutterWindow: NSWindow {
     }
     // --------------------------------------------------------
 
-    // --- Канал Wi-Fi: имя сети, уровень сигнала, скорость линка ---
-    // Важно: начиная с macOS 14 имя сети (SSID) отдаётся только при выданном
-    // доступе к геопозиции, а вот RSSI, скорость линка и канал доступны
-    // всегда — поэтому SSID может быть nil, и это нормально.
+    // --- Wi-Fi channel: network name, signal strength, link rate ---
+    // Note: since macOS 14 the SSID is only exposed when location access has
+    // been granted, while RSSI, link rate and channel are always available —
+    // so a nil SSID here is expected, not an error.
     FlutterMethodChannel(
         name: "net_pulse/wifi",
         binaryMessenger: flutterViewController.engine.binaryMessenger
@@ -54,7 +54,7 @@ class MainFlutterWindow: NSWindow {
             result(FlutterMethodNotImplemented); return
         }
         guard let iface = CWWiFiClient.shared().interface(), iface.powerOn() else {
-            result(nil) // Wi-Fi выключен или интерфейса нет (Ethernet)
+            result(nil) // Wi-Fi is off, or there is no interface (Ethernet)
             return
         }
         var info: [String: Any] = [:]

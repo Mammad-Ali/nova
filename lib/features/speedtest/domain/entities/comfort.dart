@@ -1,7 +1,7 @@
-/// Насколько комфортно конкретное занятие при измеренной скорости.
+/// How comfortable a given activity is at the measured speed.
 enum ComfortLevel { poor, ok, good, great }
 
-/// Вид активности, для которого оцениваем комфорт.
+/// An activity whose comfort level we rate.
 enum ComfortActivity {
   browsing,
   hdVideo,
@@ -18,11 +18,11 @@ class ComfortItem {
   final ComfortLevel level;
 }
 
-/// Оценивает список активностей по download/upload (Мбит/с) и ping (мс).
+/// Rates a list of activities from download/upload (Mbps) and ping (ms).
 ///
-/// Пороги ориентированы на типичные требования сервисов (YouTube/Netflix,
-/// Zoom, облачный гейминг и т.п.). Для игр и звонков учитываем и задержку —
-/// там она важнее пропускной способности.
+/// Thresholds follow the usual requirements of real services (YouTube,
+/// Netflix, Zoom, cloud gaming). Gaming and calls also weigh latency, which
+/// matters more there than raw bandwidth.
 List<ComfortItem> evaluateComfort({
   required double download,
   required double upload,
@@ -40,7 +40,7 @@ List<ComfortItem> evaluateComfort({
   ];
 }
 
-/// great ≥ [great], good ≥ [good], ok ≥ [ok], иначе poor.
+/// great ≥ [great], good ≥ [good], ok ≥ [ok], otherwise poor.
 ComfortLevel _byThresholds(double v, double great, double good, double ok) {
   if (v >= great) return ComfortLevel.great;
   if (v >= good) return ComfortLevel.good;
@@ -57,9 +57,9 @@ ComfortLevel _gaming(double download, double ping) {
 }
 
 ComfortLevel _calls(double download, double upload, double ping) {
-  final bw = download < upload ? download : upload; // ограничивает слабейшая
+  final bw = download < upload ? download : upload; // the weaker side limits
   final byBw = _byThresholds(bw, 8, 3, 1.2);
-  // Высокий пинг снижает оценку на одну ступень.
+  // High latency drops the rating by one step.
   if (ping > 150 && byBw.index > 0) {
     return ComfortLevel.values[byBw.index - 1];
   }

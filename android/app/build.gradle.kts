@@ -6,8 +6,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Ключ подписи лежит вне репозитория (android/key.properties + android/keys/).
-// Если файла нет — собираем отладочной подписью, чтобы `flutter run` работал.
+// The signing key lives outside the repository (android/key.properties and
+// android/keys/). When it is missing we fall back to the debug signature so
+// `flutter run` keeps working.
 val keystoreProperties = Properties().apply {
     val f = rootProject.file("key.properties")
     if (f.exists()) f.inputStream().use { load(it) }

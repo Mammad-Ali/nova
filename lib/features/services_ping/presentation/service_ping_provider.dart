@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/service_target.dart';
 
-/// Состояние замера задержек до сервисов.
+/// State of the per-service latency measurement.
 class ServicePingState {
   const ServicePingState({this.results = const [], this.running = false});
 
@@ -16,12 +16,12 @@ final servicePingProvider =
     NotifierProvider<ServicePingNotifier, ServicePingState>(
         ServicePingNotifier.new);
 
-/// Меряет задержку до каждого сервиса: три запроса, берём медиану.
-/// Сервисы опрашиваются параллельно, поэтому весь прогон ~1 секунду.
+/// Measures latency to each service: three requests, median wins.
+/// Services are probed in parallel, so a full run takes about a second.
 class ServicePingNotifier extends Notifier<ServicePingState> {
   @override
   ServicePingState build() {
-    // Первый замер сразу при открытии — не заставляем жать кнопку.
+    // Measure immediately on open instead of waiting for a button press.
     Future.microtask(run);
     return const ServicePingState(running: true);
   }
@@ -32,7 +32,7 @@ class ServicePingNotifier extends Notifier<ServicePingState> {
 
     final results = await Future.wait(kServiceTargets.map(_measure));
 
-    // Быстрые — наверху, недоступные — в конце.
+    // Fastest first, unreachable ones last.
     results.sort((a, b) {
       if (a.failed != b.failed) return a.failed ? 1 : -1;
       return (a.rttMs ?? 0).compareTo(b.rttMs ?? 0);
@@ -49,7 +49,7 @@ class ServicePingNotifier extends Notifier<ServicePingState> {
     final rtts = <double>[];
 
     try {
-      // Прогрев: поглощает DNS + TLS, дальше меряем по живому соединению.
+      // Warm-up absorbs DNS + TLS; the rest reuses the live connection.
       await _once(client, uri);
       for (var i = 0; i < 3; i++) {
         final rtt = await _once(client, uri);

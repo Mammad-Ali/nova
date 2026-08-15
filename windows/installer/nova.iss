@@ -1,22 +1,21 @@
-; Установщик Nova для Windows (Inno Setup 6).
+; Nova installer for Windows (Inno Setup 6).
 ;
-; Ставит приложение в папку пользователя, поэтому НЕ требует прав
-; администратора и не показывает запрос UAC — для сборки без сертификата
-; это заметно упрощает установку.
+; Installs into the user's own folder, so it needs no administrator rights
+; and raises no UAC prompt — a real simplification for an unsigned build.
 ;
-; Сборка: ISCC.exe windows\installer\nova.iss
-; Результат: build\windows\installer\Nova-Setup.exe
+; Build:  ISCC.exe windows\installer\nova.iss
+; Output: build\windows\installer\Nova-Setup.exe
 
 #define AppName "Nova"
 #define AppVersion "1.0.0"
 #define AppPublisher "Mammad-Ali"
 #define AppExe "Nova.exe"
-; Путь к собранному приложению относительно этого файла.
+; Path to the built application, relative to this file.
 #define BuildDir "..\..\build\windows\x64\runner\Release"
 
 [Setup]
-; Идентификатор менять нельзя — по нему находится прошлая версия
-; при обновлении и удалении.
+; Never change this id: it is how upgrades and uninstalls find the previous
+; installation.
 AppId={{021C8CB6-98EE-4744-913B-5407B4C4DD4F}
 AppName={#AppName}
 AppVersion={#AppVersion}
@@ -24,7 +23,7 @@ AppPublisher={#AppPublisher}
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
-; Ставим для текущего пользователя: без прав администратора и без UAC.
+; Per-user installation: no administrator rights, no UAC prompt.
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=..\..\build\windows\installer
@@ -38,15 +37,16 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 
 [Languages]
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; \
     GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-; Всё содержимое сборки: exe, библиотеки и папка data — они нужны вместе.
+; Everything the build produces: the exe, its libraries and the data folder —
+; they only work together.
 Source: "{#BuildDir}\*"; DestDir: "{app}"; \
     Flags: ignoreversion recursesubdirs createallsubdirs
 
@@ -56,7 +56,7 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; \
     Tasks: desktopicon
 
 [Run]
-; Предлагаем запустить сразу после установки.
+; Offer to launch straight after installing.
 Filename: "{app}\{#AppExe}"; \
     Description: "{cm:LaunchProgram,{#AppName}}"; \
     Flags: nowait postinstall skipifsilent

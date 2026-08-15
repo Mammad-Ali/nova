@@ -1,12 +1,12 @@
-// winsock2.h должен быть подключён до любого заголовка, который может
-// затянуть <windows.h> без WIN32_LEAN_AND_MEAN (flutter_window.h делает это
-// через win32_window.h) — иначе устаревший <winsock.h>, который тот тянет,
-// конфликтует с <winsock2.h>/<iphlpapi.h> ниже. Поэтому канал живёт в своей
-// собственной единице трансляции, а не в flutter_window.cpp.
-// GetIfTable2/MIB_IF_TABLE2 объявлены в <netioapi.h> под защитой
-// `NTDDI_VERSION >= NTDDI_VISTA`. Раннер Flutter версию Windows не задаёт,
-// поэтому объявляем её сами ДО системных заголовков — иначе эти символы
-// просто не попадут в трансляцию (проверено сборкой на Windows CI).
+// winsock2.h must come before any header that might pull in <windows.h>
+// without WIN32_LEAN_AND_MEAN (flutter_window.h does exactly that through
+// win32_window.h). Otherwise the legacy <winsock.h> it drags in clashes with
+// <winsock2.h>/<iphlpapi.h> below. That is why this channel lives in its own
+// translation unit rather than inside flutter_window.cpp.
+// GetIfTable2/MIB_IF_TABLE2 are declared in <netioapi.h> behind
+// `NTDDI_VERSION >= NTDDI_VISTA`. The Flutter runner never sets a Windows
+// version, so we declare one ourselves BEFORE the system headers — otherwise
+// those symbols never make it into the translation unit (confirmed by CI).
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0A00 // Windows 10
 #endif
@@ -15,7 +15,7 @@
 #endif
 
 #include <winsock2.h>
-#include <ws2ipdef.h> // SOCKADDR_INET, нужен для типов в netioapi.h
+#include <ws2ipdef.h> // SOCKADDR_INET, required by types in netioapi.h
 #include <iphlpapi.h>
 #include <netioapi.h>
 
@@ -32,9 +32,9 @@
 
 namespace {
 
-// Суммирует Rx/Tx октеты по физическим адаптерам, пропуская loopback и
-// виртуальные интерфейсы (VPN-туннели и т.п.) — то же правило фильтрации,
-// что и в реализациях для macOS/Android.
+// Sums Rx/Tx octets across physical adapters, skipping loopback and virtual
+// interfaces such as VPN tunnels — the same filtering rule the macOS and
+// Android implementations use.
 std::pair<int64_t, int64_t> ReadCounters() {
   int64_t rx = 0;
   int64_t tx = 0;
@@ -62,9 +62,9 @@ void RegisterTrafficChannel(flutter::BinaryMessenger* messenger) {
           messenger, "net_pulse/traffic",
           &flutter::StandardMethodCodec::GetInstance());
 
-  // SetMethodCallHandler передаёт обработчик мессенджеру по значению — сам
-  // объект channel можно безопасно уничтожить сразу после этого вызова,
-  // как и делают официальные плагины Flutter для Windows.
+  // SetMethodCallHandler hands the callback to the messenger by value, so the
+  // channel object itself can be destroyed right after this call — the same
+  // pattern the official Flutter Windows plugins use.
   channel->SetMethodCallHandler(
       [](const flutter::MethodCall<flutter::EncodableValue>& call,
          std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>

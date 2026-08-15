@@ -10,7 +10,7 @@ import 'package:net_pulse/features/speedtest/presentation/providers/speedtest_hi
 import 'package:net_pulse/features/speedtest/presentation/providers/speedtest_provider.dart';
 import 'package:net_pulse/features/speedtest/presentation/screens/speedtest_screen.dart';
 
-/// Фейковый контроллер: воспроизводит переходы состояния без реальной сети.
+/// Fake controller: replays state transitions without touching the network.
 class FakeCtrl extends SpeedTestController {
   @override
   SpeedTestState build() => const SpeedTestState();
@@ -44,7 +44,7 @@ class FakeCtrl extends SpeedTestController {
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets('повторный тест не роняет приложение', (tester) async {
+  testWidgets('running the test repeatedly does not crash', (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [
         speedTestControllerProvider.overrideWith(FakeCtrl.new),
@@ -60,27 +60,27 @@ void main() {
     final ctrl = ProviderScope.containerOf(el)
         .read(speedTestControllerProvider.notifier) as FakeCtrl;
 
-    // Тест 1
+    // Run 1
     ctrl.start();
     await tester.pump(const Duration(milliseconds: 100));
     ctrl.finish(50);
     await tester.pump(const Duration(milliseconds: 700));
     await tester.pump(const Duration(milliseconds: 700));
-    expect(tester.takeException(), isNull, reason: 'после первого теста');
+    expect(tester.takeException(), isNull, reason: 'after the first run');
 
-    // Тест 2 (повторный, рекорд → конфетти)
+    // Run 2 (repeat, a record, which fires confetti)
     ctrl.start();
     await tester.pump(const Duration(milliseconds: 100));
     ctrl.finish(90);
     await tester.pump(const Duration(milliseconds: 700));
     await tester.pump(const Duration(milliseconds: 700));
-    expect(tester.takeException(), isNull, reason: 'после повторного теста');
+    expect(tester.takeException(), isNull, reason: 'after the repeat run');
 
-    // Тест 3
+    // Run 3
     ctrl.start();
     await tester.pump(const Duration(milliseconds: 200));
     ctrl.finish(30);
     await tester.pump(const Duration(milliseconds: 700));
-    expect(tester.takeException(), isNull, reason: 'после третьего теста');
+    expect(tester.takeException(), isNull, reason: 'after the third run');
   });
 }

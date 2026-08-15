@@ -6,11 +6,11 @@ class AppDelegate: FlutterAppDelegate {
     private var activity: NSObjectProtocol?
 
     override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        false // Не закрывать приложение полностью, когда нажата кнопка-крестик
+        false // Don't quit the app when the close button is pressed
     }
 
     override func applicationDidFinishLaunching(_ notification: Notification) {
-        // Запрещаем macOS останавливать замеры скорости в фоновом режиме
+        // Stop macOS from suspending our measurements in the background
         activity = ProcessInfo.processInfo.beginActivity(
             options: .userInitiatedAllowingIdleSystemSleep,
             reason: "Continuous network traffic sampling")

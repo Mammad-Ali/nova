@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/throttle_engine.dart';
 import '../domain/throttle_result.dart';
 
-/// Состояние проверки на троттлинг.
+/// State of the throttling check.
 class ThrottleState {
   const ThrottleState({this.result, this.running = false, this.error});
 

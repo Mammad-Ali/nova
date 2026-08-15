@@ -14,7 +14,7 @@ final speedTestHistoryRepositoryProvider =
 class SpeedTestHistoryRepositoryImpl implements SpeedTestHistoryRepository {
   static const _key = 'speedtest_history_v1';
 
-  /// Ограничиваем размер истории, чтобы файл настроек не рос бесконечно.
+  /// Caps the history so the settings file doesn't grow without bound.
   static const maxEntries = 50;
 
   @override
@@ -29,8 +29,8 @@ class SpeedTestHistoryRepositoryImpl implements SpeedTestHistoryRepository {
           .map((e) => SpeedTestRecord.fromJson(e as Map<String, dynamic>))
           .toList();
     } catch (_) {
-      // Хранилище недоступно или данные повреждены — пустая история,
-      // без падения приложения.
+      // Storage unavailable or data corrupted — return an empty history
+      // rather than crashing.
       return const [];
     }
   }

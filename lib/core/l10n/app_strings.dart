@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-/// Поддерживаемые языки приложения.
+/// Languages the app supports.
 enum AppLocale {
   en,
   az,
@@ -12,7 +12,7 @@ enum AppLocale {
         AppLocale.ru => const Locale('ru'),
       };
 
-  /// Название языка на самом этом языке (для списка выбора).
+  /// The language's name in its own language, for the picker.
   String get nativeName => switch (this) {
         AppLocale.en => 'English',
         AppLocale.az => 'Azərbaycan',
@@ -27,7 +27,7 @@ enum AppLocale {
       };
 }
 
-/// Все тексты интерфейса. Один неизменяемый объект на язык.
+/// Every UI string. One immutable object per language.
 class AppStrings {
   const AppStrings({
     required this.tabSpeed,
@@ -136,7 +136,7 @@ class AppStrings {
     required this.savedTo,
   });
 
-  // Навигация / общее
+  // Navigation and shared
   final String tabSpeed;
   final String tabMonitor;
   final String language;
@@ -157,12 +157,12 @@ class AppStrings {
   final String stopTest;
   final String errorGeneric;
 
-  // История
+  // History
   final String historyTitle;
   final String historyClear;
   final String historyEmpty;
 
-  // Шкала комфорта
+  // Comfort scale
   final String comfortTitle;
   final String actBrowsing;
   final String actHdVideo;
@@ -176,7 +176,7 @@ class AppStrings {
   final String levelGood;
   final String levelGreat;
 
-  // Монитор
+  // Monitor
   final String monitorSubtitle;
   final String peak;
   final String session;
@@ -188,7 +188,7 @@ class AppStrings {
   final String usageToday;
   final String usageNote;
 
-  // Провайдер, оценка, рекорд, сравнение, копирование
+  // Provider, grade, personal best, comparison, copying
   final String providerLabel;
   final String providerDetecting;
   final String overall;
@@ -203,7 +203,7 @@ class AppStrings {
   final String copyResult;
   final String copied;
 
-  // Сервер, bufferbloat, стабильность
+  // Server, bufferbloat, stability
   final String serverLabel;
   final String bloatTitle;
   final String bloatIdle;
@@ -242,14 +242,14 @@ class AppStrings {
   final String compactExpand;
   final String compactPanel;
 
-  // Настройки, уведомления, экспорт
+  // Settings, notifications, export
   final String settings;
   final String alertsEnable;
   final String alertMinSpeed;
   final String alertDailyLimit;
   final String notSet;
 
-  /// Шаблоны с плейсхолдерами {0}/{1} — подставляются через [fill].
+  /// Templates with {0}/{1} placeholders, filled in through [fill].
   final String alertSlowTitle;
   final String alertSlowBody;
   final String alertLimitTitle;
@@ -259,7 +259,7 @@ class AppStrings {
   final String exportCsv;
   final String savedTo;
 
-  /// Подставляет значения в шаблон: `fill('{0} из {1}', ['2', '5'])`.
+  /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
     for (var i = 0; i < args.length; i++) {

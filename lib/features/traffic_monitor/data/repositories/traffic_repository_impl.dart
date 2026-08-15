@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/network_snapshot.dart';
 import '../../domain/repositories/traffic_repository.dart';
 
-// Точка DI, которую будет читать презентационный слой
+// The DI seam the presentation layer reads from.
 final trafficRepositoryProvider = Provider<TrafficRepository>((ref) {
   final repo = TrafficRepositoryImpl();
   repo.startMonitoring();
@@ -75,7 +75,7 @@ class TrafficRepositoryImpl implements TrafficRepository {
 
   int _calculateDelta(int now, int prev) {
     int delta = now - prev;
-    if (delta < 0) delta += 0x100000000; // Коррекция 32-битного счетчика macOS
+    if (delta < 0) delta += 0x100000000; // macOS 32-bit counter wrapped
     return delta;
   }
 

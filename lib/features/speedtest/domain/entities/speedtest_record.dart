@@ -1,4 +1,4 @@
-/// Один сохранённый результат завершённого теста скорости.
+/// A single stored result from a completed speed test.
 class SpeedTestRecord {
   const SpeedTestRecord({
     required this.timestamp,

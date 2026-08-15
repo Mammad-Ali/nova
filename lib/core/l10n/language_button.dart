@@ -5,7 +5,7 @@ import '../theme/app_theme.dart';
 import 'app_strings.dart';
 import 'locale_provider.dart';
 
-/// Иконка-глобус в заголовке: открывает выбор языка.
+/// Globe icon in the header: opens the language picker.
 class LanguageButton extends ConsumerWidget {
   const LanguageButton({super.key});
 
@@ -35,8 +35,9 @@ class LanguageButton extends ConsumerWidget {
         ),
         child: SafeArea(
           top: false,
-          // Material даёт ListTile поверхность для чернил/фона, иначе Flutter
-          // ругается, что они «невидимы» на цветном Container поверх.
+          // Material gives ListTile a surface for its ink and background;
+          // without it Flutter warns they are invisible on the coloured
+          // Container above.
           child: Material(
             type: MaterialType.transparency,
             child: Column(

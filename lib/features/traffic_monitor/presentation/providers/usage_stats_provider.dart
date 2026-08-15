@@ -10,26 +10,26 @@ import 'traffic_provider.dart';
 final usageStatsProvider =
     NotifierProvider<UsageStatsNotifier, UsageStats>(UsageStatsNotifier.new);
 
-/// Считает суммарный трафик (Rx+Tx) за текущий час и день, складывая
-/// посекундные дельты из [trafficStreamProvider]. База (то, что уже накоплено
-/// сегодня/в этом часу) подгружается с диска и периодически туда сбрасывается.
+/// Totals traffic (Rx+Tx) for the current hour and day by summing the
+/// per-second deltas from [trafficStreamProvider]. The baseline already
+/// accumulated today is loaded from disk and flushed back periodically.
 ///
-/// Ограничение: считается только пока приложение открыто — системного учёта в
-/// фоне тут нет.
+/// Caveat: counting only happens while the app is running; there is no
+/// system-wide background accounting.
 class UsageStatsNotifier extends Notifier<UsageStats> {
   late final UsageStatsRepository _repo =
       ref.read(usageStatsRepositoryProvider);
   late final DailyUsageRepository _dailyRepo =
       ref.read(dailyUsageRepositoryProvider);
 
-  /// Дневные корзины для месячной статистики: 'yyyy-MM-dd' → байты.
+  /// Daily buckets behind the monthly stats: 'yyyy-MM-dd' → bytes.
   Map<String, int> _byDay = {};
 
   String _dayKey = '';
   String _hourKey = '';
-  int _dayBase = 0; // загружено с диска
+  int _dayBase = 0; // loaded from disk
   int _hourBase = 0;
-  int _dayDelta = 0; // накоплено в этой сессии
+  int _dayDelta = 0; // accumulated this session
   int _hourDelta = 0;
 
   Timer? _flushTimer;
@@ -61,13 +61,13 @@ class UsageStatsNotifier extends Notifier<UsageStats> {
 
   Future<void> _loadBase() async {
     final saved = await _repo.load();
-    // Берём сохранённое только если это тот же день/час — иначе начинаем с нуля.
+    // Reuse stored values only for the same day/hour; otherwise start at zero.
     if (saved.dayKey == _dayKey) _dayBase = saved.dayBytes;
     if (saved.hourKey == _hourKey) _hourBase = saved.hourBytes;
 
     _byDay = await _dailyRepo.load();
-    // Если приложение не запускали с прошлой сессии, дневной итог мог не
-    // успеть попасть в корзину — восстанавливаем из неё базу за сегодня.
+    // If the app was closed abruptly last time, the daily total may not have
+    // reached the bucket — restore today's baseline from it.
     final storedToday = _byDay[_dayKey];
     if (storedToday != null && storedToday > _dayBase) _dayBase = storedToday;
 
@@ -97,8 +97,8 @@ class UsageStatsNotifier extends Notifier<UsageStats> {
 
   void _emit() {
     final dayTotal = _dayBase + _dayDelta;
-    // Держим корзину текущего дня в актуальном состоянии, чтобы месячная
-    // статистика включала сегодняшний трафик без ожидания смены суток.
+    // Keep today's bucket current so the monthly stats include today without
+    // waiting for the date to roll over.
     _byDay[_dayKey] = dayTotal;
 
     state = UsageStats(

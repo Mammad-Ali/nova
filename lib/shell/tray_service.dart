@@ -6,12 +6,12 @@ import 'package:window_manager/window_manager.dart';
 
 import '../core/utils/byte_format.dart';
 
-/// Десктопные платформы, где есть окно и трей/меню-бар.
+/// Desktop platforms that have a window and a tray / menu bar.
 bool get isDesktop =>
     !kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux);
 
-/// Иконка в меню-баре (macOS) / трее (Windows, Linux):
-/// показывает текущую скорость в подсказке и прячет окно вместо закрытия.
+/// Menu-bar icon (macOS) / tray icon (Windows, Linux): shows the current
+/// speed and hides the window instead of quitting when it is closed.
 class TrayService with TrayListener, WindowListener {
   TrayService._();
   static final TrayService instance = TrayService._();
@@ -20,7 +20,7 @@ class TrayService with TrayListener, WindowListener {
   String _lastTooltip = '';
   String _lastTitle = '';
 
-  /// Пункты меню — ключи обрабатываются в [onTrayMenuItemClick].
+  /// Menu entries — the keys are handled in [onTrayMenuItemClick].
   static const _kShow = 'show';
   static const _kQuit = 'quit';
 
@@ -28,8 +28,8 @@ class TrayService with TrayListener, WindowListener {
     if (!isDesktop || _ready) return;
 
     await windowManager.ensureInitialized();
-    // Закрытие окна не убивает приложение — оно уходит в трей и продолжает
-    // считать трафик.
+    // Closing the window doesn't quit the app: it goes to the tray and keeps
+    // counting traffic.
     await windowManager.setPreventClose(true);
     windowManager.addListener(this);
 
@@ -38,7 +38,7 @@ class TrayService with TrayListener, WindowListener {
       Platform.isWindows
           ? 'assets/tray/tray_icon.ico'
           : 'assets/tray/tray_template.png',
-      isTemplate: Platform.isMacOS, // macOS сам перекрасит под тему меню-бара
+      isTemplate: Platform.isMacOS, // macOS tints it for the menu-bar theme
     );
     await trayManager.setToolTip('Nova');
     await _rebuildMenu();
@@ -54,11 +54,12 @@ class TrayService with TrayListener, WindowListener {
     ]));
   }
 
-  /// Обновляет текст рядом с иконкой (как у батареи «80%») и подсказку.
+  /// Updates the text next to the icon (like the battery's "80%") and the
+  /// tooltip.
   ///
-  /// В самой строке меню места мало, поэтому показываем компактно: текущую
-  /// суммарную скорость и итог за час. Полную раскладку (отдельно
-  /// download/upload) — в подсказке при наведении.
+  /// The menu bar is tight on space, so the title stays compact: current total
+  /// speed plus the hourly total. The full split (download/upload separately)
+  /// lives in the hover tooltip.
   Future<void> updateStatus({
     required int rxPerSec,
     required int txPerSec,
@@ -76,7 +77,7 @@ class TrayService with TrayListener, WindowListener {
       try {
         await trayManager.setTitle(title);
       } catch (_) {
-        // Заголовок — украшение; его сбой не должен ломать приложение.
+        // The title is decoration; a failure here must not break the app.
       }
     }
 
@@ -84,7 +85,7 @@ class TrayService with TrayListener, WindowListener {
     final tx = formatRate(txPerSec);
     final tooltip = 'Nova\n'
         '↓ ${rx.value} ${rx.unit}   ↑ ${tx.value} ${tx.unit}\n'
-        'За час: ${hour.value} ${hour.unit}';
+        'Past hour: ${hour.value} ${hour.unit}';
     if (tooltip != _lastTooltip) {
       _lastTooltip = tooltip;
       try {
@@ -93,7 +94,7 @@ class TrayService with TrayListener, WindowListener {
     }
   }
 
-  /// «KB/s» → «K/s», «MB» → «M» и т.п. — сокращаем единицы для тесной строки меню.
+  /// "KB/s" → "K/s", "MB" → "M" and so on — shorter units for the menu bar.
   String _compactUnit(String unit) {
     if (unit == 'B/s' || unit == 'B') return unit;
     return unit.replaceFirst('B', '');
@@ -119,13 +120,13 @@ class TrayService with TrayListener, WindowListener {
 
   // ── TrayListener ──────────────────────────────────────────────────
 
-  /// Вызывается при левом клике по иконке — открывает мини-панель.
-  /// Ставится из main.dart, чтобы сервис не зависел от Riverpod.
+  /// Called on a left click on the icon — opens the compact panel.
+  /// Wired up from main.dart so this service stays free of Riverpod.
   VoidCallback? onIconTap;
 
   @override
   void onTrayIconMouseDown() {
-    // Левый клик — мини-панель, правый — меню (см. ниже).
+    // Left click opens the compact panel, right click the menu (below).
     final handler = onIconTap;
     if (handler != null) {
       handler();
@@ -151,7 +152,7 @@ class TrayService with TrayListener, WindowListener {
 
   @override
   void onWindowClose() async {
-    // Прячем окно вместо выхода — мониторинг продолжается в фоне.
+    // Hide the window instead of quitting — monitoring continues.
     if (await windowManager.isPreventClose()) {
       await windowManager.hide();
     }

@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/ping_sample.dart';
 
-/// Сводка стабильности связи за последние ~2 минуты.
+/// Connection stability over roughly the last two minutes.
 class StabilityStats {
   const StabilityStats({
     required this.samples,
@@ -17,15 +17,15 @@ class StabilityStats {
       : samples = const <PingSample>[],
         running = true;
 
-  /// Замеры, старые → новые.
+  /// Samples, oldest to newest.
   final List<PingSample> samples;
 
-  /// Идёт ли мониторинг (можно поставить на паузу).
+  /// Whether monitoring is running (it can be paused).
   final bool running;
 
   PingSample? get latest => samples.isEmpty ? null : samples.last;
 
-  /// Последний успешный пинг, мс.
+  /// The most recent successful ping, in ms.
   double? get currentMs {
     for (var i = samples.length - 1; i >= 0; i--) {
       final r = samples[i].rttMs;
@@ -49,7 +49,7 @@ class StabilityStats {
     return ok.reduce((a, b) => a > b ? a : b);
   }
 
-  /// Среднее колебание задержки между соседними замерами.
+  /// Mean variation in latency between consecutive samples.
   double? get jitterMs {
     final ok = _oks;
     if (ok.length < 2) return null;
@@ -62,11 +62,11 @@ class StabilityStats {
 
   int get lostCount => samples.where((s) => s.lost).length;
 
-  /// Доля потерь, 0..100.
+  /// Loss rate, 0..100.
   double get lossPercent =>
       samples.isEmpty ? 0 : lostCount * 100 / samples.length;
 
-  /// Обрывов подряд прямо сейчас (>0 — связь лежит).
+  /// Consecutive failures right now (>0 means the link is down).
   int get currentOutage {
     var n = 0;
     for (var i = samples.length - 1; i >= 0 && samples[i].lost; i--) {
@@ -79,11 +79,11 @@ class StabilityStats {
 final stabilityProvider =
     NotifierProvider<StabilityNotifier, StabilityStats>(StabilityNotifier.new);
 
-/// Раз в 2 секунды делает крошечный HTTPS-запрос и записывает задержку.
-/// Неудача считается потерей пакета — так ловятся микрообрывы связи,
-/// которые не видны по графику трафика.
+/// Fires a tiny HTTPS request every two seconds and records the latency.
+/// A failure counts as a lost packet, which is how brief outages get caught —
+/// they never show up on the traffic chart.
 class StabilityNotifier extends Notifier<StabilityStats> {
-  /// 60 замеров × 2 с = окно в 2 минуты.
+  /// 60 samples × 2 s = a two-minute window.
   static const capacity = 60;
   static const _interval = Duration(seconds: 2);
   static final _probeUrl = Uri.parse('https://speed.cloudflare.com/__down?bytes=0');
@@ -105,7 +105,7 @@ class StabilityNotifier extends Notifier<StabilityStats> {
       ..connectionTimeout = const Duration(seconds: 4)
       ..idleTimeout = const Duration(seconds: 30);
     _timer = Timer.periodic(_interval, (_) => _probe());
-    _probe(); // первый замер сразу, чтобы не ждать 2 секунды
+    _probe(); // probe immediately instead of waiting two seconds
   }
 
   void _stopTimer() {
@@ -115,7 +115,7 @@ class StabilityNotifier extends Notifier<StabilityStats> {
     _client = null;
   }
 
-  /// Пауза / возобновление мониторинга.
+  /// Pauses or resumes monitoring.
   void toggle() {
     if (state.running) {
       _stopTimer();
@@ -133,7 +133,7 @@ class StabilityNotifier extends Notifier<StabilityStats> {
 
   Future<void> _probe() async {
     final client = _client;
-    if (client == null || _inFlight) return; // не наслаиваем запросы
+    if (client == null || _inFlight) return; // never overlap requests
     _inFlight = true;
 
     double? rtt;
@@ -145,7 +145,7 @@ class StabilityNotifier extends Notifier<StabilityStats> {
       sw.stop();
       if (resp.statusCode == 200) rtt = sw.elapsedMicroseconds / 1000.0;
     } catch (_) {
-      rtt = null; // таймаут/обрыв → считаем потерей
+      rtt = null; // timeout or drop counts as a loss
     } finally {
       _inFlight = false;
     }

@@ -122,7 +122,7 @@ class _SettingsSheet extends ConsumerWidget {
   }
 }
 
-/// Поле для числового порога; пустая строка = выключено.
+/// A numeric threshold field; an empty string disables the alert.
 class _NumberField extends StatefulWidget {
   const _NumberField({
     required this.label,

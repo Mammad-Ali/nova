@@ -1,5 +1,5 @@
 name: net_pulse
-description: "A new Flutter project."
+description: "Cross-platform speed test and live network traffic monitor."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,12 +40,12 @@ dependencies:
   fl_chart: ^1.2.0
   shared_preferences: ^2.3.2
 
-  # Десктоп: окно, иконка в трее/меню-баре, системные уведомления
+  # Desktop: window control, tray / menu-bar icon, system notifications
   window_manager: ^0.4.3
-  screen_retriever: ^0.2.0 # размеры экрана для позиционирования мини-панели
+  screen_retriever: ^0.2.0 # screen bounds for positioning the compact panel
   tray_manager: ^0.3.2
   local_notifier: ^0.1.6
-  # Диалог сохранения файла (картинка результата, экспорт CSV)
+  # Save dialog for the result image and CSV export
   file_selector: ^1.0.3
 
 dev_dependencies:
@@ -60,8 +60,8 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.1
 
-# Иконка приложения (спидометр) для всех платформ.
-# Генерация: dart run flutter_launcher_icons
+# App icon for every platform.
+# Regenerate with: dart run flutter_launcher_icons
 flutter_launcher_icons:
   image_path: "assets/icon/nova_icon.png"
   android: true

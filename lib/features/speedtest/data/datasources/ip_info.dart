@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Данные о подключении: провайдер (ISP) и местоположение по IP.
+/// Connection details: the ISP and the location derived from the IP.
 class IpInfo {
   const IpInfo({this.isp, this.city, this.country, this.ip});
 
@@ -14,12 +14,12 @@ class IpInfo {
 
   bool get hasIsp => isp != null && isp!.trim().isNotEmpty;
 
-  /// «Baku, Azerbaijan» — пропускает пустые части.
+  /// "Baku, Azerbaijan" — skips empty parts.
   String get location =>
       [city, country].where((e) => e != null && e.isNotEmpty).join(', ');
 }
 
-/// Один запрос к бесплатному HTTPS-сервису ipwho.is (без ключей).
+/// A single request to the free HTTPS service ipwho.is (no API key needed).
 Future<IpInfo> fetchIpInfo() async {
   final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
   try {
@@ -43,5 +43,5 @@ Future<IpInfo> fetchIpInfo() async {
   }
 }
 
-/// Определяется один раз при открытии вкладки; результат кэшируется.
+/// Resolved once when the tab opens; the result is cached.
 final ipInfoProvider = FutureProvider<IpInfo>((ref) => fetchIpInfo());

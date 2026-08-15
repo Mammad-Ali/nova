@@ -5,7 +5,7 @@ import 'package:flutter/scheduler.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
-/// Управляет запуском салюта конфетти.
+/// Triggers the confetti burst.
 class ConfettiController extends ChangeNotifier {
   int token = 0;
   void fire() {
@@ -14,7 +14,8 @@ class ConfettiController extends ChangeNotifier {
   }
 }
 
-/// Полноэкранный слой конфетти. Играет короткий залп при каждом [ConfettiController.fire].
+/// Full-screen confetti layer. Plays a short burst on every
+/// [ConfettiController.fire].
 class ConfettiOverlay extends StatefulWidget {
   const ConfettiOverlay({super.key, required this.controller});
   final ConfettiController controller;
@@ -123,7 +124,7 @@ class _Confetto {
     required this.size,
   });
 
-  Offset pos; // нормированные координаты 0..1
+  Offset pos; // normalised coordinates, 0..1
   Offset vel;
   double rot;
   double spin;

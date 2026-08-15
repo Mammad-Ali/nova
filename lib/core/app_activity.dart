@@ -1,11 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// true, когда окно на виду и в фокусе — то есть анимации имеет смысл рисовать.
+/// True while the window is visible and focused — i.e. while animating is
+/// worth the cost.
 ///
-/// Спидометр и звёздный фон перерисовываются 60 раз в секунду; когда окно
-/// свёрнуто в трей или ушло в фон, это впустую тратит батарею. Виджеты
-/// подписываются на этот провайдер и останавливают свои [Ticker].
+/// The gauge and the starfield repaint 60 times a second; once the window is
+/// in the tray or in the background that is wasted battery. Widgets watch this
+/// provider and stop their [Ticker]s accordingly.
 final uiActiveProvider =
     NotifierProvider<UiActivityNotifier, bool>(UiActivityNotifier.new);
 
@@ -20,13 +21,13 @@ class UiActivityNotifier extends Notifier<bool> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Параметр перекрывает поле Notifier.state, поэтому к нему — через this.
+    // The parameter shadows Notifier.state, hence the explicit this.
     final active = _isActive(state);
     if (active != this.state) this.state = active;
   }
 
-  /// resumed — окно видно и в фокусе. inactive/hidden/paused/detached —
-  /// свёрнуто, перекрыто или ушло в фон: анимации не нужны.
+  /// resumed means visible and focused. inactive/hidden/paused/detached mean
+  /// minimised, covered or backgrounded — no animation needed.
   bool _isActive(AppLifecycleState? s) =>
       s == null || s == AppLifecycleState.resumed;
 }

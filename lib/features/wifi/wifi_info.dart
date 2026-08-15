@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Сведения о текущем Wi-Fi-подключении.
+/// Details about the current Wi-Fi connection.
 class WifiInfo {
   const WifiInfo({
     this.ssid,
@@ -13,20 +13,20 @@ class WifiInfo {
     this.interfaceName,
   });
 
-  /// Имя сети. Может быть null: и macOS, и Android отдают SSID только при
-  /// выданном доступе к геопозиции — мы его специально не запрашиваем.
+  /// Network name. May be null: both macOS and Android only reveal the SSID
+  /// when location access is granted, and we deliberately don't ask for it.
   final String? ssid;
 
-  /// Уровень сигнала в dBm (около −50 отлично, −80 плохо).
+  /// Signal strength in dBm (around −50 is excellent, −80 is poor).
   final int? rssi;
 
-  /// Скорость линка с точкой доступа, Мбит/с.
+  /// Link rate to the access point, in Mbps.
   final int? txRateMbps;
 
   final int? channel;
   final String? interfaceName;
 
-  /// Качество сигнала 0..1 по шкале −90…−40 dBm.
+  /// Signal quality 0..1, mapped from the −90…−40 dBm range.
   double? get quality {
     final r = rssi;
     if (r == null) return null;
@@ -38,8 +38,8 @@ class WifiInfo {
 
 const _channel = MethodChannel('net_pulse/wifi');
 
-/// Читает данные Wi-Fi. Возвращает null, если Wi-Fi выключен, соединение
-/// проводное или платформа не поддерживается (например, Windows).
+/// Reads Wi-Fi details. Returns null when Wi-Fi is off, the link is wired, or
+/// the platform isn't supported (Windows, for instance).
 Future<WifiInfo?> fetchWifiInfo() async {
   try {
     final raw = await _channel.invokeMapMethod<String, dynamic>('getInfo');
@@ -53,13 +53,13 @@ Future<WifiInfo?> fetchWifiInfo() async {
     );
     return info.hasData ? info : null;
   } on MissingPluginException {
-    return null; // канал не реализован на этой платформе
+    return null; // the channel isn't implemented on this platform
   } catch (_) {
     return null;
   }
 }
 
-/// Обновляется раз в 10 секунд — сигнал меняется, когда ходишь по квартире.
+/// Refreshed every 10 seconds — signal strength changes as you move around.
 final wifiInfoProvider = StreamProvider<WifiInfo?>((ref) async* {
   yield await fetchWifiInfo();
   yield* Stream.periodic(const Duration(seconds: 10))

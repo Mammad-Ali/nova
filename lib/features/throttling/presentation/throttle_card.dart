@@ -7,8 +7,8 @@ import '../../../core/theme/app_theme.dart';
 import '../domain/throttle_result.dart';
 import 'throttle_provider.dart';
 
-/// Карточка «режет ли провайдер видео»: сравнивает скорость до обычного CDN
-/// и до серверов Netflix.
+/// The "is video being throttled" card: compares throughput against a regular
+/// CDN with throughput against Netflix's servers.
 class ThrottleCard extends ConsumerWidget {
   const ThrottleCard({super.key});
 

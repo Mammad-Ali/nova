@@ -47,7 +47,7 @@ class TrafficHistoryNotifier extends Notifier<TrafficHistory> {
   @override
   TrafficHistory build() {
     ref.listen<AsyncValue<NetworkSnapshot>>(trafficStreamProvider, (_, next) {
-      // Безопасное получение данных для любой версии Riverpod
+      // Works across Riverpod versions.
       next.whenOrNull(
         data: (snapshot) => _append(snapshot),
       );

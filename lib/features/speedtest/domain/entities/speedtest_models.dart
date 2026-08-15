@@ -1,17 +1,17 @@
-/// Фазы активного теста скорости.
+/// Phases of an active speed test.
 enum TestPhase { idle, ping, download, upload, done, error }
 
 extension TestPhaseX on TestPhase {
-  // Локализованные названия фаз берутся из AppStrings в UI-слое.
+  // Localised phase names come from AppStrings in the UI layer.
   bool get isRunning =>
       this == TestPhase.ping ||
       this == TestPhase.download ||
       this == TestPhase.upload;
 }
 
-/// Одно событие прогресса, которое фоновый изолят присылает в UI.
+/// A single progress event sent from the background isolate to the UI.
 ///
-/// Обычный data-класс из примитивов — безопасно копируется между изолятами.
+/// A plain data class of primitives, so it copies safely between isolates.
 class SpeedTestProgress {
   const SpeedTestProgress({
     required this.phase,
@@ -26,28 +26,28 @@ class SpeedTestProgress {
     this.error,
   });
 
-  /// Текущая фаза.
+  /// Current phase.
   final TestPhase phase;
 
-  /// Сглаженная (EWMA) текущая скорость в Мбит/с — для стрелки спидометра.
+  /// EWMA-smoothed current speed in Mbps, used to drive the gauge.
   final double displayMbps;
 
-  /// Прогресс внутри текущей фазы, 0..1.
+  /// Progress within the current phase, 0..1.
   final double phaseProgress;
 
-  /// Итоговые метрики (заполняются по мере готовности).
+  /// Final metrics, filled in as they become available.
   final double? pingMs;
   final double? jitterMs;
   final double? downloadMbps;
   final double? uploadMbps;
 
-  /// Медианный пинг, измеренный ПОД НАГРУЗКОЙ (во время скачивания).
-  /// Разница с обычным [pingMs] и есть bufferbloat.
+  /// Median ping measured UNDER LOAD (while downloading). The gap against
+  /// the idle [pingMs] is the bufferbloat.
   final double? loadedPingMs;
 
-  /// Имя сервера, на котором реально прошёл замер.
+  /// Name of the server the measurement ran against.
   final String? serverName;
 
-  /// Текст ошибки, если фаза == error.
+  /// Error text when the phase is error.
   final String? error;
 }

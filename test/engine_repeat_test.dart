@@ -4,18 +4,18 @@ import 'package:net_pulse/features/speedtest/data/datasources/speedtest_engine.d
 import 'package:net_pulse/features/speedtest/domain/entities/speedtest_models.dart';
 
 void main() {
-  test('движок можно запускать дважды подряд без краха', () async {
+  test('the engine can run twice in a row without crashing', () async {
     for (var i = 0; i < 2; i++) {
       final engine = SpeedTestEngine();
       final phases = <TestPhase>{};
       final sub = engine.run().listen((p) => phases.add(p.phase));
 
       await Future<void>.delayed(const Duration(seconds: 4));
-      await sub.cancel(); // → onCancel → cancel() → отложенный _dispose (kill isolate)
+      await sub.cancel(); // onCancel -> cancel() -> deferred _dispose kills the isolate
       await Future<void>.delayed(const Duration(milliseconds: 900));
 
       expect(phases, contains(TestPhase.ping),
-          reason: 'запуск №${i + 1} должен присылать события');
+          reason: 'run #${i + 1} should emit events');
     }
   }, timeout: const Timeout(Duration(seconds: 40)));
 }

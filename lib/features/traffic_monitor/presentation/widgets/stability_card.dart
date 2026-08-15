@@ -6,8 +6,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/ping_sample.dart';
 import '../providers/stability_provider.dart';
 
-/// Карточка стабильности: живой график задержки за 2 минуты, потери пакетов
-/// и предупреждение, когда связь реально пропадает.
+/// Stability card: a live two-minute latency chart, packet loss, and a
+/// warning whenever the connection actually drops.
 class StabilityCard extends ConsumerWidget {
   const StabilityCard({super.key, required this.strings});
   final AppStrings strings;
@@ -118,7 +118,7 @@ class _Stat extends StatelessWidget {
   final String label;
   final String value;
 
-  /// null — обычный приглушённый текст из активной палитры.
+  /// null means the palette's regular muted text colour.
   final Color? color;
   final bool big;
 
@@ -153,7 +153,7 @@ class _Stat extends StatelessWidget {
   }
 }
 
-/// Столбики задержки; потерянные замеры — красные метки снизу.
+/// Latency bars; lost samples are drawn as full-height red marks.
 class _PingChart extends StatelessWidget {
   const _PingChart({required this.samples});
   final List<PingSample> samples;
@@ -182,7 +182,8 @@ class _PingPainter extends CustomPainter {
     final slot = size.width / capacity;
     final barW = (slot * 0.62).clamp(1.0, 6.0);
 
-    // Верх шкалы — по пику, но не ниже 60 мс, чтобы мелочь не прыгала.
+    // Scale top follows the peak but never drops below 60 ms, so small
+    // fluctuations don't make the chart jump.
     var peak = 60.0;
     for (final s in samples) {
       final r = s.rttMs;
@@ -190,7 +191,7 @@ class _PingPainter extends CustomPainter {
     }
 
     final paint = Paint();
-    // Правое выравнивание: новые замеры приходят справа.
+    // Right-aligned: new samples arrive on the right.
     final offset = capacity - samples.length;
 
     for (var i = 0; i < samples.length; i++) {
@@ -198,7 +199,7 @@ class _PingPainter extends CustomPainter {
       final s = samples[i];
 
       if (s.lost) {
-        // Потеря — красная метка на всю высоту.
+        // A loss is a full-height red mark.
         paint.color = AppColors.red.withValues(alpha: 0.75);
         canvas.drawRRect(
           RRect.fromRectAndRadius(
@@ -212,7 +213,7 @@ class _PingPainter extends CustomPainter {
 
       final rtt = s.rttMs!;
       final h = (rtt / peak).clamp(0.04, 1.0) * size.height;
-      // Цвет по величине задержки: бирюза → жёлтый → красный.
+      // Colour by latency: teal → amber → red.
       paint.color = rtt < 60
           ? AppColors.accentAlt
           : (rtt < 150 ? AppColors.amber : AppColors.red);

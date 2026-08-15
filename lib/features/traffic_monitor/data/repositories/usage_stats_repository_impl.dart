@@ -7,8 +7,8 @@ final usageStatsRepositoryProvider = Provider<UsageStatsRepository>((ref) {
   return UsageStatsRepository();
 });
 
-/// Хранит накопленный трафик за час/день в SharedPreferences, чтобы значения
-/// переживали перезапуск приложения (в пределах того же часа/дня).
+/// Keeps the hourly/daily totals in SharedPreferences so they survive an app
+/// restart within the same hour or day.
 class UsageStatsRepository {
   static const _dayKeyK = 'usage_day_key';
   static const _dayBytesK = 'usage_day_bytes';

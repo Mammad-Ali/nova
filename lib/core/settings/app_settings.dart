@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Пользовательские настройки уведомлений и лимитов.
+/// User settings for notifications and limits.
 class AppSettings {
   const AppSettings({
     this.alertsEnabled = false,
@@ -9,13 +9,13 @@ class AppSettings {
     this.dailyLimitGb,
   });
 
-  /// Показывать ли системные уведомления.
+  /// Whether to show system notifications.
   final bool alertsEnabled;
 
-  /// Порог: если тест показал меньше — предупредить. null = выключено.
+  /// Threshold: warn when a test comes in below it. null disables the alert.
   final double? minSpeedMbps;
 
-  /// Дневной лимит трафика в ГБ. null = выключено.
+  /// Daily traffic limit in GB. null disables the alert.
   final double? dailyLimitGb;
 
   AppSettings copyWith({
@@ -57,7 +57,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
         dailyLimitGb: p.getDouble(_kDailyLimit),
       );
     } catch (_) {
-      // Хранилище недоступно — остаёмся на значениях по умолчанию.
+      // Storage unavailable — keep the defaults.
     }
   }
 

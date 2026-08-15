@@ -4,22 +4,22 @@ import 'package:net_pulse/features/throttling/data/throttle_engine.dart';
 import 'package:net_pulse/features/throttling/domain/throttle_result.dart';
 
 void main() {
-  test('классификация вердикта по соотношению скоростей', () {
+  test('the verdict is classified from the speed ratio', () {
     expect(verdictFor(100, 130), ThrottleVerdict.localCache);
     expect(verdictFor(100, 95), ThrottleVerdict.none);
     expect(verdictFor(100, 70), ThrottleVerdict.suspected);
     expect(verdictFor(100, 30), ThrottleVerdict.likely);
-    // Нет данных по нейтральному CDN — не обвиняем провайдера.
+    // With no neutral-CDN data we don't blame the ISP.
     expect(verdictFor(0, 50), ThrottleVerdict.none);
   });
 
-  test('движок реально меряет обе скорости', () async {
+  test('the engine actually measures both speeds', () async {
     final result = await ThrottleEngine().run();
 
     expect(result.neutralMbps > 0, isTrue,
-        reason: 'нейтральный CDN: ${result.neutralMbps}');
+        reason: 'neutral CDN: ${result.neutralMbps}');
     expect(result.videoMbps > 0, isTrue,
-        reason: 'видео-CDN: ${result.videoMbps}');
+        reason: 'video CDN: ${result.videoMbps}');
     expect(result.videoHost, isNotNull);
 
     // ignore: avoid_print

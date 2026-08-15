@@ -7,15 +7,15 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
-/// true — окно работает как мини-панель под иконкой в меню-баре.
+/// True when the window acts as a compact panel under the menu-bar icon.
 final compactModeProvider =
     NotifierProvider<CompactModeNotifier, bool>(CompactModeNotifier.new);
 
-/// Переключает окно между обычным видом и мини-панелью.
+/// Switches the window between its normal form and the compact panel.
 ///
-/// Второе окно во Flutter на десктопе пока нестабильно, поэтому панель — это
-/// то же самое окно: без рамки, поверх остальных, прижатое к иконке трея.
-/// Прежние размер и позиция запоминаются и восстанавливаются при выходе.
+/// A second window is still unreliable in desktop Flutter, so the panel reuses
+/// the same window: frameless, always on top, anchored to the tray icon. The
+/// previous size and position are remembered and restored on exit.
 class CompactModeNotifier extends Notifier<bool> {
   static const _panelSize = Size(340, 420);
 
@@ -84,8 +84,8 @@ class CompactModeNotifier extends Notifier<bool> {
     }
   }
 
-  /// Ставим панель под иконкой трея; если координаты недоступны —
-  /// прижимаем к правому верхнему углу экрана.
+  /// Places the panel under the tray icon; if those coordinates aren't
+  /// available, falls back to the top-right corner of the screen.
   Future<Offset> _panelPosition() async {
     const margin = 8.0;
     try {
@@ -95,13 +95,13 @@ class CompactModeNotifier extends Notifier<bool> {
         return Offset(left.clamp(margin, 100000), bounds.bottom + margin);
       }
     } catch (_) {
-      // getBounds поддерживают не все платформы — идём к запасному варианту.
+      // getBounds isn't supported everywhere — fall through to the fallback.
     }
     try {
       final display = await screenRetriever.getPrimaryDisplay();
       return Offset(
         display.size.width - _panelSize.width - margin,
-        36, // ниже строки меню
+        36, // below the menu bar
       );
     } catch (_) {
       return const Offset(900, 36);

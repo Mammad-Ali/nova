@@ -6,7 +6,7 @@ import 'package:net_pulse/features/speedtest/data/datasources/speedtest_engine.d
 import 'package:net_pulse/features/speedtest/domain/entities/speedtest_models.dart';
 
 void main() {
-  test('полный тест: download, upload, bufferbloat и сервер', () async {
+  test('full run reports download, upload, bufferbloat and server', () async {
     final engine = SpeedTestEngine();
     SpeedTestProgress? result;
     final completer = Completer<void>();
@@ -21,17 +21,17 @@ void main() {
     await completer.future.timeout(const Duration(seconds: 55));
 
     expect(result, isNotNull);
-    expect(result!.phase, TestPhase.done, reason: 'ошибка: ${result!.error}');
+    expect(result!.phase, TestPhase.done, reason: 'error: ${result!.error}');
 
     expect(result!.downloadMbps! > 0, isTrue,
-        reason: 'download должен быть > 0, получили ${result!.downloadMbps}');
+        reason: 'download should be > 0, got ${result!.downloadMbps}');
     expect(result!.uploadMbps! > 0, isTrue,
-        reason: 'upload должен быть > 0, получили ${result!.uploadMbps}');
+        reason: 'upload should be > 0, got ${result!.uploadMbps}');
 
-    // Новое: пинг под нагрузкой и имя выбранного сервера.
-    expect(result!.serverName, isNotNull, reason: 'сервер должен быть выбран');
+    // Latency under load and the name of the selected server.
+    expect(result!.serverName, isNotNull, reason: 'a server should have been selected');
     expect(result!.loadedPingMs, isNotNull,
-        reason: 'пинг под нагрузкой должен измеряться');
+        reason: 'latency under load should be measured');
     expect(result!.loadedPingMs! > 0, isTrue);
 
     // ignore: avoid_print

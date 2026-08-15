@@ -6,7 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../domain/service_target.dart';
 import 'service_ping_provider.dart';
 
-/// Открывает шторку «Пинг до сервисов».
+/// Opens the "latency to services" sheet.
 void showServicePingSheet(BuildContext context) {
   showModalBottomSheet<void>(
     context: context,
@@ -125,7 +125,7 @@ class _ServiceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _qualityColor(ping.quality);
-    // Полоса: чем короче, тем быстрее (250 мс принимаем за «полную» шкалу).
+    // Bar: shorter means faster (250 ms counts as a full-width scale).
     final frac = ping.rttMs == null
         ? 1.0
         : (ping.rttMs! / 250).clamp(0.06, 1.0).toDouble();

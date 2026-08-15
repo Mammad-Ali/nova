@@ -4,9 +4,9 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/bufferbloat.dart';
 
-/// Карточка «пинг под нагрузкой»: сравнивает задержку в покое и во время
-/// скачивания. Разница и есть bufferbloat — то, из-за чего лагают игры и
-/// звонки, когда канал чем-то занят.
+/// The "latency under load" card: compares idle latency with latency while
+/// downloading. The gap is bufferbloat — the reason games and calls stutter
+/// whenever something else is using the link.
 class BufferbloatCard extends StatelessWidget {
   const BufferbloatCard({
     super.key,
@@ -80,7 +80,7 @@ class BufferbloatCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Наглядная полоса: сколько задержки добавляет нагрузка.
+          // A visual bar showing how much delay the load adds.
           _BloatBar(
             idleMs: idlePingMs,
             loadedMs: loadedPingMs,
@@ -162,7 +162,8 @@ class _Value extends StatelessWidget {
   }
 }
 
-/// Полоса: серая часть — базовая задержка, цветная — прирост под нагрузкой.
+/// Bar: the grey part is the baseline latency, the coloured part the increase
+/// under load.
 class _BloatBar extends StatelessWidget {
   const _BloatBar({
     required this.idleMs,

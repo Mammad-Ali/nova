@@ -1,19 +1,19 @@
-/// Вердикт сравнения «обычный CDN против видео-CDN».
+/// Verdict from comparing a neutral CDN against a video CDN.
 enum ThrottleVerdict {
-  /// Видео идёт не медленнее обычного трафика.
+  /// Video is no slower than ordinary traffic.
   none,
 
-  /// Видео заметно медленнее — похоже на замедление стриминга.
+  /// Video is noticeably slower — streaming looks throttled.
   suspected,
 
-  /// Видео сильно медленнее — провайдер почти наверняка режет видео.
+  /// Video is far slower — the ISP is almost certainly throttling it.
   likely,
 
-  /// Видео БЫСТРЕЕ: у провайдера стоит локальный кэш видеосервиса.
+  /// Video is FASTER: the ISP hosts a local cache of the video service.
   localCache,
 }
 
-/// Результат проверки на троттлинг.
+/// Result of the throttling check.
 class ThrottleResult {
   const ThrottleResult({
     required this.neutralMbps,
@@ -22,22 +22,22 @@ class ThrottleResult {
     this.videoHost,
   });
 
-  /// Скорость до нейтрального CDN (Cloudflare/Cachefly).
+  /// Throughput against the neutral CDN (Cloudflare/Cachefly).
   final double neutralMbps;
 
-  /// Скорость до видео-CDN (Netflix Open Connect).
+  /// Throughput against the video CDN (Netflix Open Connect).
   final double videoMbps;
 
   final ThrottleVerdict verdict;
 
-  /// Хост видео-CDN — по нему видно, стоит ли кэш внутри сети провайдера.
+  /// Video CDN host — reveals whether the cache sits inside the ISP network.
   final String? videoHost;
 
-  /// Доля скорости видео от обычной: 1.0 — одинаково.
+  /// Video speed as a fraction of the neutral one: 1.0 means identical.
   double get ratio => neutralMbps <= 0 ? 0 : videoMbps / neutralMbps;
 }
 
-/// Классифицирует результат по соотношению скоростей.
+/// Classifies the result from the ratio between the two speeds.
 ThrottleVerdict verdictFor(double neutralMbps, double videoMbps) {
   if (neutralMbps <= 0.01) return ThrottleVerdict.none;
   final r = videoMbps / neutralMbps;

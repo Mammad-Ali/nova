@@ -17,8 +17,8 @@ import 'shell/tray_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Иконка в меню-баре/трее и системные уведомления — только на десктопе;
-  // на других платформах вызовы тихо ничего не делают.
+  // Menu-bar/tray icon and system notifications are desktop-only; on other
+  // platforms these calls quietly do nothing.
   await TrayService.instance.init();
   await NotificationService.instance.init();
 
@@ -36,15 +36,15 @@ class _NovaAppState extends ConsumerState<NovaApp> {
   @override
   void initState() {
     super.initState();
-    // Прогреваем фоновые провайдеры: сбор трафика, статистика, стабильность
-    // и наблюдатель уведомлений — чтобы они работали независимо от вкладки.
+    // Warm up the background providers — traffic capture, usage stats,
+    // stability and the alert watcher — so they run regardless of the tab.
     ref.read(trafficHistoryProvider);
     ref.read(usageStatsProvider);
     ref.read(stabilityProvider);
     ref.read(alertsWatcherProvider);
 
-    // Иконка в трее показывает текущую скорость и трафик за час — оба
-    // провайдера меняются независимо, поэтому обновляем при любом из них.
+    // The tray icon shows current speed and hourly traffic; the two providers
+    // update independently, so refresh on either one.
     void pushTrayStatus() {
       final traffic = ref.read(trafficHistoryProvider);
       final usage = ref.read(usageStatsProvider);
@@ -58,11 +58,11 @@ class _NovaAppState extends ConsumerState<NovaApp> {
     ref.listenManual(trafficHistoryProvider, (prev, next) => pushTrayStatus());
     ref.listenManual(usageStatsProvider, (prev, next) => pushTrayStatus());
 
-    // Левый клик по иконке в трее открывает/закрывает мини-панель.
+    // A left click on the tray icon toggles the compact panel.
     TrayService.instance.onIconTap =
         () => ref.read(compactModeProvider.notifier).toggle();
 
-    // Следим за состоянием окна: когда оно скрыто, анимации встают на паузу.
+    // Track window state: animations pause while the window is hidden.
     ref.watch(uiActiveProvider);
   }
 

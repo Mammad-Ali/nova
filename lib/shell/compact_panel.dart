@@ -12,8 +12,8 @@ import '../features/traffic_monitor/presentation/providers/usage_stats_provider.
 import '../features/traffic_monitor/presentation/widgets/live_traffic_chart.dart';
 import 'compact_mode.dart';
 
-/// Мини-панель под иконкой меню-бара: живая скорость, график, расход за
-/// час/день и кнопка запуска теста — всё без открытия основного окна.
+/// Compact panel under the menu-bar icon: live speed, a chart, hourly and
+/// daily usage and a test button — all without opening the main window.
 class CompactPanel extends ConsumerWidget {
   const CompactPanel({super.key});
 
@@ -25,12 +25,13 @@ class CompactPanel extends ConsumerWidget {
     final test = ref.watch(speedTestControllerProvider);
 
     return Padding(
-      // Сверху оставляем место: рамки окна нет, но перетаскивать за шапку надо.
+      // Leave room at the top: there is no window frame, but the header still
+      // has to be draggable.
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Шапка: за неё можно двигать окно, справа — выход в полный вид.
+          // Header: drag it to move the window; the button exits to full view.
           DragToMoveArea(
             child: Row(
               children: [
@@ -223,7 +224,7 @@ class _TestButton extends StatelessWidget {
       child: Container(
         height: 44,
         alignment: Alignment.center,
-        // Без заливки и свечения: только тонкая обводка на чёрном.
+        // No fill and no glow: just a thin outline on black.
         decoration: BoxDecoration(
           color: running ? AppColors.red.withValues(alpha: 0.10) : null,
           borderRadius: BorderRadius.circular(14),

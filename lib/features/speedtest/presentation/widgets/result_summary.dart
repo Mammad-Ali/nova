@@ -12,8 +12,8 @@ import '../../data/share_card_renderer.dart';
 import '../../domain/entities/speed_grade.dart';
 import '../providers/speedtest_history_provider.dart';
 
-/// Блок с итоговой оценкой соединения: грейд A+…E, личный рекорд, сравнение
-/// с прошлым тестом и кнопка «Скопировать результат».
+/// Result summary: the A+…E grade, the personal best, a comparison with the
+/// previous test, and buttons to copy or save the result.
 class ResultSummary extends ConsumerWidget {
   const ResultSummary({
     super.key,
@@ -36,7 +36,7 @@ class ResultSummary extends ConsumerWidget {
     final grade = gradeForDownload(download);
     final color = _tierColor(grade.tier);
 
-    // Личный рекорд и сравнение с предыдущим тестом берём из истории.
+    // Personal best and the previous-test comparison both come from history.
     final downloads = history.map((r) => r.downloadMbps).toList();
     final personalBest =
         downloads.isEmpty ? download : downloads.reduce(math.max);
@@ -150,7 +150,7 @@ class ResultSummary extends ConsumerWidget {
     );
   }
 
-  /// Рисует карточку результата и предлагает сохранить её файлом.
+  /// Renders the result card and offers to save it as a file.
   Future<void> _saveImage(BuildContext context, WidgetRef ref) async {
     final info = ref.read(ipInfoProvider).asData?.value;
     final grade = gradeForDownload(download);

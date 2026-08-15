@@ -3,8 +3,8 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 
-/// Число, которое «прокручивается» как механический одометр: при смене
-/// значения цифровые колёсики докручиваются с нуля до итога.
+/// A number that rolls like a mechanical odometer: when the value changes,
+/// the digit wheels spin up from zero to the final figure.
 class OdometerText extends StatefulWidget {
   const OdometerText({
     super.key,
@@ -72,7 +72,7 @@ class _OdometerTextState extends State<OdometerText>
     final h = fontSize * 1.18;
     final w = fontSize * 0.62;
 
-    // Верх шкалы одометра из целевого значения (защищаемся от inf/NaN).
+    // Wheel count comes from the target value (guarding against inf/NaN).
     final safeTo = _to.isFinite ? _to : 0.0;
     final intDigits =
         math.max(1, (math.log(math.max(safeTo, 1)) / math.ln10).floor() + 1)
@@ -89,8 +89,8 @@ class _OdometerTextState extends State<OdometerText>
     return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 
-  /// Смещение колеса p: чёткая цифра, докрут только в последних 20% перед
-  /// инкрементом — как у настоящего одометра.
+  /// Offset of wheel p: a crisp digit, rolling only through the last 20%
+  /// before it increments — the way a real odometer behaves.
   double _offset(double scaled, int p) {
     final raw = scaled / math.pow(10, p);
     final base = raw.floorToDouble();

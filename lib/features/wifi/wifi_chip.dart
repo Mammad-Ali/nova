@@ -5,11 +5,11 @@ import '../../core/l10n/locale_provider.dart';
 import '../../core/theme/app_theme.dart';
 import 'wifi_info.dart';
 
-/// Компактный чип с данными Wi-Fi: уровень сигнала и скорость линка.
-/// Отвечает на вопрос «медленно из-за провайдера или я далеко от роутера».
+/// A compact Wi-Fi chip: signal strength and link rate. Answers the question
+/// "is it slow because of the ISP, or because I walked away from the router?"
 ///
-/// Ничего не рисует, если соединение проводное, Wi-Fi выключен или платформа
-/// не поддерживается.
+/// Renders nothing when the link is wired, Wi-Fi is off, or the platform is
+/// unsupported.
 class WifiChip extends ConsumerWidget {
   const WifiChip({super.key});
 

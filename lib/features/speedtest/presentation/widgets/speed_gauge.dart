@@ -5,11 +5,11 @@ import 'package:flutter/scheduler.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
-/// Радиальный спидометр на 270° с солнечно-жёлтой шкалой.
+/// A 270° radial gauge with a sun-yellow scale.
 ///
-/// Текущее значение показывает тонкий луч от центра к шкале. Вокруг циферблата
-/// вращаются жёлтые частицы, и скорость их вращения напрямую зависит от
-/// скорости интернета — чем быстрее канал, тем быстрее крутится «корона».
+/// The current value is marked by a thin ray running from the centre to the
+/// scale. Yellow particles orbit the dial, and their rotation speed follows
+/// the measured connection speed: the faster the link, the faster the corona.
 class SpeedGauge extends StatefulWidget {
   const SpeedGauge({
     super.key,
@@ -25,13 +25,13 @@ class SpeedGauge extends StatefulWidget {
   final double max;
   final Widget child;
 
-  /// Цвет шкалы. null — солнечно-жёлтый акцент приложения.
+  /// Scale colour. null means the app's sun-yellow accent.
   final Color? color;
 
-  /// Идёт ли тест сейчас (включает «разгон» луча при старте).
+  /// Whether a test is running (enables the ray's sweep on start).
   final bool active;
 
-  /// Окно свёрнуто или не в фокусе — анимацию можно остановить ради батареи.
+  /// Window hidden or unfocused — the animation can stop to save battery.
   final bool paused;
 
   @override
@@ -44,10 +44,10 @@ class _SpeedGaugeState extends State<SpeedGauge>
   final _anim = _GaugeAnim();
 
   Duration _last = Duration.zero;
-  double _clock = 0; // абсолютное время, сек
-  double _orbit = 0; // фаза орбитального движения
-  double _display = 0; // сглаженная доля шкалы
-  double _revStart = -1; // время старта «разгона»
+  double _clock = 0; // absolute time, seconds
+  double _orbit = 0; // orbital phase
+  double _display = 0; // smoothed fraction of the scale
+  double _revStart = -1; // when the sweep started
   bool _prevActive = false;
   late Color _color = widget.color ?? AppColors.sun;
 
@@ -77,7 +77,7 @@ class _SpeedGaugeState extends State<SpeedGauge>
         : (widget.value / widget.max).clamp(0.0, 1.0).toDouble();
     _display += (target - _display) * (1 - math.exp(-dtc * 6));
 
-    // «Разгон» луча при старте теста: короткий взмах 0 → 1 → факт.
+    // Sweep the ray when a test starts: a quick 0 → 1 → actual value.
     if (widget.active && !_prevActive) _revStart = _clock;
     _prevActive = widget.active;
     var rev = 0.0;
@@ -91,9 +91,9 @@ class _SpeedGaugeState extends State<SpeedGauge>
     }
     final shown = math.max(_display, rev);
 
-    // Вращение «короны»: в покое едва ползёт, на максимуме — вихрь.
+    // Corona rotation: barely creeping at rest, a vortex at full speed.
     _orbit += dtc * (0.05 + shown * 1.6);
-    // Плавная смена цвета при переходе фаз (download ↔ upload).
+    // Ease the colour across phase changes (download ↔ upload).
     _color = Color.lerp(
         _color, widget.color ?? AppColors.sun, 1 - math.exp(-dtc * 5))!;
 
@@ -106,7 +106,7 @@ class _SpeedGaugeState extends State<SpeedGauge>
     if (widget.paused && _ticker.isActive) {
       _ticker.stop();
     } else if (!widget.paused && !_ticker.isActive) {
-      _last = Duration.zero; // без этого dt подскочит на всю паузу
+      _last = Duration.zero; // otherwise dt would jump by the whole pause
       _ticker.start();
     }
   }
@@ -148,8 +148,8 @@ class _GaugePainter extends CustomPainter {
   static const _startDeg = 135.0;
   static const _sweepDeg = 270.0;
 
-  /// Сколько частиц на орбитах: от 12 в покое до 64 на максимуме —
-  /// во время замера вокруг шкалы закручивается плотная «корона».
+  /// Orbiting particle count: 12 at rest, 64 at full speed — during a test a
+  /// dense corona spins up around the scale.
   static const _minOrbiters = 12;
   static const _maxOrbiters = 64;
 
@@ -166,7 +166,7 @@ class _GaugePainter extends CustomPainter {
 
     _drawOrbiters(canvas, center, radius, speed);
 
-    // Дорожка шкалы.
+    // Scale track.
     canvas.drawArc(
       rect,
       start,
@@ -179,7 +179,7 @@ class _GaugePainter extends CustomPainter {
         ..color = AppColors.onGlass.withValues(alpha: 0.05),
     );
 
-    // Тики.
+    // Ticks.
     final tick = Paint()
       ..color = AppColors.onGlass.withValues(alpha: 0.13)
       ..strokeWidth = 1.6;
@@ -190,7 +190,7 @@ class _GaugePainter extends CustomPainter {
           center + d * (radius - 9), center + d * (radius - 1), tick);
     }
 
-    // Заполненная часть шкалы.
+    // Filled part of the scale.
     canvas.drawArc(
       rect,
       start,
@@ -215,7 +215,7 @@ class _GaugePainter extends CustomPainter {
     _drawRay(canvas, center, radius, start, sweep, f, baseColor, speed);
   }
 
-  /// Тонкий луч-указатель от центра к текущему делению шкалы.
+  /// A thin pointer ray from the centre to the current scale position.
   void _drawRay(
     Canvas canvas,
     Offset center,
@@ -231,7 +231,7 @@ class _GaugePainter extends CustomPainter {
     final from = center + dir * (radius * 0.20);
     final to = center + dir * (radius - 7);
 
-    // Луч сужается к центру: у шкалы ярче и толще, у ступицы почти исчезает.
+    // The ray fades toward the centre: bright at the scale, gone at the hub.
     canvas.drawLine(
       from,
       to,
@@ -246,14 +246,14 @@ class _GaugePainter extends CustomPainter {
         ..strokeCap = StrokeCap.round,
     );
 
-    // Крошечная метка на конце — единственное свечение на циферблате.
+    // A tiny cap at the tip — the only glow on the dial.
     canvas.drawCircle(
       to,
       3.0 + 1.5 * speed,
       Paint()..color = Color.lerp(color, Colors.white, 0.6)!,
     );
 
-    // Ступица.
+    // Hub.
     canvas.drawCircle(
       center,
       3.0,
@@ -261,8 +261,8 @@ class _GaugePainter extends CustomPainter {
     );
   }
 
-  /// Частицы на круговых орбитах вокруг циферблата. Чем выше скорость,
-  /// тем их больше и тем плотнее кольцо.
+  /// Particles on circular orbits around the dial. Higher speed means more
+  /// of them and a denser ring.
   void _drawOrbiters(
       Canvas canvas, Offset center, double radius, double speed) {
     final count =
@@ -270,15 +270,15 @@ class _GaugePainter extends CustomPainter {
     final paint = Paint();
 
     for (var i = 0; i < count; i++) {
-      // Три кольца на разных радиусах — простая, но убедительная глубина.
+      // Rings at different radii — simple but convincing depth.
       final ring = i % 4;
       final rr = radius * (1.09 + ring * 0.065);
-      // Внешние кольца отстают — как настоящие орбиты (дальше = медленнее).
+      // Outer rings lag behind, like real orbits (farther = slower).
       final rate = 1.0 - ring * 0.17;
-      final ang = anim.orbit * rate * math.pi * 2 + i * 2.399; // золотой угол
+      final ang = anim.orbit * rate * math.pi * 2 + i * 2.399; // golden angle
       final pos = center + Offset(math.cos(ang), math.sin(ang)) * rr;
 
-      // Жёлтые, как солнечная корона; дальние кольца бледнее.
+      // Yellow like a solar corona; outer rings are paler.
       paint.color = AppColors.sun
           .withValues(alpha: (0.35 + 0.45 * speed) * (1.0 - ring * 0.17));
       canvas.drawCircle(pos, 1.5 + 1.2 * speed, paint);

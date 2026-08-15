@@ -1,13 +1,13 @@
-/// Способ запросить у сервера кусок данных нужного размера.
+/// How to ask a server for a chunk of a given size.
 enum ChunkMode {
-  /// Размер задаётся query-параметром: `?bytes=N` (Cloudflare).
+  /// Size is set through a query parameter: `?bytes=N` (Cloudflare).
   bytesParam,
 
-  /// Статичный файл + HTTP-заголовок `Range: bytes=0-(N-1)`.
+  /// A static file plus the HTTP header `Range: bytes=0-(N-1)`.
   range,
 }
 
-/// Публичный источник данных для замера скорости.
+/// A public data source used for measuring throughput.
 class SpeedTestServer {
   const SpeedTestServer({
     required this.name,
@@ -21,35 +21,35 @@ class SpeedTestServer {
   final String downloadUrl;
   final ChunkMode mode;
 
-  /// Эндпоинт для отдачи (POST). Есть не у всех серверов.
+  /// Upload endpoint (POST). Not every server offers one.
   final String? uploadUrl;
 
-  /// Размер одного куска. У Cloudflare запросы крупнее ~5 МБ отдают HTTP 429,
-  /// поэтому 5 МБ — безопасный потолок для всех источников.
+  /// Chunk size. Cloudflare answers HTTP 429 to requests larger than ~5 MB,
+  /// so 5 MB is a safe ceiling across all sources.
   final int chunkBytes;
 
-  /// URL для скачивания одного куска.
+  /// URL for downloading a single chunk.
   String chunkUrl() => mode == ChunkMode.bytesParam
       ? '$downloadUrl?bytes=$chunkBytes'
       : downloadUrl;
 
-  /// URL для крошечного запроса — замер задержки.
+  /// URL for a tiny request used to measure latency.
   String probeUrl() =>
       mode == ChunkMode.bytesParam ? '$downloadUrl?bytes=0' : downloadUrl;
 
-  /// Заголовок Range для куска (null, если сервер его не использует).
+  /// Range header for a chunk (null if the server doesn't use one).
   String? rangeHeader() =>
       mode == ChunkMode.range ? 'bytes=0-${chunkBytes - 1}' : null;
 
-  /// Заголовок Range для пробы задержки.
+  /// Range header for the latency probe.
   String? probeRangeHeader() => mode == ChunkMode.range ? 'bytes=0-0' : null;
 }
 
-/// Источники по приоритету. Если первый недоступен или лимитирует запросы,
-/// движок автоматически переключается на следующий.
+/// Sources in priority order. If the first is unreachable or rate-limits us,
+/// the engine falls through to the next one automatically.
 ///
-/// Проверено вживую: все три отдают данные стабильно; отдачу (POST) among них
-/// поддерживает только Cloudflare.
+/// Verified in practice: all three serve data reliably; of the three only
+/// Cloudflare accepts uploads (POST).
 const List<SpeedTestServer> kSpeedTestServers = [
   SpeedTestServer(
     name: 'Cloudflare',

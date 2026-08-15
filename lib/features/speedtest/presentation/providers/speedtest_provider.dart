@@ -7,7 +7,7 @@ import '../../domain/entities/speedtest_models.dart';
 import '../../domain/entities/speedtest_record.dart';
 import 'speedtest_history_provider.dart';
 
-/// Иммутабельное состояние вкладки Speedtest.
+/// Immutable state of the Speedtest tab.
 class SpeedTestState {
   const SpeedTestState({
     this.phase = TestPhase.idle,
@@ -27,7 +27,7 @@ class SpeedTestState {
   final double displayMbps;
   final double phaseProgress;
 
-  /// Верх шкалы спидометра. Растёт ступенями, никогда не «дёргается» вниз.
+  /// Top of the gauge scale. Grows in steps and never jumps back down.
   final double gaugeMax;
 
   final double? pingMs;
@@ -35,10 +35,10 @@ class SpeedTestState {
   final double? downloadMbps;
   final double? uploadMbps;
 
-  /// Пинг под нагрузкой — база для оценки bufferbloat.
+  /// Latency under load — the basis for the bufferbloat rating.
   final double? loadedPingMs;
 
-  /// Сервер, на котором реально прошёл замер.
+  /// The server the measurement actually ran against.
   final String? serverName;
 
   final String? error;
@@ -74,7 +74,7 @@ class SpeedTestState {
     );
   }
 
-  /// Накатывает событие из движка, сохраняя уже полученные метрики.
+  /// Applies an engine event while keeping metrics gathered so far.
   SpeedTestState applyProgress(SpeedTestProgress p, double gaugeMax) {
     return SpeedTestState(
       phase: p.phase,
@@ -100,7 +100,7 @@ class SpeedTestController extends Notifier<SpeedTestState> {
   SpeedTestEngine? _engine;
   StreamSubscription<SpeedTestProgress>? _sub;
 
-  // Ступени шкалы спидометра (Мбит/с).
+  // Gauge scale steps (Mbps).
   static const _steps = [50.0, 100.0, 250.0, 500.0, 1000.0, 2000.0, 5000.0];
 
   @override
@@ -109,7 +109,7 @@ class SpeedTestController extends Notifier<SpeedTestState> {
     return const SpeedTestState();
   }
 
-  /// Запуск теста.
+  /// Starts a test.
   void start() {
     if (state.isRunning) return;
     _teardown();
@@ -138,7 +138,7 @@ class SpeedTestController extends Notifier<SpeedTestState> {
     );
   }
 
-  /// Остановка теста пользователем. Уже полученные результаты сохраняем.
+  /// Stops the test on user request, keeping any results already gathered.
   void stop() {
     _teardown();
     state = state.copyWith(
@@ -146,7 +146,7 @@ class SpeedTestController extends Notifier<SpeedTestState> {
     );
   }
 
-  /// Сброс к чистому состоянию.
+  /// Resets to a clean state.
   void reset() {
     _teardown();
     state = const SpeedTestState();
@@ -159,9 +159,9 @@ class SpeedTestController extends Notifier<SpeedTestState> {
     _engine = null;
   }
 
-  /// Сохраняет завершённый тест в историю. Вызывается только когда движок
-  /// сам дошёл до конца (natural completion) — ручная остановка (stop())
-  /// в историю не попадает, даже если частичные результаты уже есть.
+  /// Saves a finished test to history. Only called when the engine reached
+  /// the end on its own; a manual stop() is never recorded, even if partial
+  /// results already exist.
   void _saveToHistory() {
     final down = state.downloadMbps;
     final up = state.uploadMbps;
@@ -178,7 +178,7 @@ class SpeedTestController extends Notifier<SpeedTestState> {
         ));
   }
 
-  /// Подбирает ближайшую сверху ступень шкалы, но не ниже текущей.
+  /// Picks the next scale step above the value, never below the current one.
   double _fitMax(double v, double current) {
     final needed = (v * 1.15).clamp(1.0, double.infinity);
     var chosen = _steps.last;

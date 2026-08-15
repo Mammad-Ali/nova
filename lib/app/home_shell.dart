@@ -11,7 +11,7 @@ import '../shell/compact_mode.dart';
 import '../shell/compact_panel.dart';
 import 'starfield_background.dart';
 
-/// Корневая оболочка приложения: общий фон + две вкладки в стеклянном navbar.
+/// The app shell: shared backdrop plus two tabs in a glass navigation bar.
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
@@ -28,8 +28,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     final t = ref.watch(stringsProvider);
 
-    // В компактном режиме окно превращается в мини-панель под иконкой
-    // меню-бара: те же данные, но без вкладок и рамки.
+    // In compact mode the window becomes a small panel under the menu-bar
+    // icon: the same data, without tabs or a frame.
     if (ref.watch(compactModeProvider)) {
       return Scaffold(
         backgroundColor: AppColors.bg0,
@@ -158,7 +158,7 @@ class _NavItem extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 260),
           curve: Curves.easeOut,
-          // Активная вкладка — белая «пилюля» с чёрным текстом, без свечения.
+          // The active tab is a white pill with black text and no glow.
           decoration: BoxDecoration(
             color: selected ? Colors.white : null,
             borderRadius: BorderRadius.circular(16),

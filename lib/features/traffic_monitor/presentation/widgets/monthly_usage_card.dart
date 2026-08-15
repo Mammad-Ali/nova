@@ -5,8 +5,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/byte_format.dart';
 import '../../domain/entities/usage_stats.dart';
 
-/// Месячная статистика: итог с начала месяца, прогноз к концу месяца
-/// и столбики расхода по дням.
+/// Monthly usage: the running total, a projection for the end of the month
+/// and a per-day bar chart.
 class MonthlyUsageCard extends StatelessWidget {
   const MonthlyUsageCard({
     super.key,
@@ -127,7 +127,7 @@ class _ForecastRow extends StatelessWidget {
   }
 }
 
-/// Столбики расхода по дням месяца. Сегодняшний день подсвечен.
+/// Per-day usage bars for the current month. Today is highlighted.
 class _DayBars extends StatelessWidget {
   const _DayBars({required this.days});
   final List<MapEntry<String, int>> days;
@@ -142,7 +142,7 @@ class _DayBars extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, c) {
-        // Показываем весь месяц; при узком окне столбики просто тоньше.
+        // The whole month is shown; on narrow windows the bars just get thinner.
         final slot = c.maxWidth / days.length;
         final barW = (slot * 0.62).clamp(2.0, 14.0);
 

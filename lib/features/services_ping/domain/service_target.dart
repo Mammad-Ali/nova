@@ -1,15 +1,15 @@
-/// Сервис, до которого меряем задержку.
+/// A service we measure latency against.
 class ServiceTarget {
   const ServiceTarget({required this.name, required this.url});
 
   final String name;
 
-  /// Лёгкий эндпоинт: отдаёт 204 или крошечный ответ, чтобы измерять именно
-  /// задержку, а не скорость скачивания.
+  /// A lightweight endpoint returning 204 or a tiny body, so we measure
+  /// latency rather than download speed.
   final String url;
 }
 
-/// Результат замера. [rttMs] == null — сервис не ответил.
+/// A measurement. [rttMs] == null means the service didn't answer.
 class ServicePing {
   const ServicePing({required this.target, this.rttMs});
 
@@ -30,7 +30,7 @@ class ServicePing {
 
 enum PingQuality { great, good, fair, poor, failed }
 
-/// Набор сервисов. Эндпоинты проверены вживую — все отвечают 200/204.
+/// The service list. Every endpoint was verified to answer 200/204.
 const List<ServiceTarget> kServiceTargets = [
   ServiceTarget(
       name: 'YouTube', url: 'https://www.youtube.com/generate_204'),

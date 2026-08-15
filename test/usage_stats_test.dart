@@ -16,11 +16,11 @@ void main() {
         byDay: byDay,
       );
 
-  test('месячный итог складывает только дни текущего месяца', () {
+  test('the monthly total only sums days of the current month', () {
     final stats = withDays({
       dayOfMonth(1): 100,
       dayOfMonth(2): 250,
-      // Прошлый месяц — не должен попасть в сумму.
+      // A previous month, which must not be counted.
       '2000-01-15': 999999,
     });
 
@@ -28,7 +28,7 @@ void main() {
     expect(stats.currentMonthDays.length, 2);
   });
 
-  test('дни месяца отсортированы по возрастанию даты', () {
+  test('days of the month come back in ascending date order', () {
     final stats = withDays({
       dayOfMonth(3): 30,
       dayOfMonth(1): 10,
@@ -38,11 +38,11 @@ void main() {
     expect(stats.currentMonthDays.map((e) => e.value).toList(), [10, 20, 30]);
   });
 
-  test('прогноз масштабирует текущий темп на длину месяца', () {
+  test('the forecast scales the current pace to the month length', () {
     final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
     final elapsed = (now.day - 1) + (now.hour * 60 + now.minute) / 1440.0;
 
-    // Тест осмыслен только когда месяц уже начался (elapsed >= 0.2).
+    // Only meaningful once the month is under way (elapsed >= 0.2).
     if (elapsed < 0.2) return;
 
     const perDay = 1000;
@@ -54,12 +54,12 @@ void main() {
     expect(forecast, isNotNull);
 
     final expected = (stats.monthBytes / elapsed * daysInMonth).round();
-    // Допуск на минуту, прошедшую между вычислениями.
+    // Tolerance for the minute that may pass between the two computations.
     expect((forecast! - expected).abs() < expected * 0.02, isTrue,
-        reason: 'прогноз $forecast, ожидали ~$expected');
+        reason: 'forecast $forecast, expected ~$expected');
   });
 
-  test('без данных прогноз не строится', () {
+  test('no forecast is produced without data', () {
     expect(withDays({}).monthForecastBytes, isNull);
   });
 }

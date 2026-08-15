@@ -12,7 +12,7 @@ import '../widgets/live_traffic_chart.dart';
 import '../widgets/monthly_usage_card.dart';
 import '../widgets/stability_card.dart';
 
-/// Вкладка пассивного мониторинга: живой системный трафик Rx/Tx.
+/// The passive monitoring tab: live system-wide Rx/Tx traffic.
 class TrafficMonitorScreen extends ConsumerWidget {
   const TrafficMonitorScreen({super.key});
 
@@ -86,7 +86,7 @@ class TrafficMonitorScreen extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────── заголовок ───────────────────────────
+// ─────────────────────────── heading ─────────────────────────────
 
 class _Header extends StatelessWidget {
   const _Header({
@@ -222,7 +222,7 @@ class _PulsingDotState extends State<_PulsingDot>
   }
 }
 
-// ─────────────────────── статистика час / день ────────────────────
+// ─────────────────────── hourly / daily usage ────────────────────
 
 class _UsageStrip extends StatelessWidget {
   const _UsageStrip({
@@ -316,7 +316,7 @@ class _UsageCell extends StatelessWidget {
   }
 }
 
-// ─────────────────────────── плитка скорости ─────────────────────
+// ─────────────────────────── speed tile ──────────────────────────
 
 class _SpeedTile extends StatelessWidget {
   const _SpeedTile({
@@ -465,7 +465,7 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
-// ─────────────────────────── карточка графика ────────────────────
+// ─────────────────────────── chart card ──────────────────────────
 
 class _ChartCard extends StatelessWidget {
   const _ChartCard({

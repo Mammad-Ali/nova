@@ -10,7 +10,7 @@
 	<true/>
     <key>com.apple.security.network.client</key>
 	<true/>
-	<!-- Сохранение картинки результата и CSV в выбранное пользователем место -->
+	<!-- Saving the result image and CSV to a user-chosen location -->
 	<key>com.apple.security.files.user-selected.read-write</key>
 	<true/>
 </dict>

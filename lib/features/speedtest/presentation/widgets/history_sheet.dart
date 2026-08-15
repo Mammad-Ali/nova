@@ -7,7 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/speedtest_record.dart';
 import '../providers/speedtest_history_provider.dart';
 
-/// Открывает шторку с историей результатов speedtest.
+/// Opens the sheet listing past speed test results.
 Future<void> showSpeedTestHistorySheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
@@ -24,7 +24,7 @@ class _HistorySheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(stringsProvider);
     final records = ref.watch(speedTestHistoryProvider);
-    // Новые снизу списка удобнее не читать — разворачиваем: новые сверху.
+    // Newest entries are easier to read at the top, so reverse the list.
     final newestFirst = records.reversed.toList();
 
     return DraggableScrollableSheet(
@@ -126,7 +126,7 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-// ─────────────────────────── мини-график тренда ───────────────────────────
+// ─────────────────────────── trend sparkline ──────────────────────────────
 
 class _TrendChart extends StatelessWidget {
   const _TrendChart({required this.records});
@@ -199,7 +199,7 @@ class _TrendChart extends StatelessWidget {
   }
 }
 
-// ─────────────────────────── строка результата ────────────────────────────
+// ─────────────────────────── result row ───────────────────────────────────
 
 class _HistoryRow extends StatelessWidget {
   const _HistoryRow({required this.record});
@@ -242,7 +242,7 @@ class _HistoryRow extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              '${record.pingMs.toStringAsFixed(0)} мс',
+              '${record.pingMs.toStringAsFixed(0)} ms',
               textAlign: TextAlign.end,
               style: TextStyle(
                 color: AppColors.textLo,

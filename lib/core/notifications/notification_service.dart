@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:local_notifier/local_notifier.dart';
 
-/// Системные уведомления. Пакет [local_notifier] умеет только десктоп,
-/// поэтому на мобильных методы тихо ничего не делают.
+/// System notifications. [local_notifier] is desktop-only, so on mobile these
+/// methods quietly do nothing.
 class NotificationService {
   NotificationService._();
   static final NotificationService instance = NotificationService._();
@@ -20,7 +20,7 @@ class NotificationService {
       await localNotifier.setup(appName: 'Nova');
       _ready = true;
     } catch (_) {
-      // Без уведомлений приложение работает как обычно.
+      // The app works fine without notifications.
     }
   }
 

@@ -17,8 +17,8 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, trafficChannelName)
             .setMethodCallHandler { call, result ->
                 if (call.method == "getCounters") {
-                    // Системные счётчики с момента загрузки устройства.
-                    // TrafficStats не требует отдельного разрешения на чтение.
+                    // System-wide counters since the device booted.
+                    // TrafficStats needs no dedicated permission to read.
                     result.success(
                         listOf(
                             TrafficStats.getTotalRxBytes(),
@@ -41,9 +41,9 @@ class MainActivity : FlutterActivity() {
     }
 
     /**
-     * Данные о текущем Wi-Fi. Уровень сигнала и скорость линка доступны без
-     * разрешений; имя сети (SSID) Android отдаёт только при выданном доступе
-     * к геопозиции — иначе возвращает заглушку, которую мы отбрасываем.
+     * Details about the current Wi-Fi link. Signal strength and link rate need
+     * no permission; Android only reveals the SSID when location access has
+     * been granted, otherwise returning a placeholder that we discard.
      */
     private fun wifiInfo(): Map<String, Any>? {
         val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
@@ -52,7 +52,7 @@ class MainActivity : FlutterActivity() {
 
         @Suppress("DEPRECATION")
         val info = wifi.connectionInfo ?: return null
-        if (info.networkId == -1 && info.bssid == null) return null // не подключены
+        if (info.networkId == -1 && info.bssid == null) return null // not connected
 
         val map = mutableMapOf<String, Any>()
         @Suppress("DEPRECATION")
@@ -66,7 +66,7 @@ class MainActivity : FlutterActivity() {
         @Suppress("DEPRECATION")
         map["rssi"] = info.rssi
         @Suppress("DEPRECATION")
-        map["txRate"] = info.linkSpeed // Мбит/с
+        map["txRate"] = info.linkSpeed // Mbps
         return map
     }
 }
