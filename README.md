@@ -9,7 +9,7 @@
 A cross-platform network companion: an accurate speed test and a live
 system-wide traffic monitor, in one app.
 
-[![Build](https://github.com/Mammad-Ali/pulsar/actions/workflows/build.yml/badge.svg)](https://github.com/Mammad-Ali/pulsar/actions/workflows/build.yml)
+[![Build](https://github.com/Mammad-Ali/nova/actions/workflows/build.yml/badge.svg)](https://github.com/Mammad-Ali/nova/actions/workflows/build.yml)
 ![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20Windows%20%7C%20macOS-black)
 ![Flutter](https://img.shields.io/badge/Flutter-stable-black)
 ![License](https://img.shields.io/badge/license-MIT-black)
@@ -73,7 +73,7 @@ things that actually decide how the connection **feels**:
 ## Install
 
 Ready-to-run builds are attached to every successful CI run under
-[**Actions → Build**](https://github.com/Mammad-Ali/pulsar/actions/workflows/build.yml)
+[**Actions → Build**](https://github.com/Mammad-Ali/nova/actions/workflows/build.yml)
 (open the newest green run and scroll to *Artifacts*).
 
 | Platform | Artifact | How to run |
