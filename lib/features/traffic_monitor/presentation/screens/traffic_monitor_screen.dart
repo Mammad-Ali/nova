@@ -6,6 +6,7 @@ import '../../../../core/l10n/language_button.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/byte_format.dart';
+import '../../../lan_scan/presentation/lan_scan_sheet.dart';
 import '../providers/traffic_provider.dart';
 import '../providers/usage_stats_provider.dart';
 import '../widgets/live_traffic_chart.dart';
@@ -125,6 +126,11 @@ class _Header extends StatelessWidget {
         ),
         _LiveBadge(isLive: isLive),
         const LanguageButton(),
+        IconButton(
+          onPressed: () => showLanScanSheet(context),
+          icon: Icon(Icons.devices_rounded, color: AppColors.textMid),
+          tooltip: strings.lanTitle,
+        ),
         IconButton(
           onPressed: onReset,
           icon: Icon(Icons.restart_alt_rounded, color: AppColors.textMid),

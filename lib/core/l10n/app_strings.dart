@@ -110,6 +110,20 @@ class AppStrings {
     required this.servicesHint,
     required this.servicesRefresh,
     required this.servicesUnreachable,
+    required this.lanTitle,
+    required this.lanHint,
+    required this.lanRefresh,
+    required this.lanScanning,
+    required this.lanNoNetwork,
+    required this.lanNothingFound,
+    required this.lanThisDevice,
+    required this.lanRouter,
+    required this.lanDeviceGeneric,
+    required this.lanKindComputer,
+    required this.lanKindPhone,
+    required this.lanKindTv,
+    required this.lanKindPrinter,
+    required this.lanKindNas,
     required this.throttleTitle,
     required this.throttleHint,
     required this.throttleRun,
@@ -229,6 +243,20 @@ class AppStrings {
   final String servicesHint;
   final String servicesRefresh;
   final String servicesUnreachable;
+  final String lanTitle;
+  final String lanHint;
+  final String lanRefresh;
+  final String lanScanning;
+  final String lanNoNetwork;
+  final String lanNothingFound;
+  final String lanThisDevice;
+  final String lanRouter;
+  final String lanDeviceGeneric;
+  final String lanKindComputer;
+  final String lanKindPhone;
+  final String lanKindTv;
+  final String lanKindPrinter;
+  final String lanKindNas;
   final String throttleTitle;
   final String throttleHint;
   final String throttleRun;
@@ -357,6 +385,22 @@ const _en = AppStrings(
   servicesHint: 'Shows where exactly the delay is, not just "the internet is slow"',
   servicesRefresh: 'Measure again',
   servicesUnreachable: 'no reply',
+  lanTitle: "Who's on my network",
+  lanHint: 'Devices sharing your router right now',
+  lanRefresh: 'Scan again',
+  lanScanning: 'Scanning',
+  lanNoNetwork: 'No local network. Connect to Wi-Fi or a cable — '
+      'a VPN on its own is not enough.',
+  lanNothingFound: 'Nobody answered. The router may be keeping devices '
+      'isolated from each other.',
+  lanThisDevice: 'This device',
+  lanRouter: 'Router',
+  lanDeviceGeneric: 'Device',
+  lanKindComputer: 'Computer',
+  lanKindPhone: 'Phone',
+  lanKindTv: 'TV or streaming box',
+  lanKindPrinter: 'Printer',
+  lanKindNas: 'Network storage',
   throttleTitle: 'Video throttling check',
   throttleHint: 'Compares speed to a neutral CDN and to Netflix servers',
   throttleRun: 'Check',
@@ -465,6 +509,22 @@ const _az = AppStrings(
   servicesHint: 'Gecikmənin harada olduğunu göstərir, sadəcə «internet yavaşdır» deyil',
   servicesRefresh: 'Yenidən ölç',
   servicesUnreachable: 'cavab yoxdur',
+  lanTitle: 'Şəbəkəmdə kim var',
+  lanHint: 'Hazırda eyni routerə qoşulmuş cihazlar',
+  lanRefresh: 'Yenidən skan et',
+  lanScanning: 'Skan edilir',
+  lanNoNetwork: 'Lokal şəbəkə yoxdur. Wi-Fi və ya kabelə qoşulun — '
+      'tək VPN kifayət etmir.',
+  lanNothingFound: 'Heç kim cavab vermədi. Router cihazları '
+      'bir-birindən təcrid edə bilər.',
+  lanThisDevice: 'Bu cihaz',
+  lanRouter: 'Router',
+  lanDeviceGeneric: 'Cihaz',
+  lanKindComputer: 'Kompüter',
+  lanKindPhone: 'Telefon',
+  lanKindTv: 'Televizor və ya pristavka',
+  lanKindPrinter: 'Printer',
+  lanKindNas: 'Şəbəkə diski',
   throttleTitle: 'Video məhdudlaşdırma yoxlaması',
   throttleHint: 'Adi CDN və Netflix serverlərinə sürəti müqayisə edir',
   throttleRun: 'Yoxla',
@@ -573,6 +633,22 @@ const _ru = AppStrings(
   servicesHint: 'Показывает, где именно задержка, а не просто «интернет тормозит»',
   servicesRefresh: 'Замерить заново',
   servicesUnreachable: 'нет ответа',
+  lanTitle: 'Кто в моей сети',
+  lanHint: 'Устройства, подключённые к тому же роутеру',
+  lanRefresh: 'Сканировать заново',
+  lanScanning: 'Сканируем',
+  lanNoNetwork: 'Локальной сети нет. Подключитесь к Wi-Fi или кабелю — '
+      'одного VPN недостаточно.',
+  lanNothingFound: 'Никто не ответил. Возможно, роутер изолирует '
+      'устройства друг от друга.',
+  lanThisDevice: 'Это устройство',
+  lanRouter: 'Роутер',
+  lanDeviceGeneric: 'Устройство',
+  lanKindComputer: 'Компьютер',
+  lanKindPhone: 'Телефон',
+  lanKindTv: 'Телевизор или приставка',
+  lanKindPrinter: 'Принтер',
+  lanKindNas: 'Сетевой диск',
   throttleTitle: 'Проверка на троттлинг видео',
   throttleHint: 'Сравнивает скорость до обычного CDN и до серверов Netflix',
   throttleRun: 'Проверить',

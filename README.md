@@ -56,6 +56,7 @@ things that actually decide how the connection **feels**:
 | **Usage totals** | Hour, day and month, with a projection for the end of the month |
 | **Connection stability** | A rolling latency chart with packet loss and outage detection |
 | **Wi-Fi context** | Signal strength and link rate, so "slow" can be traced to the router |
+| **Who's on my network** | Sweeps the local subnet and lists every device that answers, with the name it announces and a guess at what it is |
 
 ### Desktop integration
 
@@ -102,6 +103,7 @@ lib/
 │  ├─ throttling/        neutral CDN vs. video CDN comparison
 │  ├─ services_ping/     latency to popular services
 │  ├─ wifi/              signal strength and link rate
+│  ├─ lan_scan/          local subnet sweep, device names and kinds
 │  ├─ alerts/            threshold notifications
 │  └─ settings/
 └─ shell/        tray icon, compact panel, window management
@@ -126,6 +128,17 @@ cumulative bytes since boot — and Dart converts those into per-second deltas:
 Two details worth knowing: the macOS counters are 32-bit and wrap at 4 GiB, so
 the repository corrects for the rollover; and virtual adapters such as VPN
 tunnels are filtered out on every platform to avoid double counting.
+
+**Finding neighbours needs no native code either.** Two properties make a
+pure-Dart sweep work. A connection that is *refused* proves a host is there
+just as well as one that succeeds, so devices with every port closed are still
+counted. And names are asked for over **unicast** mDNS — an ordinary UDP
+question sent straight to `<ip>:5353` — which responders answer happily. That
+avoids multicast altogether: no contest for port 5353 with the system mDNS
+daemon, which already holds it, and no per-platform option for choosing the
+outgoing interface. Windows machines and NAS boxes, which ignore mDNS, are
+asked over NetBIOS on UDP 137 instead. The sweep runs in an isolate and covers
+254 addresses in about 90 ms.
 
 ## Build from source
 
