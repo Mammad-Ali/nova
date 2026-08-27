@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,31 +37,37 @@ class _NovaAppState extends ConsumerState<NovaApp> {
   @override
   void initState() {
     super.initState();
-    // Warm up the background providers — traffic capture, usage stats,
-    // stability and the alert watcher — so they run regardless of the tab.
-    ref.read(trafficHistoryProvider);
-    ref.read(usageStatsProvider);
-    ref.read(stabilityProvider);
-    ref.read(alertsWatcherProvider);
+    // None of the passive monitoring exists in a browser: it reads system
+    // traffic counters through a platform channel and probes latency over
+    // dart:io sockets. The web build is the speed test alone.
+    if (!kIsWeb) {
+      // Warm up the background providers — traffic capture, usage stats,
+      // stability and the alert watcher — so they run regardless of the tab.
+      ref.read(trafficHistoryProvider);
+      ref.read(usageStatsProvider);
+      ref.read(stabilityProvider);
+      ref.read(alertsWatcherProvider);
 
-    // The tray icon shows current speed and hourly traffic; the two providers
-    // update independently, so refresh on either one.
-    void pushTrayStatus() {
-      final traffic = ref.read(trafficHistoryProvider);
-      final usage = ref.read(usageStatsProvider);
-      TrayService.instance.updateStatus(
-        rxPerSec: traffic.currentRxPerSec,
-        txPerSec: traffic.currentTxPerSec,
-        hourBytes: usage.hourBytes,
-      );
+      // The tray icon shows current speed and hourly traffic; the two
+      // providers update independently, so refresh on either one.
+      void pushTrayStatus() {
+        final traffic = ref.read(trafficHistoryProvider);
+        final usage = ref.read(usageStatsProvider);
+        TrayService.instance.updateStatus(
+          rxPerSec: traffic.currentRxPerSec,
+          txPerSec: traffic.currentTxPerSec,
+          hourBytes: usage.hourBytes,
+        );
+      }
+
+      ref.listenManual(
+          trafficHistoryProvider, (prev, next) => pushTrayStatus());
+      ref.listenManual(usageStatsProvider, (prev, next) => pushTrayStatus());
+
+      // A left click on the tray icon toggles the compact panel.
+      TrayService.instance.onIconTap =
+          () => ref.read(compactModeProvider.notifier).toggle();
     }
-
-    ref.listenManual(trafficHistoryProvider, (prev, next) => pushTrayStatus());
-    ref.listenManual(usageStatsProvider, (prev, next) => pushTrayStatus());
-
-    // A left click on the tray icon toggles the compact panel.
-    TrayService.instance.onIconTap =
-        () => ref.read(compactModeProvider.notifier).toggle();
 
     // Track window state: animations pause while the window is hidden.
     ref.watch(uiActiveProvider);

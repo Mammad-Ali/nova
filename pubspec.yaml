@@ -48,6 +48,13 @@ dependencies:
   # Save dialog for the result image and CSV export
   file_selector: ^1.0.3
 
+  # Browser APIs for the web build: the speed test there runs on
+  # XMLHttpRequest, since dart:io and isolates do not exist in a browser.
+  web: ^1.1.0
+  # One HTTP client that works on every platform, browser included. Used
+  # where the same request has to run natively and on the web.
+  http: ^1.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

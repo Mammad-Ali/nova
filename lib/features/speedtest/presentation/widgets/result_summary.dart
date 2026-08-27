@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,11 +68,14 @@ class ResultSummary extends ConsumerWidget {
                   ),
                 ),
               ),
-              _IconAction(
-                icon: Icons.image_outlined,
-                label: strings.saveImage,
-                onTap: () => _saveImage(context, ref),
-              ),
+              // Saving writes a file through a native save dialog; the web
+              // build keeps copy-to-clipboard only.
+              if (!kIsWeb)
+                _IconAction(
+                  icon: Icons.image_outlined,
+                  label: strings.saveImage,
+                  onTap: () => _saveImage(context, ref),
+                ),
               _IconAction(
                 icon: Icons.copy_rounded,
                 label: strings.copyResult,

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 /// Connection details: the ISP and the location derived from the IP.
 class IpInfo {
@@ -20,13 +20,18 @@ class IpInfo {
 }
 
 /// A single request to the free HTTPS service ipwho.is (no API key needed).
+///
+/// Goes through `package:http` rather than `dart:io`, because the web build
+/// needs the same call and a browser has no `HttpClient`. ipwho.is sends
+/// `Access-Control-Allow-Origin`, so the browser is allowed to read it.
 Future<IpInfo> fetchIpInfo() async {
-  final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
   try {
-    final req = await client.getUrl(Uri.parse('https://ipwho.is/'));
-    final resp = await req.close();
-    final body = await resp.transform(utf8.decoder).join();
-    final json = jsonDecode(body) as Map<String, dynamic>;
+    final resp = await http
+        .get(Uri.parse('https://ipwho.is/'))
+        .timeout(const Duration(seconds: 8));
+    if (resp.statusCode != 200) return const IpInfo();
+
+    final json = jsonDecode(resp.body) as Map<String, dynamic>;
     if (json['success'] == false) return const IpInfo();
 
     final conn = json['connection'] as Map<String, dynamic>?;
@@ -38,8 +43,6 @@ Future<IpInfo> fetchIpInfo() async {
     );
   } catch (_) {
     return const IpInfo();
-  } finally {
-    client.close(force: true);
   }
 }
 

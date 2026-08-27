@@ -124,6 +124,8 @@ class AppStrings {
     required this.lanKindTv,
     required this.lanKindPrinter,
     required this.lanKindNas,
+    required this.webTagline,
+    required this.webOnlyHere,
     required this.throttleTitle,
     required this.throttleHint,
     required this.throttleRun,
@@ -257,6 +259,8 @@ class AppStrings {
   final String lanKindTv;
   final String lanKindPrinter;
   final String lanKindNas;
+  final String webTagline;
+  final String webOnlyHere;
   final String throttleTitle;
   final String throttleHint;
   final String throttleRun;
@@ -401,6 +405,11 @@ const _en = AppStrings(
   lanKindTv: 'TV or streaming box',
   lanKindPrinter: 'Printer',
   lanKindNas: 'Network storage',
+  webTagline: 'Know exactly what your internet connection is doing',
+  webOnlyHere: 'A browser can only measure speed. Reading system traffic '
+      'counters, scanning the local network and checking Wi-Fi all need '
+      'direct access to the operating system — those live in the Nova app '
+      'for macOS, Windows and Android.',
   throttleTitle: 'Video throttling check',
   throttleHint: 'Compares speed to a neutral CDN and to Netflix servers',
   throttleRun: 'Check',
@@ -525,6 +534,11 @@ const _az = AppStrings(
   lanKindTv: 'Televizor və ya pristavka',
   lanKindPrinter: 'Printer',
   lanKindNas: 'Şəbəkə diski',
+  webTagline: 'İnternetinizlə əslində nə baş verdiyini öyrənin',
+  webOnlyHere: 'Brauzerdə yalnız sürət ölçülür. Sistem trafik sayğaclarını '
+      'oxumaq, lokal şəbəkəni skan etmək və Wi-Fi məlumatları sistemə '
+      'birbaşa giriş tələb edir — bunlar macOS, Windows və Android üçün '
+      'Nova tətbiqindədir.',
   throttleTitle: 'Video məhdudlaşdırma yoxlaması',
   throttleHint: 'Adi CDN və Netflix serverlərinə sürəti müqayisə edir',
   throttleRun: 'Yoxla',
@@ -649,6 +663,11 @@ const _ru = AppStrings(
   lanKindTv: 'Телевизор или приставка',
   lanKindPrinter: 'Принтер',
   lanKindNas: 'Сетевой диск',
+  webTagline: 'Узнайте, что на самом деле происходит с вашим интернетом',
+  webOnlyHere: 'В браузере доступен только замер скорости. Чтение системных '
+      'счётчиков трафика, сканирование локальной сети и данные Wi-Fi требуют '
+      'прямого доступа к системе — всё это есть в приложении Nova для '
+      'macOS, Windows и Android.',
   throttleTitle: 'Проверка на троттлинг видео',
   throttleHint: 'Сравнивает скорость до обычного CDN и до серверов Netflix',
   throttleRun: 'Проверить',

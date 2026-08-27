@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,6 +28,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(stringsProvider);
+
+    // The monitor tab needs system traffic counters, which a browser has no
+    // way to read — on the web the speed test is the whole app, so the tab
+    // bar has nothing to switch between.
+    final index = kIsWeb ? 0 : _index;
 
     // In compact mode the window becomes a small panel under the menu-bar
     // icon: the same data, without tabs or a frame.
@@ -64,19 +70,21 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 ),
               ),
               child: KeyedSubtree(
-                key: ValueKey<int>(_index),
-                child: _pages[_index],
+                key: ValueKey<int>(index),
+                child: _pages[index],
               ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: _GlassNavBar(
-        index: _index,
-        speedLabel: t.tabSpeed,
-        monitorLabel: t.tabMonitor,
-        onTap: (i) => setState(() => _index = i),
-      ),
+      bottomNavigationBar: kIsWeb
+          ? null
+          : _GlassNavBar(
+              index: index,
+              speedLabel: t.tabSpeed,
+              monitorLabel: t.tabMonitor,
+              onTap: (i) => setState(() => _index = i),
+            ),
     );
   }
 }

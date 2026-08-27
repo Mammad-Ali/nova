@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -178,8 +179,12 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                   upload: s.uploadMbps!,
                   ping: s.pingMs!,
                 ),
-                const SizedBox(height: 16),
-                const ThrottleCard(),
+                // The throttling check runs in an isolate and streams from
+                // Netflix's CDN — neither is available to a browser.
+                if (!kIsWeb) ...[
+                  const SizedBox(height: 16),
+                  const ThrottleCard(),
+                ],
               ],
               if (s.phase == TestPhase.error) ...[
                 const SizedBox(height: 16),
@@ -191,6 +196,18 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                 running: s.isRunning,
                 onTap: s.isRunning ? ctrl.stop : ctrl.start,
               ),
+              if (kIsWeb) ...[
+                const SizedBox(height: 20),
+                Text(
+                  t.webOnlyHere,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textLo,
+                    fontSize: 11.5,
+                    height: 1.5,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -235,27 +252,33 @@ class _Title extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                strings.speedtestSubtitle,
+                kIsWeb ? strings.webTagline : strings.speedtestSubtitle,
                 style: TextStyle(color: AppColors.onGlass, fontSize: 14),
               ),
             ],
           ),
         ),
         const LanguageButton(),
-        IconButton(
-          onPressed: () => showServicePingSheet(context),
-          icon: Icon(Icons.travel_explore_rounded,
-              color: AppColors.textMid),
-          tooltip: strings.servicesTitle,
-        ),
+        // Latency to services is measured over dart:io sockets, and the
+        // browser would refuse the cross-origin reads anyway.
+        if (!kIsWeb)
+          IconButton(
+            onPressed: () => showServicePingSheet(context),
+            icon: Icon(Icons.travel_explore_rounded,
+                color: AppColors.textMid),
+            tooltip: strings.servicesTitle,
+          ),
         IconButton(
           onPressed: () => showSpeedTestHistorySheet(context),
           icon: Icon(Icons.history_rounded, color: AppColors.textMid),
           tooltip: strings.historyTitle,
         ),
-        IconButton(
-          onPressed: () => showSettingsSheet(context),
-          icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
+        // Settings hold desktop-only things: notification thresholds and a
+        // CSV export that writes a file to disk.
+        if (!kIsWeb)
+          IconButton(
+            onPressed: () => showSettingsSheet(context),
+            icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
           tooltip: strings.settings,
         ),
       ],
