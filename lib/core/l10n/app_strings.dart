@@ -124,6 +124,21 @@ class AppStrings {
     required this.lanKindTv,
     required this.lanKindPrinter,
     required this.lanKindNas,
+    required this.lbTitle,
+    required this.lbScopeWorld,
+    required this.lbScopeCountry,
+    required this.lbScopeProvider,
+    required this.lbSignInTitle,
+    required this.lbSignInHint,
+    required this.lbSignInGoogle,
+    required this.lbSignOut,
+    required this.lbNickname,
+    required this.lbNicknameHint,
+    required this.lbSave,
+    required this.lbYou,
+    required this.lbEmptyScope,
+    required this.lbDemoNotice,
+    required this.lbGuestHint,
     required this.webTagline,
     required this.webOnlyHere,
     required this.throttleTitle,
@@ -259,6 +274,21 @@ class AppStrings {
   final String lanKindTv;
   final String lanKindPrinter;
   final String lanKindNas;
+  final String lbTitle;
+  final String lbScopeWorld;
+  final String lbScopeCountry;
+  final String lbScopeProvider;
+  final String lbSignInTitle;
+  final String lbSignInHint;
+  final String lbSignInGoogle;
+  final String lbSignOut;
+  final String lbNickname;
+  final String lbNicknameHint;
+  final String lbSave;
+  final String lbYou;
+  final String lbEmptyScope;
+  final String lbDemoNotice;
+  final String lbGuestHint;
   final String webTagline;
   final String webOnlyHere;
   final String throttleTitle;
@@ -405,6 +435,21 @@ const _en = AppStrings(
   lanKindTv: 'TV or streaming box',
   lanKindPrinter: 'Printer',
   lanKindNas: 'Network storage',
+  lbTitle: 'Speed leaderboard',
+  lbScopeWorld: 'World',
+  lbScopeCountry: 'My country',
+  lbScopeProvider: 'My provider',
+  lbSignInTitle: 'Sign in to Nova',
+  lbSignInHint: 'Signing in puts your best result on the board and lets you compare it with other people.',
+  lbSignInGoogle: 'Continue with Google',
+  lbSignOut: 'Sign out',
+  lbNickname: 'Nickname',
+  lbNicknameHint: 'What other people see. Your Google name and e-mail stay private.',
+  lbSave: 'Save',
+  lbYou: 'you',
+  lbEmptyScope: 'Nobody here yet — run a test and be the first.',
+  lbDemoNotice: 'Demo data. Real sign-in and live rankings arrive once the cloud project is connected.',
+  lbGuestHint: 'You are browsing as a guest — sign in to appear on the board.',
   webTagline: 'Know exactly what your internet connection is doing',
   webOnlyHere: 'A browser can only measure speed. Reading system traffic '
       'counters, scanning the local network and checking Wi-Fi all need '
@@ -534,6 +579,21 @@ const _az = AppStrings(
   lanKindTv: 'Televizor və ya pristavka',
   lanKindPrinter: 'Printer',
   lanKindNas: 'Şəbəkə diski',
+  lbTitle: 'Sürət reytinqi',
+  lbScopeWorld: 'Dünya',
+  lbScopeCountry: 'Ölkəm',
+  lbScopeProvider: 'Provayderim',
+  lbSignInTitle: 'Nova-ya daxil ol',
+  lbSignInHint: 'Daxil olsanız, ən yaxşı nəticəniz reytinqə düşür və başqaları ilə müqayisə edə bilərsiniz.',
+  lbSignInGoogle: 'Google ilə davam et',
+  lbSignOut: 'Çıxış',
+  lbNickname: 'Ləqəb',
+  lbNicknameHint: 'Başqalarının gördüyü ad. Google adınız və e-poçtunuz gizli qalır.',
+  lbSave: 'Yadda saxla',
+  lbYou: 'siz',
+  lbEmptyScope: 'Burada hələ heç kim yoxdur — test edin və birinci olun.',
+  lbDemoNotice: 'Nümunə məlumatlar. Bulud layihəsi qoşulandan sonra real giriş və canlı reytinq işləyəcək.',
+  lbGuestHint: 'Qonaq kimi baxırsınız — reytinqdə görünmək üçün daxil olun.',
   webTagline: 'İnternetinizlə əslində nə baş verdiyini öyrənin',
   webOnlyHere: 'Brauzerdə yalnız sürət ölçülür. Sistem trafik sayğaclarını '
       'oxumaq, lokal şəbəkəni skan etmək və Wi-Fi məlumatları sistemə '
@@ -663,6 +723,21 @@ const _ru = AppStrings(
   lanKindTv: 'Телевизор или приставка',
   lanKindPrinter: 'Принтер',
   lanKindNas: 'Сетевой диск',
+  lbTitle: 'Рейтинг скоростей',
+  lbScopeWorld: 'Весь мир',
+  lbScopeCountry: 'Моя страна',
+  lbScopeProvider: 'Мой провайдер',
+  lbSignInTitle: 'Вход в Nova',
+  lbSignInHint: 'После входа ваш лучший результат попадёт в рейтинг, и его можно будет сравнить с другими.',
+  lbSignInGoogle: 'Войти через Google',
+  lbSignOut: 'Выйти',
+  lbNickname: 'Ник',
+  lbNicknameHint: 'Его видят другие. Имя и почта из Google остаются скрытыми.',
+  lbSave: 'Сохранить',
+  lbYou: 'вы',
+  lbEmptyScope: 'Здесь пока никого нет — сделайте тест и станьте первым.',
+  lbDemoNotice: 'Демонстрационные данные. Настоящий вход и живой рейтинг появятся после подключения облака.',
+  lbGuestHint: 'Вы смотрите как гость — войдите, чтобы попасть в список.',
   webTagline: 'Узнайте, что на самом деле происходит с вашим интернетом',
   webOnlyHere: 'В браузере доступен только замер скорости. Чтение системных '
       'счётчиков трафика, сканирование локальной сети и данные Wi-Fi требуют '

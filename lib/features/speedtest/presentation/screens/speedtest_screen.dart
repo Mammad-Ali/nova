@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/l10n/language_button.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../leaderboard/presentation/leaderboard_sheet.dart';
 import '../../../services_ping/presentation/service_ping_sheet.dart';
 import '../../../settings/settings_sheet.dart';
 import '../../../throttling/presentation/throttle_card.dart';
@@ -268,6 +269,11 @@ class _Title extends StatelessWidget {
                 color: AppColors.textMid),
             tooltip: strings.servicesTitle,
           ),
+        IconButton(
+          onPressed: () => showLeaderboardSheet(context),
+          icon: Icon(Icons.emoji_events_rounded, color: AppColors.textMid),
+          tooltip: strings.lbTitle,
+        ),
         IconButton(
           onPressed: () => showSpeedTestHistorySheet(context),
           icon: Icon(Icons.history_rounded, color: AppColors.textMid),
