@@ -14,6 +14,9 @@ system-wide traffic monitor, in one app.
 ![Flutter](https://img.shields.io/badge/Flutter-stable-black)
 ![License](https://img.shields.io/badge/license-MIT-black)
 
+**[Open in the browser](https://mammad-ali.github.io/nova/)** ·
+**[Download for Windows, macOS or Android](#install)**
+
 </div>
 
 ---
@@ -47,6 +50,7 @@ things that actually decide how the connection **feels**:
 | **Latency to services** | Round-trip times to YouTube, Discord, Steam, Cloudflare and more |
 | **History** | Every completed run, with a trend chart, personal best and a comparison to the previous run |
 | **Sharing** | Copy results as text, save them as an image, export the history to CSV |
+| **Leaderboard** | Best results ranked worldwide, by country or by ISP; sign-in is optional and only a nickname is shown. Runs on sample data until the cloud backend is connected |
 
 ### Traffic monitor
 
@@ -73,19 +77,34 @@ things that actually decide how the connection **feels**:
 
 ## Install
 
-Ready-to-run builds are attached to every successful CI run under
-[**Actions → Build**](https://github.com/Mammad-Ali/nova/actions/workflows/build.yml)
-(open the newest green run and scroll to *Artifacts*).
+### In the browser — nothing to install
 
-| Platform | Artifact | How to run |
+**[mammad-ali.github.io/nova](https://mammad-ali.github.io/nova/)** runs the
+speed test right in the page. A browser cannot read system traffic counters,
+scan the local network or see Wi-Fi details, so those parts live in the app.
+
+### The app
+
+These links always point at the newest release:
+
+| Platform | Download | How |
 |---|---|---|
-| **Android** | `nova-apk` | Install `app-arm64-v8a-release.apk`. Play Protect will warn about an unknown developer — choose *More details → Install anyway*. |
-| **Windows** | `nova-windows-setup` | Run `Nova-Setup.exe`. No admin rights needed. SmartScreen will warn — choose *More info → Run anyway*. |
-| **macOS** | build from source | `./tool/install_macos.sh` builds it, installs to `/Applications` and clears the quarantine flag so it opens with a double click. |
+| **Windows** | [Nova-Windows-Setup.exe](https://github.com/Mammad-Ali/nova/releases/latest/download/Nova-Windows-Setup.exe) | Run it. No administrator rights needed. |
+| **macOS** | [Nova-macOS.dmg](https://github.com/Mammad-Ali/nova/releases/latest/download/Nova-macOS.dmg) | Open it and drag **Nova** onto **Applications**. |
+| **Android** | [Nova-Android.apk](https://github.com/Mammad-Ali/nova/releases/latest/download/Nova-Android.apk) | Open it on the phone and tap **Install**. On an older or unusual device use the [universal APK](https://github.com/Mammad-Ali/nova/releases/latest/download/Nova-Android-universal.apk). |
 
-> Both warnings are expected: the builds are signed with a self-issued key
-> rather than a paid Microsoft/Apple certificate. Neither affects how the app
-> runs.
+All releases: [github.com/Mammad-Ali/nova/releases](https://github.com/Mammad-Ali/nova/releases).
+
+#### The first launch warns about an unknown developer
+
+That is expected: Nova is signed with its own key rather than a paid Apple or
+Microsoft certificate. The warning appears once and does not affect the app.
+
+- **Windows** — SmartScreen: *More info* → *Run anyway*.
+- **macOS** — "Apple could not verify Nova": open **System Settings → Privacy &
+  Security**, scroll down and click **Open Anyway**. (On recent macOS versions
+  right-click → *Open* no longer offers this.)
+- **Android** — Play Protect: *More details* → *Install anyway*.
 
 ## Architecture
 
@@ -146,7 +165,7 @@ Requires the Flutter SDK (stable channel).
 
 ```bash
 flutter pub get
-flutter run -d macos     # or -d windows, or an attached Android device
+flutter run -d macos     # or -d windows, -d chrome, or an attached Android device
 ```
 
 Release builds:
@@ -155,27 +174,49 @@ Release builds:
 flutter build apk --release        # Android
 flutter build windows --release    # Windows
 flutter build macos --release      # macOS
+flutter build web --release        # browser
 ```
+
+On a Mac, `./tool/install_macos.sh` builds the app, installs it into
+`/Applications` with its sandbox entitlements intact, and clears the
+quarantine flag so it opens with a double click.
 
 Android release signing expects `android/key.properties` and a keystore in
 `android/keys/`; neither is committed. Without them the build falls back to the
 debug signature, so `flutter run` keeps working out of the box.
 
+### Publishing a release
+
+Bump `version:` in `pubspec.yaml`, then push a matching tag:
+
+```bash
+git tag v1.2.0
+git push origin v1.2.0
+```
+
+CI builds every platform and publishes a GitHub Release with the installers
+under fixed names, so the download links above switch to the new version on
+their own. Every push to `main` also republishes the browser version.
+
 ## Tests
 
 ```bash
-flutter test
+flutter test                         # everything, including live network runs
+flutter test --exclude-tags network  # offline only — what CI runs
 ```
 
 The suite covers the pure logic (monthly totals, forecasting, throttling
-verdicts) and drives the real engine end to end — a full run against live CDNs,
-plus repeat-run and crash-regression checks.
+verdicts, the network scan's packet parsing, the odometer's carry) and drives
+the real engine end to end. Tests tagged `network` move real traffic to
+Cloudflare and Netflix's CDN; CI skips them so a CDN hiccup cannot fail a
+build.
 
 ## Tech stack
 
-Flutter · Riverpod · fl_chart · `dart:io` `HttpClient` (no HTTP package needed)
-· platform channels in Swift, Kotlin and C++ · Inno Setup for the Windows
-installer · GitHub Actions for CI.
+Flutter · Riverpod · fl_chart · `dart:io` sockets for the native speed test and
+network scan, `XMLHttpRequest` in the browser · platform channels in Swift,
+Kotlin and C++ · Inno Setup for the Windows installer · GitHub Actions for CI,
+releases and the GitHub Pages site.
 
 ## License
 
