@@ -120,6 +120,11 @@ class SpeedTestEngine {
 
   Future<(double, double)> _measurePing() async {
     _emit(const SpeedTestProgress(phase: TestPhase.ping));
+    // Warm-up, not counted: the first request also pays for DNS and the TLS
+    // handshake. Counting it left the median intact but threw jitter, the
+    // mean step between samples, up by an order of magnitude — 170 ms on a
+    // line with a steady 57 ms ping. The native engine has always done this.
+    await _probe();
     final rtts = <double>[];
     for (var i = 0; i < 6 && !_cancelled; i++) {
       final rtt = await _probe();
