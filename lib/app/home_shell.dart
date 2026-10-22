@@ -39,12 +39,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     if (ref.watch(compactModeProvider)) {
       return Scaffold(
         backgroundColor: AppColors.bg0,
-        body: Stack(
-          children: [
-            StarfieldBackground(),
-            CompactPanel(),
-          ],
-        ),
+        body: Stack(children: [StarfieldBackground(), CompactPanel()]),
       );
     }
 
@@ -71,7 +66,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ),
               child: KeyedSubtree(
                 key: ValueKey<int>(index),
-                child: _pages[index],
+                child: kIsWeb
+                    ? _WebColumn(child: _pages[index])
+                    : _pages[index],
               ),
             ),
           ),
@@ -85,6 +82,28 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               monitorLabel: t.tabMonitor,
               onTap: (i) => setState(() => _index = i),
             ),
+    );
+  }
+}
+
+/// Keeps the page a readable column in a wide browser window.
+///
+/// The screens are laid out for a phone or a compact desktop window; on a
+/// 1440 px monitor they would stretch edge to edge, with the title in one
+/// corner, the buttons in the other and half-empty cards in between. The
+/// backdrop stays full width — only the content is held to the column.
+class _WebColumn extends StatelessWidget {
+  const _WebColumn({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 640),
+        child: SizedBox.expand(child: child),
+      ),
     );
   }
 }
@@ -118,7 +137,9 @@ class _GlassNavBar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.onGlass.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.onGlass.withValues(alpha: 0.10)),
+                border: Border.all(
+                  color: AppColors.onGlass.withValues(alpha: 0.10),
+                ),
               ),
               child: Row(
                 children: [
