@@ -164,6 +164,7 @@ class SpeedTestEngine {
     var bytes = 0;
     var display = 0.0;
     DateTime? measuringSince;
+    Object? failure;
 
     void count(int delta) {
       final now = DateTime.now();
@@ -200,13 +201,26 @@ class SpeedTestEngine {
 
     final workers = [
       for (var i = 0; i < _connections; i++)
-        _transferLoop(isUpload: isUpload, deadline: deadline, onBytes: count),
+        _transferLoop(
+          isUpload: isUpload,
+          deadline: deadline,
+          onBytes: count,
+          onError: (e) => failure ??= e,
+        ),
       if (loadedSamples != null) sampleLoadedPing(),
     ];
     await Future.wait(workers);
 
     final since = measuringSince;
-    if (since == null) return 0;
+    if (since == null) {
+      // Nothing arrived once counting began. Returning 0 here would grade
+      // the line "E" and store a 0 Mbps result in the history, so the phase
+      // fails instead and the error banner says why.
+      if (_cancelled) return 0;
+      final side = isUpload ? 'upload' : 'download';
+      throw Exception(
+          'No data during $side${failure == null ? '' : ' ($failure)'}');
+    }
     final elapsed = DateTime.now().difference(since).inMicroseconds / 1e6;
     return elapsed <= 0 ? 0 : bytes * 8 / elapsed / 1e6;
   }
@@ -216,6 +230,7 @@ class SpeedTestEngine {
     required bool isUpload,
     required DateTime deadline,
     required void Function(int) onBytes,
+    required void Function(Object) onError,
   }) async {
     while (!_cancelled && DateTime.now().isBefore(deadline)) {
       try {
@@ -231,8 +246,10 @@ class SpeedTestEngine {
           final url = '$_downUrl?bytes=$_chunkBytes&r=${_nonce()}';
           await _request('GET', url, onDownloadProgress: onBytes);
         }
-      } catch (_) {
+      } catch (e) {
         // A dropped chunk just ends this worker; the others carry the phase.
+        // The reason is kept in case every worker ends up failing.
+        onError(e);
         return;
       }
     }
@@ -252,7 +269,10 @@ class SpeedTestEngine {
     return buf;
   }
 
-  int _nonce() => Random().nextInt(1 << 32);
+  /// Cache-buster for chunk URLs. The bound is a literal on purpose: in
+  /// JavaScript, shifts are 32-bit, so `1 << 32` compiles to 0 and
+  /// `nextInt(0)` throws — which used to kill every download worker.
+  int _nonce() => Random().nextInt(0x7FFFFFFF);
 
   /// One request, reporting bytes through the progress callbacks. Completes
   /// when the transfer finishes, throws when it fails or is aborted.

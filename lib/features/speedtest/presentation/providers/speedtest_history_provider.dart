@@ -22,7 +22,15 @@ class SpeedTestHistoryNotifier extends Notifier<List<SpeedTestRecord>> {
   }
 
   Future<void> _load() async {
-    state = await _repo.loadAll();
+    final stored = await _repo.loadAll();
+    // A run that moved no data was never a measurement. The web engine used
+    // to finish such runs and store them as 0 Mbps, which then showed up as a
+    // "personal best: 0.0" and skewed the comparison with the previous test.
+    final valid = stored
+        .where((r) => r.downloadMbps > 0 && r.uploadMbps > 0)
+        .toList();
+    state = valid;
+    if (valid.length != stored.length) await _repo.saveAll(valid);
   }
 
   Future<void> add(SpeedTestRecord record) async {
