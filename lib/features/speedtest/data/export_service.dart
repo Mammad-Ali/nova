@@ -15,7 +15,7 @@ class ExportService {
   /// Returns the saved file's path, or null if the user cancelled.
   Future<String?> savePng(Uint8List bytes, {String? suggestedName}) async {
     final location = await getSaveLocation(
-      suggestedName: suggestedName ?? 'pulsar-speedtest.png',
+      suggestedName: suggestedName ?? 'nova-speedtest.png',
       acceptedTypeGroups: const [
         XTypeGroup(label: 'PNG', extensions: ['png']),
       ],
@@ -28,7 +28,7 @@ class ExportService {
   /// Exports the test history as CSV.
   Future<String?> saveHistoryCsv(List<SpeedTestRecord> records) async {
     final location = await getSaveLocation(
-      suggestedName: 'pulsar-history.csv',
+      suggestedName: 'nova-history.csv',
       acceptedTypeGroups: const [
         XTypeGroup(label: 'CSV', extensions: ['csv']),
       ],
