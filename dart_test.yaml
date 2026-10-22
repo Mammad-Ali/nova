@@ -1,0 +1,5 @@
+tags:
+  # Tests that move real traffic to Cloudflare or Netflix's CDN. CI runs
+  # `flutter test --exclude-tags network`, so a CDN outage cannot fail a build;
+  # a plain `flutter test` on a developer machine still runs them.
+  network:

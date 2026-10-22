@@ -1,17 +1,26 @@
 name: Build
 
-# Builds the Android APK and the Windows installer in the cloud, so no local
-# Android SDK or Windows machine is required. Results are attached to each run
-# as artifacts.
+# Builds Nova for every platform in the cloud, so no local Android SDK,
+# Windows machine or Mac is needed:
+#
+#   * every push to main  — checks, installers as run artifacts, and the web
+#                           version published to GitHub Pages;
+#   * every tag v1.2.3    — the same, plus a GitHub Release carrying the
+#                           installers under fixed names, so the links in the
+#                           README always point at the newest version.
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch: # allows running the workflow manually from the Actions tab
 
+permissions:
+  contents: read
+
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze and test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +29,10 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter analyze lib
+      - run: flutter analyze
+      # Tests tagged `network` move real traffic to Cloudflare and Netflix's
+      # CDN; a CDN hiccup must not fail a build, so they run locally only.
+      - run: flutter test --exclude-tags network
 
   android:
     name: Android APK
@@ -113,15 +125,17 @@ jobs:
       - run: flutter build windows --release
 
       # Ship a single installer instead of a folder of DLLs, so it is obvious
-      # what to click.
+      # what to click. The version shown in "Apps & features" comes from
+      # pubspec.yaml, the same place every other platform reads it from.
       - name: Build installer
         shell: pwsh
         run: |
+          $version = (Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9.]+)').Matches[0].Groups[1].Value
           $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
           if (-not (Test-Path $iscc)) {
             choco install innosetup -y --no-progress
           }
-          & $iscc windows\installer\nova.iss
+          & $iscc "/DAppVersion=$version" windows\installer\nova.iss
           if ($LASTEXITCODE -ne 0) { throw "ISCC exited with $LASTEXITCODE" }
           Get-ChildItem build\windows\installer
 
@@ -131,3 +145,117 @@ jobs:
           path: build/windows/installer/Nova-Setup.exe
           if-no-files-found: error
           retention-days: 30
+
+  macos:
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build macos --release
+
+      # Ad-hoc signature with the release entitlements, then a check that
+      # they are really there. Signing without --entitlements silently strips
+      # the sandbox and the network permissions — that once shipped a build
+      # whose network scan could not name a single device.
+      - name: Sign and check entitlements
+        run: |
+          APP=build/macos/Build/Products/Release/Nova.app
+          codesign --force --sign - --entitlements macos/Runner/Release.entitlements "$APP"
+          ENT=$(codesign -d --entitlements - "$APP" 2>/dev/null)
+          for key in app-sandbox network.client network.server; do
+            if ! echo "$ENT" | grep -q "$key"; then
+              echo "::error::$key is missing from the signed app"
+              exit 1
+            fi
+          done
+          echo "Entitlements present: sandbox, network client and server."
+
+      # A disk image with the app next to a link to Applications: open it,
+      # drag one icon onto the other — the way Mac apps are installed.
+      - name: Build disk image
+        run: |
+          mkdir -p dmg
+          cp -R build/macos/Build/Products/Release/Nova.app dmg/
+          ln -s /Applications dmg/Applications
+          hdiutil create -volname Nova -srcfolder dmg -ov -format UDZO Nova-macOS.dmg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nova-macos
+          path: Nova-macOS.dmg
+          if-no-files-found: error
+          retention-days: 30
+
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Served from https://mammad-ali.github.io/nova/, so every asset path
+      # has to be relative to /nova/ rather than the domain root.
+      - run: flutter build web --release --base-href /nova/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  pages:
+    name: Publish website
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [analyze, web]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  release:
+    name: Publish release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [analyze, android, windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: nova-*
+          path: dist
+
+      # Fixed names on purpose: GitHub serves the newest release's files at
+      # releases/latest/download/<name>, so links in the README never go
+      # stale.
+      - name: Name the files
+        run: |
+          mkdir -p out
+          cp dist/nova-apk/app-arm64-v8a-release.apk out/Nova-Android.apk
+          cp dist/nova-apk/app-release.apk out/Nova-Android-universal.apk
+          cp dist/nova-windows-setup/Nova-Setup.exe out/Nova-Windows-Setup.exe
+          cp dist/nova-macos/Nova-macOS.dmg out/Nova-macOS.dmg
+          ls -lh out
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" out/* \
+            --title "Nova ${GITHUB_REF_NAME#v}" \
+            --notes-file .github/release-notes.md

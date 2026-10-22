@@ -1,3 +1,8 @@
+// Runs a real speed test against Cloudflare. Tagged so CI can skip it:
+// a CDN hiccup must not fail a build. Locally, `flutter test` runs it.
+@Tags(['network'])
+library;
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:net_pulse/features/speedtest/data/datasources/speedtest_engine.dart';

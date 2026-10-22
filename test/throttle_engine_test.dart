@@ -27,5 +27,5 @@ void main() {
         'video=${result.videoMbps.toStringAsFixed(1)} '
         'ratio=${(result.ratio * 100).round()}% '
         'verdict=${result.verdict.name} host=${result.videoHost}');
-  }, timeout: const Timeout(Duration(seconds: 60)));
+  }, timeout: const Timeout(Duration(seconds: 60)), tags: 'network');
 }
