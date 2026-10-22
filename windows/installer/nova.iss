@@ -7,7 +7,11 @@
 ; Output: build\windows\installer\Nova-Setup.exe
 
 #define AppName "Nova"
-#define AppVersion "1.0.0"
+; The version comes from pubspec.yaml: CI passes /DAppVersion=x.y.z. The
+; fallback only covers a hand-run build without the switch.
+#ifndef AppVersion
+  #define AppVersion "0.0.0-dev"
+#endif
 #define AppPublisher "Mammad-Ali"
 #define AppExe "Nova.exe"
 ; Path to the built application, relative to this file.
