@@ -6,6 +6,13 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<!-- The network scan asks each device its name over UDP (unicast mDNS
+	     and NetBIOS). Binding the reply socket counts as "server" in the
+	     sandbox: with the client entitlement alone bind() fails with
+	     EPERM, and every device came out nameless in release builds while
+	     debug builds, which carry this entitlement, worked. -->
+	<key>com.apple.security.network.server</key>
+	<true/>
 	<!-- Saving the result image and CSV to a user-chosen location -->
 	<key>com.apple.security.files.user-selected.read-write</key>
 	<true/>
