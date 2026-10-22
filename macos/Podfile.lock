@@ -24,11 +24,11 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
-  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
+  FlutterMacOS: c232990155153907050900a2e175c7773903ba4e
   local_notifier: ebf072651e35ae5e47280ad52e2707375cb2ae4e
   tray_manager: a104b5c81b578d83f3c3d0f40a997c8b10810166
   window_manager: 1d01fa7ac65a6e6f83b965471b1a7fdd3f06166c
 
-PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
+PODFILE CHECKSUM: e09059b6833ee78a9bbf07ec32a9403e9a75c175
 
 COCOAPODS: 1.17.0
