@@ -72,7 +72,11 @@ things that actually decide how the connection **feels**:
 
 ### Everywhere
 
-- Three interface languages: **English, Azerbaijani, Russian**
+- Five interface languages: **English, Azerbaijani, Russian, German, Hungarian**
+- A **More** tab with four sections — *Learn* (key terms, guides, FAQ),
+  *Tools* (leaderboard, provider ranking, latency to services), *About*
+  (about Nova, privacy, source code) and *Profile* (history, settings, help,
+  account). The website shows the same four sections as its footer.
 - A single dark theme built for readability against the animated backdrop
 
 ## Install
@@ -80,8 +84,12 @@ things that actually decide how the connection **feels**:
 ### In the browser — nothing to install
 
 **[mammad-ali.github.io/nova](https://mammad-ali.github.io/nova/)** runs the
-speed test right in the page. A browser cannot read system traffic counters,
-scan the local network or see Wi-Fi details, so those parts live in the app.
+speed test right in the page, together with everything a browser can do: the
+history with CSV and image export, latency to services, the leaderboard and
+provider ranking, and the Learn, About and Help pages. A browser cannot read
+system traffic counters, scan the local network, see Wi-Fi details or run the
+throttling check, so those live in the app — the site lists them and offers
+the download for the visitor's own system.
 
 ### The app
 
@@ -123,6 +131,8 @@ lib/
 │  ├─ services_ping/     latency to popular services
 │  ├─ wifi/              signal strength and link rate
 │  ├─ lan_scan/          local subnet sweep, device names and kinds
+│  ├─ leaderboard/       sign-in, rankings, provider ranking (demo backend)
+│  ├─ more/              More tab and site footer: Learn, About, Help pages
 │  ├─ alerts/            threshold notifications
 │  └─ settings/
 └─ shell/        tray icon, compact panel, window management
