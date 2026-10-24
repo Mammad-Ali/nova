@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/l10n/locale_provider.dart';
 import '../core/theme/app_theme.dart';
+import '../features/more/presentation/more_screen.dart';
 import '../features/speedtest/presentation/screens/speedtest_screen.dart';
 import '../features/traffic_monitor/presentation/screens/traffic_monitor_screen.dart';
 import '../shell/compact_mode.dart';
@@ -23,7 +24,7 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
 
-  static const _pages = [SpeedTestScreen(), TrafficMonitorScreen()];
+  static const _pages = [SpeedTestScreen(), TrafficMonitorScreen(), MoreScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -78,8 +79,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ? null
           : _GlassNavBar(
               index: index,
-              speedLabel: t.tabSpeed,
-              monitorLabel: t.tabMonitor,
+              items: [
+                (Icons.speed_rounded, t.tabSpeed),
+                (Icons.show_chart_rounded, t.tabMonitor),
+                (Icons.apps_rounded, t.tabMore),
+              ],
               onTap: (i) => setState(() => _index = i),
             ),
     );
@@ -111,14 +115,14 @@ class _WebColumn extends StatelessWidget {
 class _GlassNavBar extends StatelessWidget {
   const _GlassNavBar({
     required this.index,
-    required this.speedLabel,
-    required this.monitorLabel,
+    required this.items,
     required this.onTap,
   });
 
   final int index;
-  final String speedLabel;
-  final String monitorLabel;
+
+  /// Icon and label of each tab, in order.
+  final List<(IconData, String)> items;
   final ValueChanged<int> onTap;
 
   @override
@@ -143,18 +147,13 @@ class _GlassNavBar extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _NavItem(
-                    selected: index == 0,
-                    icon: Icons.speed_rounded,
-                    label: speedLabel,
-                    onTap: () => onTap(0),
-                  ),
-                  _NavItem(
-                    selected: index == 1,
-                    icon: Icons.show_chart_rounded,
-                    label: monitorLabel,
-                    onTap: () => onTap(1),
-                  ),
+                  for (var i = 0; i < items.length; i++)
+                    _NavItem(
+                      selected: index == i,
+                      icon: items[i].$1,
+                      label: items[i].$2,
+                      onTap: () => onTap(i),
+                    ),
                 ],
               ),
             ),
@@ -201,14 +200,18 @@ class _NavItem extends StatelessWidget {
                 color: selected ? Colors.black : AppColors.textLo,
               ),
               const SizedBox(width: 8),
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 260),
-                style: TextStyle(
-                  color: selected ? Colors.black : AppColors.textLo,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
+              // Three tabs share a phone's width, and some languages have
+              // long words for them: let a label shrink rather than overflow.
+              Flexible(
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 260),
+                  style: TextStyle(
+                    color: selected ? Colors.black : AppColors.textLo,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                  child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
-                child: Text(label),
               ),
             ],
           ),

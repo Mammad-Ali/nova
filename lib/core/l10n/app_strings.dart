@@ -173,6 +173,43 @@ class AppStrings {
     required this.saveImage,
     required this.exportCsv,
     required this.savedTo,
+    required this.tabMore,
+    required this.moreSubtitle,
+    required this.secLearn,
+    required this.secTools,
+    required this.secAbout,
+    required this.secProfile,
+    required this.learnGlossary,
+    required this.learnGuides,
+    required this.learnFaq,
+    required this.toolsRanking,
+    required this.aboutNova,
+    required this.aboutPrivacy,
+    required this.aboutSource,
+    required this.profileHelp,
+    required this.profileAccount,
+    required this.profileSignedIn,
+    required this.rankHint,
+    required this.rankResults,
+    required this.rankEmpty,
+    required this.getAppTitle,
+    required this.getAppHint,
+    required this.getAppFor,
+    required this.getAppOther,
+    required this.getAppAll,
+    required this.appOnlyTitle,
+    required this.appOnlyMonitorTitle,
+    required this.appOnlyMonitorText,
+    required this.appOnlyLanText,
+    required this.appOnlyWifiTitle,
+    required this.appOnlyWifiText,
+    required this.appOnlyThrottleText,
+    required this.getApp,
+    required this.versionLabel,
+    required this.footerLicense,
+    required this.servicesWebNote,
+    required this.settingsWebNote,
+    required this.demoBadge,
   });
 
   // Navigation and shared
@@ -328,6 +365,45 @@ class AppStrings {
   final String saveImage;
   final String exportCsv;
   final String savedTo;
+
+  // More tab, the site footer and the web-only blocks
+  final String tabMore;
+  final String moreSubtitle;
+  final String secLearn;
+  final String secTools;
+  final String secAbout;
+  final String secProfile;
+  final String learnGlossary;
+  final String learnGuides;
+  final String learnFaq;
+  final String toolsRanking;
+  final String aboutNova;
+  final String aboutPrivacy;
+  final String aboutSource;
+  final String profileHelp;
+  final String profileAccount;
+  final String profileSignedIn;
+  final String rankHint;
+  final String rankResults;
+  final String rankEmpty;
+  final String getAppTitle;
+  final String getAppHint;
+  final String getAppFor;
+  final String getAppOther;
+  final String getAppAll;
+  final String appOnlyTitle;
+  final String appOnlyMonitorTitle;
+  final String appOnlyMonitorText;
+  final String appOnlyLanText;
+  final String appOnlyWifiTitle;
+  final String appOnlyWifiText;
+  final String appOnlyThrottleText;
+  final String getApp;
+  final String versionLabel;
+  final String footerLicense;
+  final String servicesWebNote;
+  final String settingsWebNote;
+  final String demoBadge;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -489,6 +565,43 @@ const _en = AppStrings(
   saveImage: 'Save as image',
   exportCsv: 'Export CSV',
   savedTo: 'Saved',
+  tabMore: 'More',
+  moreSubtitle: 'Learn, tools, about Nova and your profile',
+  secLearn: 'Learn',
+  secTools: 'Tools',
+  secAbout: 'About',
+  secProfile: 'Profile',
+  learnGlossary: 'Key terms',
+  learnGuides: 'Guides',
+  learnFaq: 'FAQ',
+  toolsRanking: 'Provider ranking',
+  aboutNova: 'About Nova',
+  aboutPrivacy: 'Privacy',
+  aboutSource: 'Source code',
+  profileHelp: 'Help',
+  profileAccount: 'Sign in or create an account',
+  profileSignedIn: 'Signed in as {0}',
+  rankHint: "Typical best result per provider — the median of everyone's best tests.",
+  rankResults: 'Results',
+  rankEmpty: 'No results for your country yet.',
+  getAppTitle: 'Get the Nova app',
+  getAppHint: "Free for Windows, macOS and Android — with everything a browser can't do.",
+  getAppFor: 'Download for {0}',
+  getAppOther: 'Also for',
+  getAppAll: 'All versions',
+  appOnlyTitle: 'Only in the app',
+  appOnlyMonitorTitle: 'Live traffic monitor',
+  appOnlyMonitorText: 'System-wide download and upload every second, with daily and monthly totals.',
+  appOnlyLanText: 'Every device on your Wi-Fi, with names and types.',
+  appOnlyWifiTitle: 'Wi-Fi signal',
+  appOnlyWifiText: 'Signal strength and link rate — tells a weak router from a slow line.',
+  appOnlyThrottleText: 'Finds out whether your provider slows down video.',
+  getApp: 'Get the app',
+  versionLabel: 'Version',
+  footerLicense: 'Open source · MIT License',
+  servicesWebNote: 'In a browser the figures are approximate: a web page cannot open raw connections.',
+  settingsWebNote: 'Notifications about slow speed and traffic limits are available in the app.',
+  demoBadge: 'demo',
 );
 
 const _az = AppStrings(
@@ -633,6 +746,43 @@ const _az = AppStrings(
   saveImage: 'Şəkil kimi saxla',
   exportCsv: 'CSV ixrac et',
   savedTo: 'Saxlanıldı',
+  tabMore: 'Daha çox',
+  moreSubtitle: 'Bələdçi, alətlər, Nova haqqında və profil',
+  secLearn: 'Bələdçi',
+  secTools: 'Alətlər',
+  secAbout: 'Haqqında',
+  secProfile: 'Profil',
+  learnGlossary: 'Əsas anlayışlar',
+  learnGuides: 'Təlimatlar',
+  learnFaq: 'Tez-tez verilən suallar',
+  toolsRanking: 'Provayder reytinqi',
+  aboutNova: 'Nova haqqında',
+  aboutPrivacy: 'Məxfilik',
+  aboutSource: 'Mənbə kodu',
+  profileHelp: 'Kömək',
+  profileAccount: 'Daxil olun və ya hesab yaradın',
+  profileSignedIn: '{0} kimi daxil olmusunuz',
+  rankHint: 'Hər provayderdə tipik ən yaxşı nəticə — istifadəçilərin ən yaxşı testlərinin medianı.',
+  rankResults: 'Nəticələr',
+  rankEmpty: 'Ölkəniz üçün hələ nəticə yoxdur.',
+  getAppTitle: 'Nova tətbiqini yükləyin',
+  getAppHint: 'Windows, macOS və Android üçün pulsuz — brauzerin bacarmadığı hər şeylə.',
+  getAppFor: '{0} üçün yüklə',
+  getAppOther: 'Həmçinin',
+  getAppAll: 'Bütün versiyalar',
+  appOnlyTitle: 'Yalnız tətbiqdə',
+  appOnlyMonitorTitle: 'Canlı trafik monitoru',
+  appOnlyMonitorText: 'Bütün sistemin yükləmə və göndərməsi hər saniyə, günlük və aylıq yekunlarla.',
+  appOnlyLanText: 'Wi-Fi şəbəkənizdəki bütün cihazlar — adları və növləri ilə.',
+  appOnlyWifiTitle: 'Wi-Fi siqnalı',
+  appOnlyWifiText: 'Siqnal gücü və kanal sürəti — zəif routeri yavaş xətdən ayırır.',
+  appOnlyThrottleText: 'Provayderin videonu yavaşladıb-yavaşlatmadığını yoxlayır.',
+  getApp: 'Tətbiqi yüklə',
+  versionLabel: 'Versiya',
+  footerLicense: 'Açıq mənbə · MIT lisenziyası',
+  servicesWebNote: 'Brauzerdə rəqəmlər təxminidir: veb səhifə birbaşa bağlantı aça bilmir.',
+  settingsWebNote: 'Aşağı sürət və trafik limiti barədə bildirişlər tətbiqdə mövcuddur.',
+  demoBadge: 'demo',
 );
 
 const _ru = AppStrings(
@@ -777,6 +927,43 @@ const _ru = AppStrings(
   saveImage: 'Сохранить картинкой',
   exportCsv: 'Экспорт CSV',
   savedTo: 'Сохранено',
+  tabMore: 'Ещё',
+  moreSubtitle: 'Справочник, инструменты, о Nova и профиль',
+  secLearn: 'Справочник',
+  secTools: 'Инструменты',
+  secAbout: 'О Nova',
+  secProfile: 'Профиль',
+  learnGlossary: 'Термины',
+  learnGuides: 'Руководства',
+  learnFaq: 'Частые вопросы',
+  toolsRanking: 'Рейтинг провайдеров',
+  aboutNova: 'О приложении',
+  aboutPrivacy: 'Конфиденциальность',
+  aboutSource: 'Исходный код',
+  profileHelp: 'Помощь',
+  profileAccount: 'Войти или создать аккаунт',
+  profileSignedIn: 'Вы вошли как {0}',
+  rankHint: 'Типичный лучший результат у каждого провайдера — медиана лучших тестов пользователей.',
+  rankResults: 'Результатов',
+  rankEmpty: 'Для вашей страны пока нет результатов.',
+  getAppTitle: 'Скачайте приложение Nova',
+  getAppHint: 'Бесплатно для Windows, macOS и Android — со всем, чего не умеет браузер.',
+  getAppFor: 'Скачать для {0}',
+  getAppOther: 'Также для',
+  getAppAll: 'Все версии',
+  appOnlyTitle: 'Только в приложении',
+  appOnlyMonitorTitle: 'Монитор трафика',
+  appOnlyMonitorText: 'Загрузка и отдача всей системы каждую секунду, итоги за день и месяц.',
+  appOnlyLanText: 'Все устройства в вашей сети — с именами и типами.',
+  appOnlyWifiTitle: 'Сигнал Wi-Fi',
+  appOnlyWifiText: 'Уровень сигнала и скорость канала — отличает слабый роутер от медленной линии.',
+  appOnlyThrottleText: 'Проверяет, не замедляет ли провайдер видео.',
+  getApp: 'Скачать приложение',
+  versionLabel: 'Версия',
+  footerLicense: 'Открытый исходный код · лицензия MIT',
+  servicesWebNote: 'В браузере значения приблизительные: веб-страница не может открывать прямые соединения.',
+  settingsWebNote: 'Уведомления о низкой скорости и лимите трафика доступны в приложении.',
+  demoBadge: 'демо',
 );
 
 const _de = AppStrings(
@@ -915,6 +1102,43 @@ const _de = AppStrings(
   saveImage: 'Als Bild speichern',
   exportCsv: 'Als CSV exportieren',
   savedTo: 'Gespeichert',
+  tabMore: 'Mehr',
+  moreSubtitle: 'Wissen, Werkzeuge, über Nova und dein Profil',
+  secLearn: 'Wissen',
+  secTools: 'Werkzeuge',
+  secAbout: 'Über',
+  secProfile: 'Profil',
+  learnGlossary: 'Begriffe',
+  learnGuides: 'Anleitungen',
+  learnFaq: 'FAQ',
+  toolsRanking: 'Anbieter-Ranking',
+  aboutNova: 'Über Nova',
+  aboutPrivacy: 'Datenschutz',
+  aboutSource: 'Quellcode',
+  profileHelp: 'Hilfe',
+  profileAccount: 'Anmelden oder Konto erstellen',
+  profileSignedIn: 'Angemeldet als {0}',
+  rankHint: 'Typisches Bestergebnis je Anbieter – der Median der besten Tests aller Nutzer.',
+  rankResults: 'Ergebnisse',
+  rankEmpty: 'Für dein Land gibt es noch keine Ergebnisse.',
+  getAppTitle: 'Hol dir die Nova-App',
+  getAppHint: 'Kostenlos für Windows, macOS und Android – mit allem, was ein Browser nicht kann.',
+  getAppFor: 'Für {0} herunterladen',
+  getAppOther: 'Auch für',
+  getAppAll: 'Alle Versionen',
+  appOnlyTitle: 'Nur in der App',
+  appOnlyMonitorTitle: 'Live-Datenmonitor',
+  appOnlyMonitorText: 'Systemweiter Down- und Upload jede Sekunde, mit Tages- und Monatssummen.',
+  appOnlyLanText: 'Alle Geräte in deinem WLAN, mit Namen und Typ.',
+  appOnlyWifiTitle: 'WLAN-Signal',
+  appOnlyWifiText: 'Signalstärke und Verbindungsrate – unterscheidet einen schwachen Router von einer langsamen Leitung.',
+  appOnlyThrottleText: 'Findet heraus, ob dein Anbieter Videos ausbremst.',
+  getApp: 'App holen',
+  versionLabel: 'Version',
+  footerLicense: 'Open Source · MIT-Lizenz',
+  servicesWebNote: 'Im Browser sind die Werte ungefähr: Eine Webseite kann keine direkten Verbindungen öffnen.',
+  settingsWebNote: 'Benachrichtigungen bei langsamer Verbindung und Datenlimit gibt es in der App.',
+  demoBadge: 'Demo',
 );
 
 const _hu = AppStrings(
@@ -1053,4 +1277,41 @@ const _hu = AppStrings(
   saveImage: 'Mentés képként',
   exportCsv: 'CSV exportálása',
   savedTo: 'Mentve',
+  tabMore: 'Továbbiak',
+  moreSubtitle: 'Tudnivalók, eszközök, a Nováról és a profilod',
+  secLearn: 'Tudnivalók',
+  secTools: 'Eszközök',
+  secAbout: 'Névjegy',
+  secProfile: 'Profil',
+  learnGlossary: 'Fogalmak',
+  learnGuides: 'Útmutatók',
+  learnFaq: 'GYIK',
+  toolsRanking: 'Szolgáltatói rangsor',
+  aboutNova: 'A Nováról',
+  aboutPrivacy: 'Adatvédelem',
+  aboutSource: 'Forráskód',
+  profileHelp: 'Súgó',
+  profileAccount: 'Bejelentkezés vagy fiók létrehozása',
+  profileSignedIn: 'Bejelentkezve: {0}',
+  rankHint: 'Szolgáltatónként a jellemző legjobb eredmény – a felhasználók legjobb tesztjeinek mediánja.',
+  rankResults: 'Eredmények',
+  rankEmpty: 'Az országodból még nincs eredmény.',
+  getAppTitle: 'Töltsd le a Nova alkalmazást',
+  getAppHint: 'Ingyenes Windowsra, macOS-re és Androidra – mindazzal, amire a böngésző nem képes.',
+  getAppFor: 'Letöltés: {0}',
+  getAppOther: 'Elérhető még',
+  getAppAll: 'Összes verzió',
+  appOnlyTitle: 'Csak az alkalmazásban',
+  appOnlyMonitorTitle: 'Élő forgalomfigyelő',
+  appOnlyMonitorText: 'A teljes rendszer le- és feltöltése másodpercenként, napi és havi összesítéssel.',
+  appOnlyLanText: 'Minden eszköz a Wi-Fi-hálózatodon, névvel és típussal.',
+  appOnlyWifiTitle: 'Wi-Fi jel',
+  appOnlyWifiText: 'Jelerősség és kapcsolati sebesség – megkülönbözteti a gyenge routert a lassú vonaltól.',
+  appOnlyThrottleText: 'Kideríti, hogy a szolgáltatód lassítja-e a videókat.',
+  getApp: 'Alkalmazás letöltése',
+  versionLabel: 'Verzió',
+  footerLicense: 'Nyílt forráskód · MIT-licenc',
+  servicesWebNote: 'Böngészőben az értékek hozzávetőlegesek: egy weboldal nem nyithat közvetlen kapcsolatot.',
+  settingsWebNote: 'A lassú sebességről és az adatkeretről szóló értesítések az alkalmazásban érhetők el.',
+  demoBadge: 'demó',
 );
