@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/latency_probe.dart';
 import '../domain/service_target.dart';
 
 /// State of the per-service latency measurement.
@@ -41,39 +40,6 @@ class ServicePingNotifier extends Notifier<ServicePingState> {
     state = ServicePingState(results: results, running: false);
   }
 
-  Future<ServicePing> _measure(ServiceTarget target) async {
-    final client = HttpClient()
-      ..connectionTimeout = const Duration(seconds: 5)
-      ..idleTimeout = const Duration(seconds: 10);
-    final uri = Uri.parse(target.url);
-    final rtts = <double>[];
-
-    try {
-      // Warm-up absorbs DNS + TLS; the rest reuses the live connection.
-      await _once(client, uri);
-      for (var i = 0; i < 3; i++) {
-        final rtt = await _once(client, uri);
-        if (rtt != null) rtts.add(rtt);
-      }
-    } finally {
-      client.close(force: true);
-    }
-
-    if (rtts.isEmpty) return ServicePing(target: target);
-    rtts.sort();
-    return ServicePing(target: target, rttMs: rtts[rtts.length ~/ 2]);
-  }
-
-  Future<double?> _once(HttpClient c, Uri uri) async {
-    try {
-      final sw = Stopwatch()..start();
-      final req = await c.headUrl(uri);
-      final resp = await req.close().timeout(const Duration(seconds: 5));
-      await resp.drain<void>();
-      sw.stop();
-      return sw.elapsedMicroseconds / 1000.0;
-    } catch (_) {
-      return null;
-    }
-  }
+  Future<ServicePing> _measure(ServiceTarget target) async =>
+      ServicePing(target: target, rttMs: await measureLatency(target.url));
 }

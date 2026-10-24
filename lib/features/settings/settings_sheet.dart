@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,29 +66,40 @@ class _SettingsSheet extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SwitchListTile(
-                  value: s.alertsEnabled,
-                  onChanged: notifier.setAlertsEnabled,
-                  activeThumbColor: AppColors.nebulaViolet,
-                  title: Text(
-                    t.alertsEnable,
-                    style: TextStyle(color: AppColors.onGlass, fontSize: 14),
+                // Alerts need the app running in the background and system
+                // notifications — neither exists for a web page.
+                if (!kIsWeb) ...[
+                  SwitchListTile(
+                    value: s.alertsEnabled,
+                    onChanged: notifier.setAlertsEnabled,
+                    activeThumbColor: AppColors.nebulaViolet,
+                    title: Text(
+                      t.alertsEnable,
+                      style: TextStyle(color: AppColors.onGlass, fontSize: 14),
+                    ),
                   ),
-                ),
-                _NumberField(
-                  label: t.alertMinSpeed,
-                  hint: t.notSet,
-                  value: s.minSpeedMbps,
-                  enabled: s.alertsEnabled,
-                  onChanged: notifier.setMinSpeed,
-                ),
-                _NumberField(
-                  label: t.alertDailyLimit,
-                  hint: t.notSet,
-                  value: s.dailyLimitGb,
-                  enabled: s.alertsEnabled,
-                  onChanged: notifier.setDailyLimit,
-                ),
+                  _NumberField(
+                    label: t.alertMinSpeed,
+                    hint: t.notSet,
+                    value: s.minSpeedMbps,
+                    enabled: s.alertsEnabled,
+                    onChanged: notifier.setMinSpeed,
+                  ),
+                  _NumberField(
+                    label: t.alertDailyLimit,
+                    hint: t.notSet,
+                    value: s.dailyLimitGb,
+                    enabled: s.alertsEnabled,
+                    onChanged: notifier.setDailyLimit,
+                  ),
+                ] else
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+                    child: Text(
+                      t.settingsWebNote,
+                      style: TextStyle(color: AppColors.textLo, fontSize: 13, height: 1.4),
+                    ),
+                  ),
                 Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                 ListTile(
                   leading: Icon(Icons.table_view_rounded,

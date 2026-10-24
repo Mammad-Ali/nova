@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -86,7 +87,8 @@ class _ServicePingSheet extends ConsumerWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    t.servicesHint,
+                    // Browser timings carry the page's own overhead.
+                    kIsWeb ? '${t.servicesHint}\n${t.servicesWebNote}' : t.servicesHint,
                     style:
                         TextStyle(color: AppColors.textLo, fontSize: 12),
                   ),

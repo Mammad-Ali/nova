@@ -8,6 +8,7 @@ import '../../../../core/l10n/language_button.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../leaderboard/presentation/leaderboard_sheet.dart';
+import '../../../more/presentation/web_extras.dart';
 import '../../../services_ping/presentation/service_ping_sheet.dart';
 import '../../../settings/settings_sheet.dart';
 import '../../../throttling/presentation/throttle_card.dart';
@@ -197,18 +198,9 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                 running: s.isRunning,
                 onTap: s.isRunning ? ctrl.stop : ctrl.start,
               ),
-              if (kIsWeb) ...[
-                const SizedBox(height: 20),
-                Text(
-                  t.webOnlyHere,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.textLo,
-                    fontSize: 11.5,
-                    height: 1.5,
-                  ),
-                ),
-              ],
+              // The browser has no tab bar: what the app keeps under Monitor
+              // and More appears here instead, below the test.
+              if (kIsWeb) const WebExtras(),
             ],
           ),
         ),
@@ -260,15 +252,11 @@ class _Title extends StatelessWidget {
           ),
         ),
         const LanguageButton(),
-        // Latency to services is measured over dart:io sockets, and the
-        // browser would refuse the cross-origin reads anyway.
-        if (!kIsWeb)
-          IconButton(
-            onPressed: () => showServicePingSheet(context),
-            icon: Icon(Icons.travel_explore_rounded,
-                color: AppColors.textMid),
-            tooltip: strings.servicesTitle,
-          ),
+        IconButton(
+          onPressed: () => showServicePingSheet(context),
+          icon: Icon(Icons.travel_explore_rounded, color: AppColors.textMid),
+          tooltip: strings.servicesTitle,
+        ),
         IconButton(
           onPressed: () => showLeaderboardSheet(context),
           icon: Icon(Icons.emoji_events_rounded, color: AppColors.textMid),
@@ -279,12 +267,9 @@ class _Title extends StatelessWidget {
           icon: Icon(Icons.history_rounded, color: AppColors.textMid),
           tooltip: strings.historyTitle,
         ),
-        // Settings hold desktop-only things: notification thresholds and a
-        // CSV export that writes a file to disk.
-        if (!kIsWeb)
-          IconButton(
-            onPressed: () => showSettingsSheet(context),
-            icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
+        IconButton(
+          onPressed: () => showSettingsSheet(context),
+          icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
           tooltip: strings.settings,
         ),
       ],
