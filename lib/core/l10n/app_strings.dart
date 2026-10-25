@@ -210,6 +210,8 @@ class AppStrings {
     required this.servicesWebNote,
     required this.settingsWebNote,
     required this.demoBadge,
+    required this.getAppStarted,
+    required this.getAppBrowserHint,
   });
 
   // Navigation and shared
@@ -404,6 +406,8 @@ class AppStrings {
   final String servicesWebNote;
   final String settingsWebNote;
   final String demoBadge;
+  final String getAppStarted;
+  final String getAppBrowserHint;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -602,6 +606,8 @@ const _en = AppStrings(
   servicesWebNote: 'In a browser the figures are approximate: a web page cannot open raw connections.',
   settingsWebNote: 'Notifications about slow speed and traffic limits are available in the app.',
   demoBadge: 'demo',
+  getAppStarted: "Download started — look in your browser's downloads.",
+  getAppBrowserHint: 'Your browser may ask to allow the download or to keep the file — confirm it.',
 );
 
 const _az = AppStrings(
@@ -783,6 +789,8 @@ const _az = AppStrings(
   servicesWebNote: 'Brauzerdə rəqəmlər təxminidir: veb səhifə birbaşa bağlantı aça bilmir.',
   settingsWebNote: 'Aşağı sürət və trafik limiti barədə bildirişlər tətbiqdə mövcuddur.',
   demoBadge: 'demo',
+  getAppStarted: 'Yükləmə başladı — brauzerin yükləmələrinə baxın.',
+  getAppBrowserHint: 'Brauzer yükləməyə icazə və ya faylı saxlamaq üçün təsdiq istəyə bilər — təsdiqləyin.',
 );
 
 const _ru = AppStrings(
@@ -964,6 +972,8 @@ const _ru = AppStrings(
   servicesWebNote: 'В браузере значения приблизительные: веб-страница не может открывать прямые соединения.',
   settingsWebNote: 'Уведомления о низкой скорости и лимите трафика доступны в приложении.',
   demoBadge: 'демо',
+  getAppStarted: 'Загрузка началась — смотрите в загрузках браузера.',
+  getAppBrowserHint: 'Браузер может спросить разрешение на загрузку или предложить сохранить файл — подтвердите.',
 );
 
 const _de = AppStrings(
@@ -1139,6 +1149,8 @@ const _de = AppStrings(
   servicesWebNote: 'Im Browser sind die Werte ungefähr: Eine Webseite kann keine direkten Verbindungen öffnen.',
   settingsWebNote: 'Benachrichtigungen bei langsamer Verbindung und Datenlimit gibt es in der App.',
   demoBadge: 'Demo',
+  getAppStarted: 'Download gestartet – sieh in den Downloads deines Browsers nach.',
+  getAppBrowserHint: 'Dein Browser fragt eventuell, ob der Download erlaubt oder die Datei behalten werden soll – bestätige das.',
 );
 
 const _hu = AppStrings(
@@ -1314,4 +1326,6 @@ const _hu = AppStrings(
   servicesWebNote: 'Böngészőben az értékek hozzávetőlegesek: egy weboldal nem nyithat közvetlen kapcsolatot.',
   settingsWebNote: 'A lassú sebességről és az adatkeretről szóló értesítések az alkalmazásban érhetők el.',
   demoBadge: 'demó',
+  getAppStarted: 'Elindult a letöltés – nézd meg a böngésző letöltéseit.',
+  getAppBrowserHint: 'A böngésző rákérdezhet, hogy engedélyezed-e a letöltést, vagy megtartod-e a fájlt – erősítsd meg.',
 );

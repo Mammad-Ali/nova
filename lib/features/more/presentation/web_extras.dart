@@ -10,15 +10,26 @@ import 'more_links.dart';
 
 /// The lower half of the web page: what only the app can do, where to get
 /// it, and the footer with the same four sections as the app's More tab.
-class WebExtras extends StatefulWidget {
+class WebExtras extends ConsumerStatefulWidget {
   const WebExtras({super.key});
 
   @override
-  State<WebExtras> createState() => _WebExtrasState();
+  ConsumerState<WebExtras> createState() => _WebExtrasState();
 }
 
-class _WebExtrasState extends State<WebExtras> {
+class _WebExtrasState extends ConsumerState<WebExtras> {
   final _downloads = GlobalKey();
+
+  /// "Get the app" on a feature card: download straight away when the
+  /// visitor's system has an installer, otherwise show the download block.
+  void _getApp() {
+    final mine = visitorDownload();
+    if (mine != null) {
+      _download(context, ref.read(stringsProvider), mine);
+    } else {
+      _scrollToDownloads();
+    }
+  }
 
   void _scrollToDownloads() {
     final target = _downloads.currentContext;
@@ -37,7 +48,7 @@ class _WebExtrasState extends State<WebExtras> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 40),
-        _AppOnly(onGetApp: _scrollToDownloads),
+        _AppOnly(onGetApp: _getApp),
         const SizedBox(height: 28),
         _GetTheApp(key: _downloads),
         const SizedBox(height: 40),
@@ -45,6 +56,21 @@ class _WebExtrasState extends State<WebExtras> {
       ],
     );
   }
+}
+
+/// Starts the download and says so. The page itself does not change and
+/// Safari's only other sign is a small toolbar animation, so without a
+/// message a working download looks like a button that does nothing.
+void _download(BuildContext context, AppStrings t, DownloadTarget target) {
+  startDownload(target);
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(
+      content: Text(t.getAppStarted),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: AppColors.surface,
+      duration: const Duration(seconds: 6),
+    ));
 }
 
 // ─────────────────────────── only in the app ───────────────────────────
@@ -203,7 +229,7 @@ class _GetTheApp extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: () => startDownload(mine),
+                onPressed: () => _download(context, t, mine),
                 icon: Icon(mine.icon, size: 20),
                 label: Text(AppStrings.fill(t.getAppFor, [mine.label])),
                 style: FilledButton.styleFrom(
@@ -230,7 +256,7 @@ class _GetTheApp extends ConsumerWidget {
             children: [
               for (final target in others)
                 OutlinedButton.icon(
-                  onPressed: () => startDownload(target),
+                  onPressed: () => _download(context, t, target),
                   icon: Icon(target.icon, size: 18),
                   label: Text(target.label),
                   style: OutlinedButton.styleFrom(
@@ -244,7 +270,12 @@ class _GetTheApp extends ConsumerWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 12),
+          Text(
+            t.getAppBrowserHint,
+            style: TextStyle(color: AppColors.textLo, fontSize: 12, height: 1.4),
+          ),
+          const SizedBox(height: 2),
           TextButton(
             onPressed: () => openLink(kReleasesUrl),
             style: TextButton.styleFrom(

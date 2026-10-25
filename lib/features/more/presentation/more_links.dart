@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'download_launcher.dart';
+
 const kRepoUrl = 'https://github.com/Mammad-Ali/nova';
 const kIssuesUrl = '$kRepoUrl/issues';
 const kReleasesUrl = '$kRepoUrl/releases/latest';
@@ -38,13 +40,9 @@ DownloadTarget? visitorDownload() => switch (defaultTargetPlatform) {
 Future<void> openLink(String url) =>
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
 
-/// Starts a download. On the web it stays in the same tab: the file is served
-/// as an attachment, so the page itself does not change.
-Future<void> startDownload(DownloadTarget target) => launchUrl(
-      Uri.parse(target.url),
-      mode: LaunchMode.externalApplication,
-      webOnlyWindowName: '_self',
-    );
+/// Starts downloading the installer — see download_launcher.dart for why the
+/// web does this without window.open.
+Future<void> startDownload(DownloadTarget target) => openDownload(target.url);
 
 /// The running version, e.g. "1.2.0" — read from the build, so it can never
 /// disagree with pubspec.yaml.
