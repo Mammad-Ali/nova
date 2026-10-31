@@ -73,7 +73,7 @@ const learnEn = LearnContent(
     ),
     Article(
       'Are my results sent anywhere?',
-      'No. History and settings stay on your device. The Privacy page lists exactly who Nova talks to.',
+      'Only if you sign in: then your history is kept in your account and is the same on all your devices, and your best result appears on the leaderboard under your nickname. Without an account, everything stays on your device.',
     ),
     Article(
       'Why does the browser version do less?',
@@ -87,16 +87,16 @@ const learnEn = LearnContent(
   about: 'Nova is a free, open-source network companion: an accurate speed test and a live traffic monitor in one app. Besides raw speed it measures what decides how a connection feels — latency under load, jitter and stability. It runs on Windows, macOS and Android, and the speed test also works right in the browser.',
   privacy: [
     Article(
-      'Stays on your device',
-      'Test results, history, settings and traffic statistics are stored only on your device. Nova has no server of its own that collects them.',
+      'Where your data lives',
+      'Without an account, test results, history and settings stay only on your device. Signed in with Google, your test history is also kept in your Nova account in Google Firebase, so it is the same on every device. Clearing the history removes it there too.',
     ),
     Article(
       'Who Nova talks to',
-      "The speed test exchanges data with Cloudflare's speed-test servers. To show your provider and city, Nova asks ipwho.is, which sees your IP address. The throttling check uses Netflix's fast.com, and ping to services contacts YouTube, Google, Discord, Steam, Cloudflare and Telegram. The network scan talks only to devices on your local network. The browser version is hosted on GitHub Pages and loads its graphics engine from Google's gstatic.com.",
+      "The speed test exchanges data with Cloudflare's speed-test servers. To show your provider and city, Nova asks ipwho.is, which sees your IP address. The throttling check uses Netflix's fast.com, and ping to services contacts YouTube, Google, Discord, Steam, Cloudflare and Telegram. The network scan talks only to devices on your local network. The browser version is hosted on GitHub Pages and loads its graphics engine from Google's gstatic.com. Signing in goes through Google, and the account lives in Google Firebase.",
     ),
     Article(
       'The leaderboard',
-      'For now it runs on sample data inside the app, and nothing is published. Once the online leaderboard launches, only your nickname, country, provider and best result will be shared — never your name or e-mail.',
+      'The best result of each signed-in person is public on the leaderboard: nickname, country, provider and the speeds — never a name or an e-mail. A nickname starts as a neutral "Nova-…" until you change it.',
     ),
     Article(
       'No tracking',

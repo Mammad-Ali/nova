@@ -73,7 +73,7 @@ const learnDe = LearnContent(
     ),
     Article(
       'Werden meine Ergebnisse irgendwohin gesendet?',
-      'Nein. Verlauf und Einstellungen bleiben auf deinem Gerät. Die Seite „Datenschutz“ listet genau auf, mit wem Nova kommuniziert.',
+      'Nur wenn du dich anmeldest: Dann liegt dein Verlauf in deinem Konto und ist auf allen Geräten gleich, und dein bestes Ergebnis erscheint unter deinem Spitznamen in der Rangliste. Ohne Konto bleibt alles auf deinem Gerät.',
     ),
     Article(
       'Warum kann die Browser-Version weniger?',
@@ -87,16 +87,16 @@ const learnDe = LearnContent(
   about: 'Nova ist ein kostenloser Open-Source-Begleiter für dein Netzwerk: ein genauer Speedtest und ein Live-Datenmonitor in einer App. Neben der reinen Geschwindigkeit misst Nova, was darüber entscheidet, wie sich eine Verbindung anfühlt – Latenz unter Last, Jitter und Stabilität. Läuft unter Windows, macOS und Android, und der Speedtest funktioniert auch direkt im Browser.',
   privacy: [
     Article(
-      'Bleibt auf deinem Gerät',
-      'Testergebnisse, Verlauf, Einstellungen und Datenstatistiken werden nur auf deinem Gerät gespeichert. Nova hat keinen eigenen Server, der sie sammelt.',
+      'Wo deine Daten liegen',
+      'Ohne Konto bleiben Testergebnisse, Verlauf und Einstellungen nur auf deinem Gerät. Bist du mit Google angemeldet, liegt dein Testverlauf zusätzlich in deinem Nova-Konto bei Google Firebase, damit er auf allen Geräten gleich ist. Wenn du den Verlauf löschst, wird er auch dort gelöscht.',
     ),
     Article(
       'Mit wem Nova kommuniziert',
-      'Der Speedtest tauscht Daten mit den Speedtest-Servern von Cloudflare aus. Um Anbieter und Stadt anzuzeigen, fragt Nova den Dienst ipwho.is, der deine IP-Adresse sieht. Die Drosselungsprüfung nutzt fast.com von Netflix, der Ping zu Diensten kontaktiert YouTube, Google, Discord, Steam, Cloudflare und Telegram. Der Netzwerkscan spricht nur mit Geräten in deinem lokalen Netzwerk. Die Browser-Version liegt auf GitHub Pages und lädt ihre Grafik-Engine von Googles gstatic.com.',
+      'Der Speedtest tauscht Daten mit den Speedtest-Servern von Cloudflare aus. Um Anbieter und Stadt anzuzeigen, fragt Nova den Dienst ipwho.is, der deine IP-Adresse sieht. Die Drosselungsprüfung nutzt fast.com von Netflix, der Ping zu Diensten kontaktiert YouTube, Google, Discord, Steam, Cloudflare und Telegram. Der Netzwerkscan spricht nur mit Geräten in deinem lokalen Netzwerk. Die Browser-Version liegt auf GitHub Pages und lädt ihre Grafik-Engine von Googles gstatic.com. Die Anmeldung läuft über Google, das Konto liegt bei Google Firebase.',
     ),
     Article(
       'Die Rangliste',
-      'Vorerst läuft sie mit Beispieldaten innerhalb der App, und nichts wird veröffentlicht. Sobald die Online-Rangliste startet, werden nur dein Spitzname, dein Land, dein Anbieter und dein Bestergebnis geteilt – niemals dein Name oder deine E-Mail.',
+      'Das beste Ergebnis jeder angemeldeten Person ist in der Rangliste öffentlich: Spitzname, Land, Anbieter und die Geschwindigkeiten – niemals ein Name oder eine E-Mail. Ein Spitzname ist zunächst ein neutrales „Nova-…“, bis du ihn änderst.',
     ),
     Article(
       'Kein Tracking',

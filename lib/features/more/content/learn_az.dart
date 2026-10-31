@@ -73,7 +73,7 @@ const learnAz = LearnContent(
     ),
     Article(
       'Nəticələrim harasa göndərilir?',
-      'Xeyr. Tarixçə və tənzimləmələr cihazınızda qalır. «Məxfilik» səhifəsində Nova-nın kimlə əlaqə saxladığı dəqiq sadalanır.',
+      'Yalnız daxil olsanız: onda tarixçə hesabınızda saxlanılır və bütün cihazlarda eyni olur, ən yaxşı nəticəniz isə ləqəbinizlə reytinqdə görünür. Hesab olmadan hər şey cihazda qalır.',
     ),
     Article(
       'Brauzer versiyası niyə daha az bacarır?',
@@ -87,16 +87,16 @@ const learnAz = LearnContent(
   about: 'Nova pulsuz, açıq mənbəli şəbəkə köməkçisidir: bir tətbiqdə dəqiq sürət testi və canlı trafik monitoru. Sırf sürətdən əlavə, bağlantının necə hiss olunduğunu müəyyən edən göstəriciləri ölçür — yük altında gecikmə, jitter və sabitlik. Windows, macOS və Android-də işləyir, sürət testi isə birbaşa brauzerdə də işləyir.',
   privacy: [
     Article(
-      'Cihazınızda qalır',
-      'Test nəticələri, tarixçə, tənzimləmələr və trafik statistikası yalnız cihazınızda saxlanılır. Nova-nın onları toplayan öz serveri yoxdur.',
+      'Məlumatlarınız harada saxlanılır',
+      'Hesab olmadan test nəticələri, tarixçə və tənzimləmələr yalnız cihazınızda qalır. Google ilə daxil olduqda test tarixçəniz Google Firebase-dəki Nova hesabınızda da saxlanılır, buna görə bütün cihazlarda eyni olur. Tarixçəni təmizləmək onu oradan da silir.',
     ),
     Article(
       'Nova kimlə əlaqə saxlayır',
-      'Sürət testi Cloudflare-in sürət testi serverləri ilə məlumat mübadiləsi edir. Provayderi və şəhəri göstərmək üçün Nova ipwho.is xidmətinə müraciət edir, o da IP ünvanınızı görür. Məhdudlaşdırma yoxlaması Netflix-in fast.com xidmətindən istifadə edir, servislərə ping isə YouTube, Google, Discord, Steam, Cloudflare və Telegram ilə əlaqə saxlayır. Şəbəkə skanı yalnız lokal şəbəkənizdəki cihazlarla əlaqə saxlayır. Brauzer versiyası GitHub Pages-də yerləşir və qrafik mühərrikini Google-un gstatic.com saytından yükləyir.',
+      'Sürət testi Cloudflare-in sürət testi serverləri ilə məlumat mübadiləsi edir. Provayderi və şəhəri göstərmək üçün Nova ipwho.is xidmətinə müraciət edir, o da IP ünvanınızı görür. Məhdudlaşdırma yoxlaması Netflix-in fast.com xidmətindən istifadə edir, servislərə ping isə YouTube, Google, Discord, Steam, Cloudflare və Telegram ilə əlaqə saxlayır. Şəbəkə skanı yalnız lokal şəbəkənizdəki cihazlarla əlaqə saxlayır. Brauzer versiyası GitHub Pages-də yerləşir və qrafik mühərrikini Google-un gstatic.com saytından yükləyir. Giriş Google vasitəsilə olur, hesab isə Google Firebase-də saxlanılır.',
     ),
     Article(
       'Reytinq',
-      'Hələlik tətbiqin daxilində nümunə məlumatlarla işləyir və heç nə dərc olunmur. Onlayn reytinq işə düşəndə yalnız ləqəbiniz, ölkəniz, provayderiniz və ən yaxşı nəticəniz paylaşılacaq — adınız və e-poçtunuz heç vaxt.',
+      'Daxil olmuş hər istifadəçinin ən yaxşı nəticəsi reytinqdə hamıya görünür: ləqəb, ölkə, provayder və sürət — amma heç vaxt ad və ya e-poçt. Ləqəb siz dəyişənə qədər neytral olur — «Nova-…».',
     ),
     Article(
       'İzləmə yoxdur',

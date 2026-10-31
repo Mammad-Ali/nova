@@ -73,7 +73,7 @@ const learnHu = LearnContent(
     ),
     Article(
       'Elküldik valahová az eredményeimet?',
-      'Nem. Az előzmények és a beállítások az eszközödön maradnak. Az Adatvédelem oldal pontosan felsorolja, kivel kommunikál a Nova.',
+      'Csak ha bejelentkezel: ekkor az előzményeid a fiókodban vannak, és minden eszközödön ugyanazok, a legjobb eredményed pedig a beceneveddel megjelenik a ranglistán. Fiók nélkül minden az eszközödön marad.',
     ),
     Article(
       'Miért tud kevesebbet a böngészős változat?',
@@ -87,16 +87,16 @@ const learnHu = LearnContent(
   about: 'A Nova ingyenes, nyílt forráskódú hálózati segéd: pontos sebességmérő és élő forgalomfigyelő egy alkalmazásban. A puszta sebességen túl azt is méri, ami eldönti, milyennek érezzük a kapcsolatot – a terhelés alatti késleltetést, a jittert és a stabilitást. Windowson, macOS-en és Androidon fut, a sebességmérés pedig közvetlenül a böngészőben is működik.',
   privacy: [
     Article(
-      'Az eszközödön marad',
-      'A teszteredmények, az előzmények, a beállítások és a forgalmi statisztikák csak az eszközödön tárolódnak. A Novának nincs saját szervere, amely gyűjtené őket.',
+      'Hol vannak az adataid',
+      'Fiók nélkül a teszteredmények, az előzmények és a beállítások csak az eszközödön maradnak. Ha Google-fiókkal bejelentkezel, a teszt-előzményeid a Google Firebase-ben lévő Nova-fiókodban is megmaradnak, így minden eszközödön ugyanazok. Az előzmények törlése onnan is eltávolítja őket.',
     ),
     Article(
       'Kivel kommunikál a Nova',
-      'A sebességmérés a Cloudflare sebességmérő szervereivel cserél adatot. A szolgáltató és a város megjelenítéséhez a Nova az ipwho.is szolgáltatást kérdezi meg, amely látja az IP-címedet. A lassítás-ellenőrzés a Netflix fast.com szolgáltatását használja, a szolgáltatások pingje pedig a YouTube-ot, a Google-t, a Discordot, a Steamet, a Cloudflare-t és a Telegramot éri el. A hálózatkeresés csak a helyi hálózatod eszközeivel kommunikál. A böngészős változatot a GitHub Pages szolgálja ki, a grafikus motor pedig a Google gstatic.com oldaláról töltődik be.',
+      'A sebességmérés a Cloudflare sebességmérő szervereivel cserél adatot. A szolgáltató és a város megjelenítéséhez a Nova az ipwho.is szolgáltatást kérdezi meg, amely látja az IP-címedet. A lassítás-ellenőrzés a Netflix fast.com szolgáltatását használja, a szolgáltatások pingje pedig a YouTube-ot, a Google-t, a Discordot, a Steamet, a Cloudflare-t és a Telegramot éri el. A hálózatkeresés csak a helyi hálózatod eszközeivel kommunikál. A böngészős változatot a GitHub Pages szolgálja ki, a grafikus motor pedig a Google gstatic.com oldaláról töltődik be. A bejelentkezés a Google-on keresztül történik, a fiók pedig a Google Firebase-ben van.',
     ),
     Article(
       'A ranglista',
-      'Egyelőre mintaadatokkal működik az alkalmazáson belül, és semmi sem kerül nyilvánosságra. Amikor elindul az online ranglista, csak a beceneved, az országod, a szolgáltatód és a legjobb eredményed lesz látható – a neved és az e-mail-címed soha.',
+      'Minden bejelentkezett felhasználó legjobb eredménye nyilvános a ranglistán: becenév, ország, szolgáltató és a sebességek – név vagy e-mail-cím soha. A becenév először egy semleges „Nova-…”, amíg meg nem változtatod.',
     ),
     Article(
       'Nincs követés',
