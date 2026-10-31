@@ -1,0 +1,68 @@
+rules_version = '2';
+
+// Security rules for Nova's Firestore database. These are enforced by
+// Google's servers, so they hold even against someone calling the database
+// directly instead of through the app. Paste them into Firebase console →
+// Firestore Database → Rules, then Publish.
+//
+//   users/{uid}               a person's profile: nickname, country, provider
+//   users/{uid}/tests/{id}    their test history, one document per test
+//   leaderboard/{uid}         their best result, public
+//
+// Each person reads and writes only their own profile and history. The
+// leaderboard is public to read; each entry can be written only by its
+// owner, and only with plausible values.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function text(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    function inRange(value, max) {
+      return value is number && value >= 0 && value <= max;
+    }
+
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['nickname', 'country', 'provider', 'updated'])
+        && text(request.resource.data.nickname, 20)
+        && request.resource.data.nickname.size() > 0
+        && text(request.resource.data.country, 80)
+        && text(request.resource.data.provider, 120)
+        && request.resource.data.updated is timestamp;
+
+      match /tests/{testId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['t', 'd', 'u', 'p', 'j', 'platform'])
+          && request.resource.data.t is timestamp
+          && inRange(request.resource.data.d, 100000)
+          && inRange(request.resource.data.u, 100000)
+          && inRange(request.resource.data.p, 60000)
+          && inRange(request.resource.data.j, 60000)
+          && text(request.resource.data.platform, 16);
+      }
+    }
+
+    match /leaderboard/{uid} {
+      allow read: if true;
+      allow delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['nickname', 'country', 'provider', 'd', 'u', 'p', 't'])
+        && text(request.resource.data.nickname, 20)
+        && request.resource.data.nickname.size() > 0
+        && text(request.resource.data.country, 80)
+        && text(request.resource.data.provider, 120)
+        && inRange(request.resource.data.d, 100000)
+        && inRange(request.resource.data.u, 100000)
+        && inRange(request.resource.data.p, 60000)
+        && request.resource.data.t is timestamp;
+    }
+  }
+}

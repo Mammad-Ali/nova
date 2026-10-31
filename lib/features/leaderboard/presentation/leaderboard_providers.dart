@@ -1,19 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/cloud/cloud_config.dart';
 import '../../speedtest/data/datasources/ip_info.dart';
 import '../../speedtest/domain/entities/speedtest_record.dart';
 import '../../speedtest/presentation/providers/speedtest_history_provider.dart';
 import '../data/demo_backend.dart';
+import '../data/firebase_backend.dart';
 import '../data/leaderboard_repository.dart';
 import '../domain/leaderboard_models.dart';
 
-/// Swapping these two lines for a Firebase-backed pair is the whole
-/// migration: nothing above this file knows which backend is in use.
+/// Google sign-in and the Firestore leaderboard when this build was given a
+/// Firebase project; the local stand-ins otherwise, so a build without one —
+/// a fork, a quick local run — still works end to end. Nothing above this
+/// file knows which backend is in use.
 final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => DemoAuthRepository(),
+  (ref) => cloudConfigured ? FirebaseAuthRepository(ref) : DemoAuthRepository(),
 );
 final leaderboardRepositoryProvider = Provider<LeaderboardRepository>(
-  (ref) => DemoLeaderboardRepository(),
+  (ref) => cloudConfigured
+      ? FirestoreLeaderboardRepository(ref)
+      : DemoLeaderboardRepository(),
 );
 
 /// The signed-in account, or null when nobody is signed in.
@@ -116,8 +122,11 @@ class LeaderboardNotifier extends Notifier<LeaderboardState> {
 
   Future<void> refresh() async {
     // A signed-in user's own best result goes up first, so their row is in
-    // the table they are about to look at.
-    await _publishBest();
+    // the table they are about to look at. Failing to publish — offline, say
+    // — must not keep everyone else's results from showing.
+    try {
+      await _publishBest();
+    } catch (_) {}
 
     // Where "my country" and "my provider" point is taken from the IP
     // lookup, so both filters work before the first test is published —

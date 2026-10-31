@@ -2,9 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/speedtest_record.dart';
+import '../providers/history_sync_provider.dart';
 import '../providers/speedtest_history_provider.dart';
 
 /// Opens the sheet listing past speed test results.
@@ -24,6 +26,7 @@ class _HistorySheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(stringsProvider);
     final records = ref.watch(speedTestHistoryProvider);
+    final sync = ref.watch(historySyncProvider);
     // Newest entries are easier to read at the top, so reverse the list.
     final newestFirst = records.reversed.toList();
 
@@ -68,8 +71,7 @@ class _HistorySheet extends ConsumerWidget {
                     ),
                     if (records.isNotEmpty)
                       TextButton.icon(
-                        onPressed: () =>
-                            ref.read(speedTestHistoryProvider.notifier).clear(),
+                        onPressed: () => _clear(context, ref, t, cloud: sync != SyncStatus.off),
                         icon: Icon(Icons.delete_outline_rounded,
                             size: 18, color: AppColors.red),
                         label: Text(t.historyClear,
@@ -78,6 +80,26 @@ class _HistorySheet extends ConsumerWidget {
                   ],
                 ),
               ),
+              if (sync == SyncStatus.synced || sync == SyncStatus.failed)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+                  child: Row(
+                    children: [
+                      Icon(
+                        sync == SyncStatus.synced
+                            ? Icons.cloud_done_outlined
+                            : Icons.cloud_off_outlined,
+                        size: 15,
+                        color: sync == SyncStatus.synced ? AppColors.green : AppColors.amber,
+                      ),
+                      const SizedBox(width: 7),
+                      Text(
+                        sync == SyncStatus.synced ? t.historySynced : t.historySyncFailed,
+                        style: TextStyle(color: AppColors.textLo, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
               Expanded(
                 child: records.isEmpty
                     ? _EmptyState(text: t.historyEmpty)
@@ -102,6 +124,38 @@ class _HistorySheet extends ConsumerWidget {
       },
     );
   }
+}
+
+/// Clears the history. Signed in, the history also lives in the account on
+/// every device, so that is asked about first.
+Future<void> _clear(
+  BuildContext context,
+  WidgetRef ref,
+  AppStrings t, {
+  required bool cloud,
+}) async {
+  if (cloud) {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(t.historyClearTitle, style: TextStyle(color: AppColors.onGlass)),
+        content: Text(t.historyClearCloudBody, style: TextStyle(color: AppColors.textMid)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(t.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(t.historyClear, style: TextStyle(color: AppColors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+  }
+  await ref.read(speedTestHistoryProvider.notifier).clear();
 }
 
 class _EmptyState extends StatelessWidget {

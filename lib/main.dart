@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/home_shell.dart';
 import 'core/app_activity.dart';
+import 'core/cloud/google_identity.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/l10n/locale_provider.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/alerts/alerts_watcher.dart';
+import 'features/speedtest/presentation/providers/history_sync_provider.dart';
 import 'features/traffic_monitor/presentation/providers/stability_provider.dart';
 import 'features/traffic_monitor/presentation/providers/traffic_provider.dart';
 import 'features/traffic_monitor/presentation/providers/usage_stats_provider.dart';
@@ -17,6 +19,9 @@ import 'shell/compact_mode.dart';
 import 'shell/tray_service.dart';
 
 Future<void> main() async {
+  // On the web, Google's sign-in reply arrives in the address bar; take it
+  // out before Flutter reads the address as a route.
+  captureGoogleRedirect();
   WidgetsFlutterBinding.ensureInitialized();
   // Menu-bar/tray icon and system notifications are desktop-only; on other
   // platforms these calls quietly do nothing.
@@ -68,6 +73,10 @@ class _NovaAppState extends ConsumerState<NovaApp> {
       TrayService.instance.onIconTap =
           () => ref.read(compactModeProvider.notifier).toggle();
     }
+
+    // Restores the account and keeps its test history in sync, on every
+    // platform — the website included.
+    ref.read(historySyncProvider);
 
     // Track window state: animations pause while the window is hidden.
     ref.watch(uiActiveProvider);

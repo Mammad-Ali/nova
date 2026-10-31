@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/cloud/cloud_config.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../domain/leaderboard_models.dart';
@@ -99,6 +100,7 @@ class _LeaderboardSheet extends ConsumerWidget {
               Flexible(
                 child: _Table(state: s, strings: t),
               ),
+              if (!cloudConfigured)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
                 child: Row(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/cloud/cloud_config.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../more/presentation/articles_sheet.dart';
@@ -73,6 +74,7 @@ class _RankingSheet extends ConsumerWidget {
           else
             for (var i = 0; i < stats.length; i++)
               _Row(place: i + 1, stat: stats[i], strings: t),
+          if (!cloudConfigured)
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 10, 4, 0),
             child: Row(

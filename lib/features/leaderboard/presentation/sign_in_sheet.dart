@@ -1,6 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/cloud/cloud_config.dart';
+import '../../../core/cloud/cloud_session.dart';
+import '../../../core/cloud/google_identity.dart';
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import 'leaderboard_providers.dart';
@@ -28,6 +33,19 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
   );
   var _busy = false;
 
+  /// Shown under the button: "finish in your browser" while a desktop
+  /// sign-in waits, or why it failed.
+  String? _message;
+  var _messageIsError = false;
+
+  /// Desktop sign-in happens in the system browser, which the person has to
+  /// be told about; Android shows its own sheet and the web leaves the page.
+  static bool get _signsInViaBrowser =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.macOS ||
+          defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux);
+
   @override
   void dispose() {
     _nickname.dispose();
@@ -35,11 +53,28 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
   }
 
   Future<void> _signIn() async {
-    setState(() => _busy = true);
-    await ref.read(accountProvider.notifier).signIn();
+    final t = ref.read(stringsProvider);
+    setState(() {
+      _busy = true;
+      _message = _signsInViaBrowser ? t.signInWaiting : null;
+      _messageIsError = false;
+    });
+    String? failure;
+    try {
+      await ref.read(accountProvider.notifier).signIn();
+    } on GoogleSignInFailed catch (e) {
+      // Closing Google's page is a choice, not an error to report.
+      if (!e.cancelled) failure = t.signInFailed;
+    } catch (_) {
+      failure = t.signInFailed;
+    }
     if (!mounted) return;
     _nickname.text = ref.read(accountProvider)?.nickname ?? '';
-    setState(() => _busy = false);
+    setState(() {
+      _busy = false;
+      _message = failure;
+      _messageIsError = failure != null;
+    });
   }
 
   Future<void> _save() async {
@@ -59,6 +94,7 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
   Widget build(BuildContext context) {
     final t = ref.watch(stringsProvider);
     final account = ref.watch(accountProvider);
+    final email = ref.watch(cloudSessionProvider)?.email;
 
     return Container(
       decoration: BoxDecoration(
@@ -113,7 +149,7 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                if (account == null)
+                if (account == null) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: _GoogleButton(
@@ -121,8 +157,29 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
                       busy: _busy,
                       onTap: _busy ? null : _signIn,
                     ),
-                  )
-                else ...[
+                  ),
+                  if (_message != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                      child: Text(
+                        _message!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: _messageIsError ? AppColors.amber : AppColors.textMid,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                ] else ...[
+                  if (email != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+                      child: Text(
+                        // Shown to the account's owner only — never published.
+                        AppStrings.fill(t.accountGoogle, [email]),
+                        style: TextStyle(color: AppColors.textMid, fontSize: 12.5),
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextField(
@@ -178,7 +235,8 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
                   ),
                 ],
                 const SizedBox(height: 18),
-                Padding(
+                if (!cloudConfigured)
+                  Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

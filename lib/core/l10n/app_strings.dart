@@ -212,6 +212,15 @@ class AppStrings {
     required this.demoBadge,
     required this.getAppStarted,
     required this.getAppBrowserHint,
+    required this.signInWaiting,
+    required this.signInFailed,
+    required this.signInBrowserDone,
+    required this.accountGoogle,
+    required this.historySynced,
+    required this.historySyncFailed,
+    required this.historyClearTitle,
+    required this.historyClearCloudBody,
+    required this.cancel,
   });
 
   // Navigation and shared
@@ -409,6 +418,17 @@ class AppStrings {
   final String getAppStarted;
   final String getAppBrowserHint;
 
+  // Google sign-in and cloud history
+  final String signInWaiting;
+  final String signInFailed;
+  final String signInBrowserDone;
+  final String accountGoogle;
+  final String historySynced;
+  final String historySyncFailed;
+  final String historyClearTitle;
+  final String historyClearCloudBody;
+  final String cancel;
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -530,7 +550,7 @@ const _en = AppStrings(
   lbScopeCountry: 'My country',
   lbScopeProvider: 'My provider',
   lbSignInTitle: 'Sign in to Nova',
-  lbSignInHint: 'Signing in puts your best result on the board and lets you compare it with other people.',
+  lbSignInHint: 'Sign in to keep your test history in the cloud on all your devices and to appear on the leaderboard.',
   lbSignInGoogle: 'Continue with Google',
   lbSignOut: 'Sign out',
   lbNickname: 'Nickname',
@@ -608,6 +628,15 @@ const _en = AppStrings(
   demoBadge: 'demo',
   getAppStarted: "Download started — look in your browser's downloads.",
   getAppBrowserHint: 'Your browser may ask to allow the download or to keep the file — confirm it.',
+  signInWaiting: 'Finish signing in in your browser…',
+  signInFailed: "Sign-in didn't finish. Please try again.",
+  signInBrowserDone: "You're signed in — you can close this tab and go back to Nova.",
+  accountGoogle: 'Google account: {0}',
+  historySynced: 'Synced with your account',
+  historySyncFailed: "Couldn't sync — Nova will try again",
+  historyClearTitle: 'Clear history?',
+  historyClearCloudBody: 'This also deletes it from your account on all your devices.',
+  cancel: 'Cancel',
 );
 
 const _az = AppStrings(
@@ -713,7 +742,7 @@ const _az = AppStrings(
   lbScopeCountry: 'Ölkəm',
   lbScopeProvider: 'Provayderim',
   lbSignInTitle: 'Nova-ya daxil ol',
-  lbSignInHint: 'Daxil olsanız, ən yaxşı nəticəniz reytinqə düşür və başqaları ilə müqayisə edə bilərsiniz.',
+  lbSignInHint: 'Daxil olun ki, test tarixçəniz bütün cihazlarınızda buludda saxlanılsın və reytinqə düşəsiniz.',
   lbSignInGoogle: 'Google ilə davam et',
   lbSignOut: 'Çıxış',
   lbNickname: 'Ləqəb',
@@ -791,6 +820,15 @@ const _az = AppStrings(
   demoBadge: 'demo',
   getAppStarted: 'Yükləmə başladı — brauzerin yükləmələrinə baxın.',
   getAppBrowserHint: 'Brauzer yükləməyə icazə və ya faylı saxlamaq üçün təsdiq istəyə bilər — təsdiqləyin.',
+  signInWaiting: 'Girişi brauzerdə tamamlayın…',
+  signInFailed: 'Giriş alınmadı. Yenidən cəhd edin.',
+  signInBrowserDone: 'Daxil oldunuz — bu səhifəni bağlayıb Nova-ya qayıda bilərsiniz.',
+  accountGoogle: 'Google hesabı: {0}',
+  historySynced: 'Hesabınızla sinxronlaşdırılıb',
+  historySyncFailed: 'Sinxronlaşdırmaq alınmadı — Nova yenidən cəhd edəcək',
+  historyClearTitle: 'Tarixçə təmizlənsin?',
+  historyClearCloudBody: 'O, hesabınızdan da — bütün cihazlarda silinəcək.',
+  cancel: 'Ləğv et',
 );
 
 const _ru = AppStrings(
@@ -896,7 +934,7 @@ const _ru = AppStrings(
   lbScopeCountry: 'Моя страна',
   lbScopeProvider: 'Мой провайдер',
   lbSignInTitle: 'Вход в Nova',
-  lbSignInHint: 'После входа ваш лучший результат попадёт в рейтинг, и его можно будет сравнить с другими.',
+  lbSignInHint: 'Войдите, чтобы история тестов хранилась в облаке на всех ваших устройствах, а вы попали в рейтинг.',
   lbSignInGoogle: 'Войти через Google',
   lbSignOut: 'Выйти',
   lbNickname: 'Ник',
@@ -974,6 +1012,15 @@ const _ru = AppStrings(
   demoBadge: 'демо',
   getAppStarted: 'Загрузка началась — смотрите в загрузках браузера.',
   getAppBrowserHint: 'Браузер может спросить разрешение на загрузку или предложить сохранить файл — подтвердите.',
+  signInWaiting: 'Завершите вход в браузере…',
+  signInFailed: 'Войти не получилось. Попробуйте ещё раз.',
+  signInBrowserDone: 'Вы вошли — эту вкладку можно закрыть и вернуться в Nova.',
+  accountGoogle: 'Аккаунт Google: {0}',
+  historySynced: 'Синхронизировано с аккаунтом',
+  historySyncFailed: 'Не удалось синхронизировать — Nova попробует снова',
+  historyClearTitle: 'Очистить историю?',
+  historyClearCloudBody: 'Она удалится и из вашего аккаунта — на всех устройствах.',
+  cancel: 'Отмена',
 );
 
 const _de = AppStrings(
@@ -1076,7 +1123,7 @@ const _de = AppStrings(
   lbScopeCountry: 'Mein Land',
   lbScopeProvider: 'Mein Anbieter',
   lbSignInTitle: 'Bei Nova anmelden',
-  lbSignInHint: 'Nach der Anmeldung erscheint dein bestes Ergebnis in der Rangliste und du kannst es mit anderen vergleichen.',
+  lbSignInHint: 'Melde dich an, damit dein Testverlauf in der Cloud auf all deinen Geräten bleibt und du in der Rangliste erscheinst.',
   lbSignInGoogle: 'Weiter mit Google',
   lbSignOut: 'Abmelden',
   lbNickname: 'Spitzname',
@@ -1151,6 +1198,15 @@ const _de = AppStrings(
   demoBadge: 'Demo',
   getAppStarted: 'Download gestartet – sieh in den Downloads deines Browsers nach.',
   getAppBrowserHint: 'Dein Browser fragt eventuell, ob der Download erlaubt oder die Datei behalten werden soll – bestätige das.',
+  signInWaiting: 'Schließe die Anmeldung im Browser ab…',
+  signInFailed: 'Die Anmeldung hat nicht geklappt. Bitte versuch es noch einmal.',
+  signInBrowserDone: 'Du bist angemeldet – du kannst diesen Tab schließen und zu Nova zurückkehren.',
+  accountGoogle: 'Google-Konto: {0}',
+  historySynced: 'Mit deinem Konto synchronisiert',
+  historySyncFailed: 'Synchronisierung fehlgeschlagen – Nova versucht es erneut',
+  historyClearTitle: 'Verlauf löschen?',
+  historyClearCloudBody: 'Er wird auch aus deinem Konto gelöscht – auf allen Geräten.',
+  cancel: 'Abbrechen',
 );
 
 const _hu = AppStrings(
@@ -1253,7 +1309,7 @@ const _hu = AppStrings(
   lbScopeCountry: 'Az országom',
   lbScopeProvider: 'A szolgáltatóm',
   lbSignInTitle: 'Bejelentkezés a Novába',
-  lbSignInHint: 'Bejelentkezés után a legjobb eredményed felkerül a ranglistára, és összevetheted másokéval.',
+  lbSignInHint: 'Jelentkezz be, hogy a teszt-előzményeid a felhőben, minden eszközödön elérhetők legyenek, és felkerülj a ranglistára.',
   lbSignInGoogle: 'Folytatás Google-fiókkal',
   lbSignOut: 'Kijelentkezés',
   lbNickname: 'Becenév',
@@ -1328,4 +1384,13 @@ const _hu = AppStrings(
   demoBadge: 'demó',
   getAppStarted: 'Elindult a letöltés – nézd meg a böngésző letöltéseit.',
   getAppBrowserHint: 'A böngésző rákérdezhet, hogy engedélyezed-e a letöltést, vagy megtartod-e a fájlt – erősítsd meg.',
+  signInWaiting: 'Fejezd be a bejelentkezést a böngészőben…',
+  signInFailed: 'A bejelentkezés nem sikerült. Próbáld újra.',
+  signInBrowserDone: 'Bejelentkeztél – ezt a lapot bezárhatod, és visszatérhetsz a Novába.',
+  accountGoogle: 'Google-fiók: {0}',
+  historySynced: 'Szinkronizálva a fiókoddal',
+  historySyncFailed: 'A szinkronizálás nem sikerült – a Nova újra megpróbálja',
+  historyClearTitle: 'Törlöd az előzményeket?',
+  historyClearCloudBody: 'A fiókodból is törlődnek – minden eszközödön.',
+  cancel: 'Mégse',
 );
