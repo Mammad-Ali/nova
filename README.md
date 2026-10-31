@@ -50,7 +50,8 @@ things that actually decide how the connection **feels**:
 | **Latency to services** | Round-trip times to YouTube, Discord, Steam, Cloudflare and more |
 | **History** | Every completed run, with a trend chart, personal best and a comparison to the previous run |
 | **Sharing** | Copy results as text, save them as an image, export the history to CSV |
-| **Leaderboard** | Best results ranked worldwide, by country or by ISP; sign-in is optional and only a nickname is shown. Runs on sample data until the cloud backend is connected |
+| **Google account** | Optional sign-in on every platform, the website included; the test history follows you to every device |
+| **Leaderboard** | Best results ranked worldwide, by country or by ISP; only a nickname is shown |
 
 ### Traffic monitor
 
@@ -131,7 +132,7 @@ lib/
 │  ├─ services_ping/     latency to popular services
 │  ├─ wifi/              signal strength and link rate
 │  ├─ lan_scan/          local subnet sweep, device names and kinds
-│  ├─ leaderboard/       sign-in, rankings, provider ranking (demo backend)
+│  ├─ leaderboard/       sign-in, rankings, provider ranking (Firestore)
 │  ├─ more/              More tab and site footer: Learn, About, Help pages
 │  ├─ alerts/            threshold notifications
 │  └─ settings/
@@ -221,8 +222,8 @@ are in `firestore.rules`.
 Bump `version:` in `pubspec.yaml`, then push a matching tag:
 
 ```bash
-git tag v1.2.0
-git push origin v1.2.0
+git tag v1.3.0
+git push origin v1.3.0
 ```
 
 CI builds every platform and publishes a GitHub Release with the installers
