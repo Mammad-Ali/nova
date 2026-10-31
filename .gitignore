@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase project and Google sign-in clients — see nova_cloud.example.json.
+# GitHub rejects pushes that contain Google keys, so the real file stays local
+# and CI gets it from the NOVA_CLOUD_CONFIG repository secret.
+nova_cloud.json

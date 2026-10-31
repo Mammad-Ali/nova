@@ -58,6 +58,11 @@ dependencies:
   url_launcher: ^6.3.3
   # The running version, shown on the About page.
   package_info_plus: ^10.2.2
+  # Google sign-in on Android, where Google's own sheet is expected. The
+  # other platforms sign in without a native SDK — see lib/core/cloud/.
+  google_sign_in: ^7.2.0
+  # SHA-256 for the PKCE step of the desktop Google sign-in.
+  crypto: ^3.0.8
 
 dev_dependencies:
   flutter_test:

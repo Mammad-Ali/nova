@@ -1,0 +1,7 @@
+{
+  "NOVA_FIREBASE_API_KEY": "AIza... (Firebase console → Project settings → Your apps → web app)",
+  "NOVA_FIREBASE_PROJECT_ID": "nova-xxxxx",
+  "NOVA_GOOGLE_WEB_CLIENT_ID": "....apps.googleusercontent.com (Authentication → Sign-in method → Google → Web SDK configuration)",
+  "NOVA_GOOGLE_DESKTOP_CLIENT_ID": "....apps.googleusercontent.com (Google Cloud console → Credentials → Desktop app client)",
+  "NOVA_GOOGLE_DESKTOP_CLIENT_SECRET": "GOCSPX-... (same Desktop app client)"
+}
