@@ -71,12 +71,29 @@ jobs:
           EOF
           echo "Keystore restored."
 
+      # The Firebase project and Google sign-in clients, from the
+      # NOVA_CLOUD_CONFIG repository secret (GitHub refuses pushes that
+      # contain Google keys). Without the secret the build still succeeds,
+      # with the local demo account instead of the cloud.
+      - name: Cloud configuration
+        shell: bash
+        env:
+          NOVA_CLOUD_CONFIG: ${{ secrets.NOVA_CLOUD_CONFIG }}
+        run: |
+          if [ -n "$NOVA_CLOUD_CONFIG" ]; then
+            printf '%s' "$NOVA_CLOUD_CONFIG" > nova_cloud.json
+            echo "DEFINES=--dart-define-from-file=nova_cloud.json" >> "$GITHUB_ENV"
+            echo "Cloud configuration written."
+          else
+            echo "No NOVA_CLOUD_CONFIG secret: building with the demo account."
+          fi
+
       # Split per ABI: each APK is smaller and installs faster.
       - name: Build APK
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi $DEFINES
 
       - name: Build universal APK
-        run: flutter build apk --release
+        run: flutter build apk --release $DEFINES
 
       # Upload before verifying: even if the certificate cannot be read, the
       # finished APK must stay available.
@@ -122,7 +139,25 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build windows --release
+      # The Firebase project and Google sign-in clients, from the
+      # NOVA_CLOUD_CONFIG repository secret (GitHub refuses pushes that
+      # contain Google keys). Without the secret the build still succeeds,
+      # with the local demo account instead of the cloud.
+      - name: Cloud configuration
+        shell: bash
+        env:
+          NOVA_CLOUD_CONFIG: ${{ secrets.NOVA_CLOUD_CONFIG }}
+        run: |
+          if [ -n "$NOVA_CLOUD_CONFIG" ]; then
+            printf '%s' "$NOVA_CLOUD_CONFIG" > nova_cloud.json
+            echo "DEFINES=--dart-define-from-file=nova_cloud.json" >> "$GITHUB_ENV"
+            echo "Cloud configuration written."
+          else
+            echo "No NOVA_CLOUD_CONFIG secret: building with the demo account."
+          fi
+      - name: Build
+        shell: bash
+        run: flutter build windows --release $DEFINES
 
       # Ship a single installer instead of a folder of DLLs, so it is obvious
       # what to click. The version shown in "Apps & features" comes from
@@ -156,7 +191,23 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build macos --release
+      # The Firebase project and Google sign-in clients, from the
+      # NOVA_CLOUD_CONFIG repository secret (GitHub refuses pushes that
+      # contain Google keys). Without the secret the build still succeeds,
+      # with the local demo account instead of the cloud.
+      - name: Cloud configuration
+        shell: bash
+        env:
+          NOVA_CLOUD_CONFIG: ${{ secrets.NOVA_CLOUD_CONFIG }}
+        run: |
+          if [ -n "$NOVA_CLOUD_CONFIG" ]; then
+            printf '%s' "$NOVA_CLOUD_CONFIG" > nova_cloud.json
+            echo "DEFINES=--dart-define-from-file=nova_cloud.json" >> "$GITHUB_ENV"
+            echo "Cloud configuration written."
+          else
+            echo "No NOVA_CLOUD_CONFIG secret: building with the demo account."
+          fi
+      - run: flutter build macos --release $DEFINES
 
       # Ad-hoc signature with the release entitlements, then a check that
       # they are really there. Signing without --entitlements silently strips
@@ -201,9 +252,25 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # The Firebase project and Google sign-in clients, from the
+      # NOVA_CLOUD_CONFIG repository secret (GitHub refuses pushes that
+      # contain Google keys). Without the secret the build still succeeds,
+      # with the local demo account instead of the cloud.
+      - name: Cloud configuration
+        shell: bash
+        env:
+          NOVA_CLOUD_CONFIG: ${{ secrets.NOVA_CLOUD_CONFIG }}
+        run: |
+          if [ -n "$NOVA_CLOUD_CONFIG" ]; then
+            printf '%s' "$NOVA_CLOUD_CONFIG" > nova_cloud.json
+            echo "DEFINES=--dart-define-from-file=nova_cloud.json" >> "$GITHUB_ENV"
+            echo "Cloud configuration written."
+          else
+            echo "No NOVA_CLOUD_CONFIG secret: building with the demo account."
+          fi
       # Served from https://mammad-ali.github.io/nova/, so every asset path
       # has to be relative to /nova/ rather than the domain root.
-      - run: flutter build web --release --base-href /nova/
+      - run: flutter build web --release --base-href /nova/ $DEFINES
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web

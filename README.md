@@ -195,6 +195,27 @@ Android release signing expects `android/key.properties` and a keystore in
 `android/keys/`; neither is committed. Without them the build falls back to the
 debug signature, so `flutter run` keeps working out of the box.
 
+### Cloud: Google sign-in, history and leaderboard
+
+Signing in and the cloud history run on a Firebase project (Authentication
+with the Google provider, and Cloud Firestore) reached over its REST APIs, so
+the same code works on all four platforms without Firebase's native SDKs —
+which on macOS would need a paid Apple developer account, and do not exist
+for Windows. Each platform only differs in how it gets a Google ID token:
+
+| Platform | Google sign-in |
+|---|---|
+| macOS, Windows | system browser + OAuth loopback redirect with PKCE (a "Desktop app" client) |
+| Android | Google's sign-in sheet via `google_sign_in` |
+| Web | redirect to Google and back (the Firebase "Web client") |
+
+The project's identifiers live in `nova_cloud.json` (see
+`nova_cloud.example.json`), which is git-ignored — GitHub refuses pushes that
+contain Google keys — and passed with `--dart-define-from-file`. CI writes it
+from the `NOVA_CLOUD_CONFIG` repository secret. Without it, Nova builds with
+the local demo account and sample leaderboard. The database's security rules
+are in `firestore.rules`.
+
 ### Publishing a release
 
 Bump `version:` in `pubspec.yaml`, then push a matching tag:

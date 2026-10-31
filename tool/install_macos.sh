@@ -13,8 +13,18 @@ DEST="/Applications/Nova.app"
 
 cd "$(dirname "$0")/.."
 
+# The Firebase project and Google sign-in clients live in a git-ignored file;
+# without it the app builds with the local demo account instead.
+DEFINES=()
+if [ -f nova_cloud.json ]; then
+  DEFINES=(--dart-define-from-file=nova_cloud.json)
+else
+  echo "(no nova_cloud.json — building without Google sign-in and cloud history)"
+fi
+
 echo "==> Building release…"
-"$FLUTTER" build macos --release
+# The odd expansion keeps macOS's bash 3.2 happy with an empty array under -u.
+"$FLUTTER" build macos --release ${DEFINES[@]+"${DEFINES[@]}"}
 
 SRC="build/macos/Build/Products/Release/$APP_NAME"
 [ -d "$SRC" ] || { echo "Build not found: $SRC"; exit 1; }
