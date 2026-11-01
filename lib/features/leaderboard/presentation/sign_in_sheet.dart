@@ -28,9 +28,10 @@ class _SignInSheet extends ConsumerStatefulWidget {
 }
 
 class _SignInSheetState extends ConsumerState<_SignInSheet> {
-  late final TextEditingController _nickname = TextEditingController(
-    text: ref.read(accountProvider)?.nickname ?? '',
-  );
+  // Created in initState, not lazily: signed out, nothing reads it before
+  // dispose(), and a lazy initialiser would first run there — using ref on
+  // an unmounted widget, which throws.
+  late final TextEditingController _nickname;
   var _busy = false;
 
   /// Shown under the button: "finish in your browser" while a desktop
@@ -45,6 +46,14 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
       (defaultTargetPlatform == TargetPlatform.macOS ||
           defaultTargetPlatform == TargetPlatform.windows ||
           defaultTargetPlatform == TargetPlatform.linux);
+
+  @override
+  void initState() {
+    super.initState();
+    _nickname = TextEditingController(
+      text: ref.read(accountProvider)?.nickname ?? '',
+    );
+  }
 
   @override
   void dispose() {
