@@ -221,6 +221,7 @@ class AppStrings {
     required this.historyClearTitle,
     required this.historyClearCloudBody,
     required this.cancel,
+    required this.signIn,
   });
 
   // Navigation and shared
@@ -428,6 +429,9 @@ class AppStrings {
   final String historyClearTitle;
   final String historyClearCloudBody;
   final String cancel;
+
+  /// The header button that opens sign-in, kept to a word or two.
+  final String signIn;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -637,6 +641,7 @@ const _en = AppStrings(
   historyClearTitle: 'Clear history?',
   historyClearCloudBody: 'This also deletes it from your account on all your devices.',
   cancel: 'Cancel',
+  signIn: 'Sign in',
 );
 
 const _az = AppStrings(
@@ -829,6 +834,7 @@ const _az = AppStrings(
   historyClearTitle: 'Tarixçə təmizlənsin?',
   historyClearCloudBody: 'O, hesabınızdan da — bütün cihazlarda silinəcək.',
   cancel: 'Ləğv et',
+  signIn: 'Daxil ol',
 );
 
 const _ru = AppStrings(
@@ -1021,6 +1027,7 @@ const _ru = AppStrings(
   historyClearTitle: 'Очистить историю?',
   historyClearCloudBody: 'Она удалится и из вашего аккаунта — на всех устройствах.',
   cancel: 'Отмена',
+  signIn: 'Войти',
 );
 
 const _de = AppStrings(
@@ -1207,6 +1214,7 @@ const _de = AppStrings(
   historyClearTitle: 'Verlauf löschen?',
   historyClearCloudBody: 'Er wird auch aus deinem Konto gelöscht – auf allen Geräten.',
   cancel: 'Abbrechen',
+  signIn: 'Anmelden',
 );
 
 const _hu = AppStrings(
@@ -1393,4 +1401,5 @@ const _hu = AppStrings(
   historyClearTitle: 'Törlöd az előzményeket?',
   historyClearCloudBody: 'A fiókodból is törlődnek – minden eszközödön.',
   cancel: 'Mégse',
+  signIn: 'Bejelentkezés',
 );

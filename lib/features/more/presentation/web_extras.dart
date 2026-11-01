@@ -109,8 +109,13 @@ class _AppOnly extends ConsumerWidget {
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, box) {
-            // Two cards per row once there is room; one on a phone.
-            final columns = box.maxWidth >= 520 ? 2 : 1;
+            // All four in a row on a desktop screen, two on a tablet, one on
+            // a phone.
+            final columns = box.maxWidth >= 960
+                ? 4
+                : box.maxWidth >= 520
+                    ? 2
+                    : 1;
             const gap = 12.0;
             final width = (box.maxWidth - gap * (columns - 1)) / columns;
             return Wrap(
@@ -205,87 +210,127 @@ class _GetTheApp extends ConsumerWidget {
         if (target != mine) target,
     ];
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
-      decoration: glassCard(radius: 22, glow: AppColors.sun),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            t.getAppTitle,
-            style: TextStyle(
-              color: AppColors.onGlass,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
+    final intro = [
+      Text(
+        t.getAppTitle,
+        style: TextStyle(
+          color: AppColors.onGlass,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+      const SizedBox(height: 6),
+      Text(
+        t.getAppHint,
+        style: TextStyle(color: AppColors.textMid, fontSize: 13, height: 1.45),
+      ),
+    ];
+    final buttons = [
+      if (mine != null) ...[
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: () => _download(context, t, mine),
+            icon: Icon(mine.icon, size: 20),
+            label: Text(AppStrings.fill(t.getAppFor, [mine.label])),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            t.getAppHint,
-            style: TextStyle(color: AppColors.textMid, fontSize: 13, height: 1.45),
-          ),
-          const SizedBox(height: 18),
-          if (mine != null) ...[
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => _download(context, t, mine),
-                icon: Icon(mine.icon, size: 20),
-                label: Text(AppStrings.fill(t.getAppFor, [mine.label])),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          t.getAppOther,
+          style: TextStyle(color: AppColors.textLo, fontSize: 12),
+        ),
+        const SizedBox(height: 8),
+      ],
+      Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          for (final target in others)
+            OutlinedButton.icon(
+              onPressed: () => _download(context, t, target),
+              icon: Icon(target.icon, size: 18),
+              label: Text(target.label),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.onGlass,
+                side: BorderSide(color: AppColors.onGlass.withValues(alpha: 0.25)),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
-            const SizedBox(height: 14),
-            Text(
-              t.getAppOther,
-              style: TextStyle(color: AppColors.textLo, fontSize: 12),
-            ),
-            const SizedBox(height: 8),
-          ],
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              for (final target in others)
-                OutlinedButton.icon(
-                  onPressed: () => _download(context, t, target),
-                  icon: Icon(target.icon, size: 18),
-                  label: Text(target.label),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.onGlass,
-                    side: BorderSide(color: AppColors.onGlass.withValues(alpha: 0.25)),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            t.getAppBrowserHint,
-            style: TextStyle(color: AppColors.textLo, fontSize: 12, height: 1.4),
-          ),
-          const SizedBox(height: 2),
-          TextButton(
-            onPressed: () => openLink(kReleasesUrl),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.accentAlt,
-              padding: EdgeInsets.zero,
-            ),
-            child: Text('${t.getAppAll}  →'),
-          ),
         ],
       ),
+    ];
+    final notes = [
+      Text(
+        t.getAppBrowserHint,
+        style: TextStyle(color: AppColors.textLo, fontSize: 12, height: 1.4),
+      ),
+      const SizedBox(height: 2),
+      TextButton(
+        onPressed: () => openLink(kReleasesUrl),
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.accentAlt,
+          padding: EdgeInsets.zero,
+        ),
+        child: Text('${t.getAppAll}  →'),
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, box) {
+        // On a wide screen a full-width download button would stretch over
+        // a metre of glass: the text goes left, the buttons right.
+        final wide = box.maxWidth >= 860;
+        return Container(
+          padding: wide
+              ? const EdgeInsets.fromLTRB(28, 26, 28, 22)
+              : const EdgeInsets.fromLTRB(20, 22, 20, 18),
+          decoration: glassCard(radius: 22, glow: AppColors.sun),
+          child: wide
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [...intro, const SizedBox(height: 14), ...notes],
+                      ),
+                    ),
+                    const SizedBox(width: 40),
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: buttons,
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...intro,
+                    const SizedBox(height: 18),
+                    ...buttons,
+                    const SizedBox(height: 12),
+                    ...notes,
+                  ],
+                ),
+        );
+      },
     );
   }
 }

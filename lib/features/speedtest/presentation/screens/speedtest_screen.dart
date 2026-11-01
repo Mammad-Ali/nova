@@ -7,6 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/l10n/language_button.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../leaderboard/presentation/account_button.dart';
 import '../../../leaderboard/presentation/leaderboard_sheet.dart';
 import '../../../more/presentation/web_extras.dart';
 import '../../../services_ping/presentation/service_ping_sheet.dart';
@@ -73,142 +74,239 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
         s.uploadMbps != null &&
         s.pingMs != null;
 
-    return Stack(
-      children: [
-        SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    return LayoutBuilder(
+      builder: (context, box) {
+        // A laptop or desktop browser gets the whole width: the gauge on the
+        // left, the readings and verdicts beside it. Phones, and the apps,
+        // keep the single column they were designed around.
+        final wide = kIsWeb && box.maxWidth >= _wideLayoutWidth;
+
+        final gauge = Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: wide ? 400 : 340),
+            child: SpeedGauge(
+              value: gaugeValue,
+              max: s.gaugeMax,
+              color: gaugeColor,
+              active: s.isRunning,
+              paused: !ref.watch(uiActiveProvider),
+              child: _GaugeCenter(
+                phaseLabel: _phaseLabel(t, s.phase),
+                value: s.isRunning ? s.displayMbps : s.downloadMbps,
+                color: gaugeColor,
+              ),
+            ),
+          ),
+        );
+        final phaseBar = _PhaseBar(
+            active: s.isRunning,
+            progress: s.phaseProgress,
+            color: gaugeColor);
+        final origin = [
+          _ProviderRow(strings: t, serverName: s.serverName),
+          const SizedBox(height: 8),
+          const WifiChip(),
+        ];
+        final metrics = [
+          Row(
             children: [
-              _Title(strings: t),
-              const SizedBox(height: 8),
-              Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 340),
-                  child: SpeedGauge(
-                    value: gaugeValue,
-                    max: s.gaugeMax,
-                    color: gaugeColor,
-                    active: s.isRunning,
-                    paused: !ref.watch(uiActiveProvider),
-                    child: _GaugeCenter(
-                      phaseLabel: _phaseLabel(t, s.phase),
-                      value: s.isRunning ? s.displayMbps : s.downloadMbps,
-                      color: gaugeColor,
-                    ),
-                  ),
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.wifi_tethering_rounded,
+                  label: t.ping,
+                  value: s.pingMs,
+                  unit: 'ms',
+                  accent: AppColors.green,
+                  large: wide,
                 ),
               ),
-              const SizedBox(height: 12),
-              _PhaseBar(
-                  active: s.isRunning,
-                  progress: s.phaseProgress,
-                  color: gaugeColor),
-              const SizedBox(height: 14),
-              _ProviderRow(strings: t, serverName: s.serverName),
-              const SizedBox(height: 8),
-              const WifiChip(),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: _MetricCard(
-                      icon: Icons.wifi_tethering_rounded,
-                      label: t.ping,
-                      value: s.pingMs,
-                      unit: 'ms',
-                      accent: AppColors.green,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _MetricCard(
-                      icon: Icons.graphic_eq_rounded,
-                      label: t.jitter,
-                      value: s.jitterMs,
-                      unit: 'ms',
-                      accent: AppColors.accentInfo,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _MetricCard(
-                      icon: Icons.south_rounded,
-                      label: t.download,
-                      value: s.downloadMbps,
-                      unit: 'Mbps',
-                      accent: AppColors.accentDown,
-                      highlight: true,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _MetricCard(
-                      icon: Icons.north_rounded,
-                      label: t.upload,
-                      value: s.uploadMbps,
-                      unit: 'Mbps',
-                      accent: AppColors.accentUp,
-                    ),
-                  ),
-                ],
-              ),
-              if (showComfort && s.loadedPingMs != null) ...[
-                const SizedBox(height: 16),
-                BufferbloatCard(
-                  strings: t,
-                  idlePingMs: s.pingMs!,
-                  loadedPingMs: s.loadedPingMs!,
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.graphic_eq_rounded,
+                  label: t.jitter,
+                  value: s.jitterMs,
+                  unit: 'ms',
+                  accent: AppColors.accentInfo,
+                  large: wide,
                 ),
-              ],
-              if (showComfort) ...[
-                const SizedBox(height: 16),
-                ResultSummary(
-                  strings: t,
-                  download: s.downloadMbps!,
-                  upload: s.uploadMbps!,
-                  ping: s.pingMs!,
-                  jitter: s.jitterMs ?? 0,
-                ),
-                const SizedBox(height: 16),
-                ComfortSection(
-                  strings: t,
-                  download: s.downloadMbps!,
-                  upload: s.uploadMbps!,
-                  ping: s.pingMs!,
-                ),
-                // The throttling check runs in an isolate and streams from
-                // Netflix's CDN — neither is available to a browser.
-                if (!kIsWeb) ...[
-                  const SizedBox(height: 16),
-                  const ThrottleCard(),
-                ],
-              ],
-              if (s.phase == TestPhase.error) ...[
-                const SizedBox(height: 16),
-                _ErrorBanner(message: s.error ?? t.errorGeneric),
-              ],
-              const SizedBox(height: 28),
-              _ActionButton(
-                label: s.isRunning ? t.stopTest : t.startTest,
-                running: s.isRunning,
-                onTap: s.isRunning ? ctrl.stop : ctrl.start,
               ),
-              // The browser has no tab bar: what the app keeps under Monitor
-              // and More appears here instead, below the test.
-              if (kIsWeb) const WebExtras(),
             ],
           ),
-        ),
-        Positioned.fill(child: ConfettiOverlay(controller: _confetti)),
-      ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.south_rounded,
+                  label: t.download,
+                  value: s.downloadMbps,
+                  unit: 'Mbps',
+                  accent: AppColors.accentDown,
+                  highlight: true,
+                  large: wide,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  icon: Icons.north_rounded,
+                  label: t.upload,
+                  value: s.uploadMbps,
+                  unit: 'Mbps',
+                  accent: AppColors.accentUp,
+                  large: wide,
+                ),
+              ),
+            ],
+          ),
+        ];
+        // The verdicts after a test. Two columns split them so neither runs
+        // on alone: latency under load and the grade sit under the gauge.
+        final underGauge = [
+          if (showComfort && s.loadedPingMs != null) ...[
+            const SizedBox(height: 16),
+            BufferbloatCard(
+              strings: t,
+              idlePingMs: s.pingMs!,
+              loadedPingMs: s.loadedPingMs!,
+            ),
+          ],
+          if (showComfort) ...[
+            const SizedBox(height: 16),
+            ResultSummary(
+              strings: t,
+              download: s.downloadMbps!,
+              upload: s.uploadMbps!,
+              ping: s.pingMs!,
+              jitter: s.jitterMs ?? 0,
+            ),
+          ],
+        ];
+        final besideGauge = [
+          if (showComfort) ...[
+            const SizedBox(height: 16),
+            ComfortSection(
+              strings: t,
+              download: s.downloadMbps!,
+              upload: s.uploadMbps!,
+              ping: s.pingMs!,
+            ),
+            // The throttling check runs in an isolate and streams from
+            // Netflix's CDN — neither is available to a browser.
+            if (!kIsWeb) ...[
+              const SizedBox(height: 16),
+              const ThrottleCard(),
+            ],
+          ],
+          if (s.phase == TestPhase.error) ...[
+            const SizedBox(height: 16),
+            _ErrorBanner(message: s.error ?? t.errorGeneric),
+          ],
+        ];
+        final action = _ActionButton(
+          label: s.isRunning ? t.stopTest : t.startTest,
+          running: s.isRunning,
+          onTap: s.isRunning ? ctrl.stop : ctrl.start,
+        );
+
+        return Stack(
+          children: [
+            // The scroll view spans the whole window so the mouse wheel
+            // works anywhere on the page, not only over the content.
+            SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                wide ? 40 : 20,
+                24,
+                wide ? 40 : 20,
+                kIsWeb ? 40 : 120,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: !kIsWeb
+                        ? double.infinity
+                        : wide
+                            ? _wideMaxWidth
+                            : _narrowMaxWidth,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _Title(strings: t),
+                      if (wide) ...[
+                        const SizedBox(height: 28),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  gauge,
+                                  const SizedBox(height: 12),
+                                  phaseBar,
+                                  ...underGauge,
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 40),
+                            Expanded(
+                              flex: 6,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  ...metrics,
+                                  const SizedBox(height: 22),
+                                  ...origin,
+                                  const SizedBox(height: 22),
+                                  action,
+                                  ...besideGauge,
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 8),
+                        gauge,
+                        const SizedBox(height: 12),
+                        phaseBar,
+                        const SizedBox(height: 14),
+                        ...origin,
+                        const SizedBox(height: 18),
+                        ...metrics,
+                        ...underGauge,
+                        ...besideGauge,
+                        const SizedBox(height: 28),
+                        action,
+                      ],
+                      // The browser has no tab bar: what the app keeps under
+                      // Monitor and More appears here instead, below the test.
+                      if (kIsWeb) const WebExtras(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(child: ConfettiOverlay(controller: _confetti)),
+          ],
+        );
+      },
     );
   }
 }
+
+/// From this width on, the website lays the test out in two columns.
+const _wideLayoutWidth = 980.0;
+
+/// How far the page spreads on a large monitor. Beyond this, lines of text
+/// and rows of cards get too long to read across.
+const _wideMaxWidth = 1320.0;
+
+/// The single column's width on a tablet or a narrow browser window.
+const _narrowMaxWidth = 640.0;
 
 String _phaseLabel(AppStrings t, TestPhase p) => switch (p) {
       TestPhase.idle => t.phaseIdle,
@@ -227,52 +325,76 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Nova',
-                style: TextStyle(
-                  color: AppColors.sun,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                kIsWeb ? strings.webTagline : strings.speedtestSubtitle,
-                style: TextStyle(color: AppColors.onGlass, fontSize: 14),
-              ),
-            ],
+    return LayoutBuilder(
+      builder: (context, box) {
+        // On a phone the title shares ~335 px with six icons: the account
+        // button shrinks to an icon, all of them to compact size, and the
+        // tagline moves under the row instead of being squeezed beside it.
+        final compact = box.maxWidth < 560;
+        final heading = Text(
+          'Nova',
+          style: TextStyle(
+            color: AppColors.sun,
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
           ),
-        ),
-        const LanguageButton(),
-        IconButton(
-          onPressed: () => showServicePingSheet(context),
-          icon: Icon(Icons.travel_explore_rounded, color: AppColors.textMid),
-          tooltip: strings.servicesTitle,
-        ),
-        IconButton(
-          onPressed: () => showLeaderboardSheet(context),
-          icon: Icon(Icons.emoji_events_rounded, color: AppColors.textMid),
-          tooltip: strings.lbTitle,
-        ),
-        IconButton(
-          onPressed: () => showSpeedTestHistorySheet(context),
-          icon: Icon(Icons.history_rounded, color: AppColors.textMid),
-          tooltip: strings.historyTitle,
-        ),
-        IconButton(
-          onPressed: () => showSettingsSheet(context),
-          icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
-          tooltip: strings.settings,
-        ),
-      ],
+        );
+        final tagline = Text(
+          kIsWeb ? strings.webTagline : strings.speedtestSubtitle,
+          style: TextStyle(color: AppColors.onGlass, fontSize: 14),
+        );
+        final actions = [
+          const LanguageButton(),
+          IconButton(
+            onPressed: () => showServicePingSheet(context),
+            icon: Icon(Icons.travel_explore_rounded, color: AppColors.textMid),
+            tooltip: strings.servicesTitle,
+          ),
+          IconButton(
+            onPressed: () => showLeaderboardSheet(context),
+            icon: Icon(Icons.emoji_events_rounded, color: AppColors.textMid),
+            tooltip: strings.lbTitle,
+          ),
+          IconButton(
+            onPressed: () => showSpeedTestHistorySheet(context),
+            icon: Icon(Icons.history_rounded, color: AppColors.textMid),
+            tooltip: strings.historyTitle,
+          ),
+          IconButton(
+            onPressed: () => showSettingsSheet(context),
+            icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
+            tooltip: strings.settings,
+          ),
+          AccountButton(compact: compact),
+        ];
+
+        if (compact) {
+          return Theme(
+            data: Theme.of(context).copyWith(visualDensity: VisualDensity.compact),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [Expanded(child: heading), ...actions]),
+                const SizedBox(height: 2),
+                tagline,
+              ],
+            ),
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [heading, const SizedBox(height: 2), tagline],
+              ),
+            ),
+            ...actions,
+          ],
+        );
+      },
     );
   }
 }
@@ -382,6 +504,7 @@ class _MetricCard extends StatelessWidget {
     required this.unit,
     required this.accent,
     this.highlight = false,
+    this.large = false,
   });
 
   final IconData icon;
@@ -391,16 +514,19 @@ class _MetricCard extends StatelessWidget {
   final Color accent;
   final bool highlight;
 
-  static final _numStyle = TextStyle(
-    color: AppColors.onGlass,
-    fontSize: 26,
-    fontWeight: FontWeight.w700,
-  );
+  /// Bigger figures for the two-column layout on a desktop screen, where a
+  /// phone-sized card would leave the column half empty.
+  final bool large;
 
   @override
   Widget build(BuildContext context) {
+    final numStyle = TextStyle(
+      color: AppColors.onGlass,
+      fontSize: large ? 40 : 26,
+      fontWeight: FontWeight.w700,
+    );
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(large ? 22 : 16),
       decoration: glassCard(glow: highlight ? accent : null).copyWith(
         border: Border.all(
           color: accent.withValues(alpha: highlight ? 0.30 : 0.10),
@@ -411,7 +537,7 @@ class _MetricCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: accent),
+              Icon(icon, size: large ? 18 : 16, color: accent),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -420,14 +546,14 @@ class _MetricCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.textMid,
-                    fontSize: 12,
+                    fontSize: large ? 14 : 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: large ? 18 : 12),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -435,15 +561,15 @@ class _MetricCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 value == null
-                    ? Text('—', style: _numStyle)
+                    ? Text('—', style: numStyle)
                     // Odometer-style digits.
-                    : OdometerText(value: value!, decimals: 1, style: _numStyle),
+                    : OdometerText(value: value!, decimals: 1, style: numStyle),
                 const SizedBox(width: 5),
                 Text(
                   unit,
                   style: TextStyle(
                     color: accent,
-                    fontSize: 12,
+                    fontSize: large ? 14 : 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

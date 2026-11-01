@@ -65,11 +65,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   child: child,
                 ),
               ),
+              // On the web the speed test page sets its own width: one
+              // column on a phone, two on a laptop or desktop screen.
               child: KeyedSubtree(
                 key: ValueKey<int>(index),
-                child: kIsWeb
-                    ? _WebColumn(child: _pages[index])
-                    : _pages[index],
+                child: _pages[index],
               ),
             ),
           ),
@@ -86,28 +86,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               ],
               onTap: (i) => setState(() => _index = i),
             ),
-    );
-  }
-}
-
-/// Keeps the page a readable column in a wide browser window.
-///
-/// The screens are laid out for a phone or a compact desktop window; on a
-/// 1440 px monitor they would stretch edge to edge, with the title in one
-/// corner, the buttons in the other and half-empty cards in between. The
-/// backdrop stays full width — only the content is held to the column.
-class _WebColumn extends StatelessWidget {
-  const _WebColumn({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 640),
-        child: SizedBox.expand(child: child),
-      ),
     );
   }
 }
