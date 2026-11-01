@@ -14,6 +14,36 @@ const List<String> _sizeUnits = ['B', 'KB', 'MB', 'GB', 'TB'];
 FormattedRate formatRate(num bytesPerSecond) => _humanize(bytesPerSecond, _rateUnits);
 FormattedRate formatBytes(num bytes) => _humanize(bytes, _sizeUnits);
 
+/// Exactly as wide as a full stop: stands in for the decimal point a
+/// three-digit number doesn't have.
+const String punctuationSpace = ' ';
+
+/// [bytes] to three significant digits and a one-letter unit — "6.01K",
+/// "62.0K", "620K" — for text that must not change width, like the menu-bar
+/// title. With equal-width digits all three take the same room: each has
+/// three digits, and "620" gets a [punctuationSpace] where the others have a
+/// point. Units switch before a fourth digit would appear, and start at K so
+/// idle traffic doesn't flicker in and out of "B".
+String formatFixedWidth(num bytes) {
+  // Up to E, so even a 64-bit counter's largest value keeps three digits.
+  const units = ['K', 'M', 'G', 'T', 'P', 'E'];
+  final raw = bytes.toDouble();
+  var value = (raw.isFinite && raw > 0 ? raw : 0.0) / _kib;
+  var i = 0;
+  while (value >= 999.5 && i < units.length - 1) {
+    value /= _kib;
+    i++;
+  }
+  // The bounds sit where rounding would add a digit: 9.996 is "10.0", not
+  // "10.00".
+  final number = value < 9.995
+      ? value.toStringAsFixed(2)
+      : value < 99.95
+          ? value.toStringAsFixed(1)
+          : '$punctuationSpace${value.toStringAsFixed(0)}';
+  return number + units[i];
+}
+
 FormattedRate _humanize(num amount, List<String> units) {
   var value = amount.toDouble();
   if (!value.isFinite || value < 0) value = 0;

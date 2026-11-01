@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -19,6 +20,17 @@ class TrayService with TrayListener, WindowListener {
   bool _ready = false;
   String _lastTooltip = '';
   String _lastTitle = '';
+
+  /// On macOS the menu bar is anchored on the right, so an item that changes
+  /// width drags its icon sideways. tray_manager has no setting for this;
+  /// the native side (MainFlutterWindow.swift) gives the title equal-width
+  /// digits and holds the item at the width of [_widestTitle].
+  static const _titleChannel = MethodChannel('net_pulse/tray');
+  bool _titleSteadied = false;
+
+  /// The widest title [updateStatus] can produce: digits all have one width
+  /// there, and M is the widest unit letter.
+  static const _widestTitle = ' 88.8M/s · 88.8M/h';
 
   /// Menu entries — the keys are handled in [onTrayMenuItemClick].
   static const _kShow = 'show';
@@ -67,20 +79,26 @@ class TrayService with TrayListener, WindowListener {
   }) async {
     if (!_ready) return;
 
-    final rate = formatRate(rxPerSec + txPerSec);
-    final hour = formatBytes(hourBytes);
-    final title =
-        ' ${rate.value}${_compactUnit(rate.unit)} · ${hour.value}${_compactUnit(hour.unit)}/h';
+    // Every reading has the same number of characters, so with equal-width
+    // digits the title keeps its width as the numbers change.
+    final title = ' ${formatFixedWidth(rxPerSec + txPerSec)}/s'
+        ' · ${formatFixedWidth(hourBytes)}/h';
 
     if (title != _lastTitle) {
       _lastTitle = title;
       try {
         await trayManager.setTitle(title);
+        // Once the item has a title to measure, on the Mac.
+        if (Platform.isMacOS && !_titleSteadied) {
+          _titleSteadied = true;
+          await _titleChannel.invokeMethod<bool>('steadyTitle', _widestTitle);
+        }
       } catch (_) {
         // The title is decoration; a failure here must not break the app.
       }
     }
 
+    final hour = formatBytes(hourBytes);
     final rx = formatRate(rxPerSec);
     final tx = formatRate(txPerSec);
     final tooltip = 'Nova\n'
@@ -92,12 +110,6 @@ class TrayService with TrayListener, WindowListener {
         await trayManager.setToolTip(tooltip);
       } catch (_) {}
     }
-  }
-
-  /// "KB/s" → "K/s", "MB" → "M" and so on — shorter units for the menu bar.
-  String _compactUnit(String unit) {
-    if (unit == 'B/s' || unit == 'B') return unit;
-    return unit.replaceFirst('B', '');
   }
 
   Future<void> showWindow() async {

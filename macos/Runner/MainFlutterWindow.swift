@@ -68,6 +68,56 @@ class MainFlutterWindow: NSWindow {
     }
     // --------------------------------------------------------
 
+    // --- Menu-bar title that holds still ---
+    // tray_manager shows the title in the system font, whose digits differ in
+    // width, and lets the item resize with every reading; the menu bar is
+    // anchored on the right, so the icon then jumps sideways. The plugin has
+    // no setting for this, but its button lives in one of this app's windows
+    // and is found there: digits get equal widths, and the item keeps the
+    // width of the widest title Dart can produce.
+    FlutterMethodChannel(
+        name: "net_pulse/tray",
+        binaryMessenger: flutterViewController.engine.binaryMessenger
+    ).setMethodCallHandler { [weak self] call, result in
+        guard call.method == "steadyTitle", let widest = call.arguments as? String else {
+            result(FlutterMethodNotImplemented); return
+        }
+        guard let button = NSApp.windows.lazy
+            .compactMap({ statusBarButton(in: $0.contentView) }).first else {
+            result(false); return
+        }
+        let font = NSFont.monospacedDigitSystemFont(
+            ofSize: NSFont.menuBarFont(ofSize: 0).pointSize, weight: .regular)
+        button.font = font
+        button.alignment = .left
+        button.window?.layoutIfNeeded()
+        // The status bar pads the button beyond its text, so the width comes
+        // from the laid-out frame, adjusted for the widest text.
+        func textWidth(_ text: String) -> CGFloat {
+            (text as NSString).size(withAttributes: [.font: font]).width
+        }
+        let width = ceil(button.frame.width + textWidth(widest) - textWidth(button.title))
+        self?.titleWidth?.isActive = false
+        let constraint = button.widthAnchor.constraint(greaterThanOrEqualToConstant: width)
+        constraint.isActive = true
+        self?.titleWidth = constraint
+        result(true)
+    }
+    // --------------------------------------------------------
+
     super.awakeFromNib()
   }
+
+  /// Holds the menu-bar item at its widest title's width; see "net_pulse/tray".
+  private var titleWidth: NSLayoutConstraint?
+}
+
+/// The menu-bar item's button inside [view], searched depth first.
+private func statusBarButton(in view: NSView?) -> NSStatusBarButton? {
+  guard let view = view else { return nil }
+  if let button = view as? NSStatusBarButton { return button }
+  for subview in view.subviews {
+    if let found = statusBarButton(in: subview) { return found }
+  }
+  return nil
 }
