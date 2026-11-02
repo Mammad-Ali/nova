@@ -292,6 +292,7 @@ class AppStrings {
     required this.updateEmailLabel,
     required this.updateEmailHint,
     required this.updateEmailFailed,
+    required this.widgetTesting,
   });
 
   // Navigation and shared
@@ -597,6 +598,9 @@ class AppStrings {
   final String updateEmailHint;
   final String updateEmailFailed;
 
+  /// On the Mac widgets while a test runs.
+  final String widgetTesting;
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -876,6 +880,7 @@ const _en = AppStrings(
   updateEmailLabel: 'Email me when a new version is out',
   updateEmailHint: 'To {0}. Only about new versions, nothing else — turn it off here any time.',
   updateEmailFailed: "Couldn't save that — check the connection and try again.",
+  widgetTesting: 'Testing…',
 );
 
 const _az = AppStrings(
@@ -1139,6 +1144,7 @@ const _az = AppStrings(
   updateEmailLabel: 'Yeni versiya çıxanda mənə e-poçt göndər',
   updateEmailHint: '{0} ünvanına. Yalnız yeni versiyalar haqqında — istənilən vaxt burada söndürə bilərsiniz.',
   updateEmailFailed: 'Yadda saxlamaq alınmadı — bağlantını yoxlayıb yenidən cəhd edin.',
+  widgetTesting: 'Test gedir…',
 );
 
 const _ru = AppStrings(
@@ -1402,6 +1408,7 @@ const _ru = AppStrings(
   updateEmailLabel: 'Сообщать на почту о новых версиях',
   updateEmailHint: 'На {0}. Только о новых версиях — отключить можно здесь в любой момент.',
   updateEmailFailed: 'Не удалось сохранить — проверьте соединение и попробуйте снова.',
+  widgetTesting: 'Идёт тест…',
 );
 
 const _de = AppStrings(
@@ -1659,6 +1666,7 @@ const _de = AppStrings(
   updateEmailLabel: 'Mir eine E-Mail schicken, wenn eine neue Version da ist',
   updateEmailHint: 'An {0}. Nur zu neuen Versionen – du kannst es hier jederzeit abschalten.',
   updateEmailFailed: 'Das ließ sich nicht speichern – prüf die Verbindung und versuch es noch einmal.',
+  widgetTesting: 'Test läuft…',
 );
 
 const _hu = AppStrings(
@@ -1916,4 +1924,5 @@ const _hu = AppStrings(
   updateEmailLabel: 'Küldj e-mailt, ha új verzió jelenik meg',
   updateEmailHint: 'Ide: {0}. Csak az új verziókról – itt bármikor kikapcsolhatod.',
   updateEmailFailed: 'Nem sikerült menteni – ellenőrizd a kapcsolatot, és próbáld újra.',
+  widgetTesting: 'Teszt fut…',
 );

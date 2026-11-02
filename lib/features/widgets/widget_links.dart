@@ -17,6 +17,9 @@ import '../speedtest/presentation/providers/speedtest_provider.dart';
 ///   nova://call   … and start the call check
 ///   nova://cause  … and start "Find the cause"
 ///   nova://open   just bring Nova forward
+///   nova://test?quiet=1
+///                 start a speed test and stay out of the way: a widget's
+///                 "Start test", whose result shows on the widget
 ///
 /// A click can also launch Nova; its link then waits on the native side
 /// until [listen] asks for it.
@@ -44,8 +47,18 @@ class WidgetLinks {
   }
 
   Future<void> _handle(String link) async {
-    final action = Uri.tryParse(link)?.host;
-    if (action == null) return;
+    final uri = Uri.tryParse(link);
+    final action = uri?.host;
+    if (uri == null || action == null) return;
+
+    // A test from a widget runs where Nova is — in the menu bar, or behind
+    // other windows — without moving anything; the widget shows the result.
+    if (action == 'test' && uri.queryParameters['quiet'] == '1') {
+      if (!_ref.read(speedTestControllerProvider).isRunning) {
+        _ref.read(speedTestControllerProvider.notifier).start();
+      }
+      return;
+    }
 
     // Out of the menu-bar panel and onto the speed test, in front.
     final compact = _ref.read(compactModeProvider.notifier);

@@ -1,11 +1,14 @@
+import AppIntents
+import AppKit
 import Charts
 import SwiftUI
 import WidgetKit
 
 // Nova's desktop and Notification Centre widgets. The app writes what they
 // show to a small JSON file (see widget_bridge.dart and WidgetStore in
-// MainFlutterWindow.swift); every tap goes back to the app as a nova:// link
-// that starts the matching action.
+// MainFlutterWindow.swift). "Start test" runs the test in the background
+// (StartTestIntent); every other click goes to the app as a nova:// link
+// that opens it on the matching action.
 
 // MARK: - Data
 
@@ -44,6 +47,11 @@ struct NovaSnapshot: Decodable {
   let services: [Service]
   let provider: String?
   let labels: [String: String]
+
+  /// A test is running right now; absent in files from before 1.5.
+  var running: Bool? = nil
+
+  var isTesting: Bool { running == true }
 
   /// The app's words for [key] in the app's language, English until the app
   /// has written any.
@@ -193,6 +201,25 @@ enum NovaLink {
   static let call = URL(string: "nova://call")!
   static let cause = URL(string: "nova://cause")!
   static let open = URL(string: "nova://open")!
+  /// The test, but without bringing Nova forward.
+  static let quietTest = URL(string: "nova://test?quiet=1")!
+}
+
+/// "Start test" on a widget: Nova runs the test in the background — its
+/// window stays where it is — and the widget shows the result once it lands.
+/// The link is opened without activating Nova; a Link would bring it to the
+/// front. If Nova isn't running, this starts it, still in the background.
+struct StartTestIntent: AppIntent {
+  static var title: LocalizedStringResource = "Start a speed test"
+  static var description = IntentDescription("Runs a speed test in Nova without opening its window.")
+
+  func perform() async throws -> some IntentResult {
+    let configuration = NSWorkspace.OpenConfiguration()
+    configuration.activates = false
+    configuration.addsToRecentItems = false
+    _ = try? await NSWorkspace.shared.open(NovaLink.quietTest, configuration: configuration)
+    return .result()
+  }
 }
 
 // MARK: - Pieces
@@ -221,6 +248,57 @@ struct GradeBadge: View {
       .overlay(
         RoundedRectangle(cornerRadius: 7, style: .continuous)
           .stroke(Palette.tier(test.tierKey).opacity(0.45), lineWidth: 1))
+  }
+}
+
+/// In place of the grade while a test runs.
+struct TestingBadge: View {
+  let snapshot: NovaSnapshot
+
+  var body: some View {
+    HStack(spacing: 4) {
+      Image(systemName: "hourglass")
+      Text(snapshot.label("testing", "Testing…"))
+    }
+    .font(.system(size: 11, weight: .bold))
+    .foregroundStyle(Palette.sun)
+    .padding(.horizontal, 8)
+    .frame(minHeight: 22)
+    .background(Capsule().fill(Palette.sun.opacity(0.15)))
+    .overlay(Capsule().stroke(Palette.sun.opacity(0.45), lineWidth: 1))
+  }
+}
+
+/// The grade, or "Testing…" while a test runs.
+struct StatusBadge: View {
+  let snapshot: NovaSnapshot
+
+  var body: some View {
+    if snapshot.isTesting {
+      TestingBadge(snapshot: snapshot)
+    } else if let test = snapshot.test {
+      GradeBadge(test: test)
+    }
+  }
+}
+
+/// "Start test": runs StartTestIntent, so the test starts without Nova
+/// coming to the front.
+struct TestButton: View {
+  let snapshot: NovaSnapshot
+  var stacked = false
+
+  var body: some View {
+    Button(intent: StartTestIntent()) {
+      ActionLabel(
+        icon: snapshot.isTesting ? "hourglass" : "play.fill",
+        title: snapshot.isTesting
+          ? snapshot.label("testing", "Testing…")
+          : snapshot.label("runTest", "Start test"),
+        primary: true,
+        stacked: stacked)
+    }
+    .buttonStyle(.plain)
   }
 }
 
@@ -392,23 +470,30 @@ struct SpeedSmallView: View {
 
   var body: some View {
     let s = entry.snapshot
-    VStack(alignment: .leading, spacing: 0) {
-      HStack {
-        Wordmark()
-        Spacer()
-        if let test = s.test { GradeBadge(test: test) }
-      }
-      Spacer(minLength: 4)
-      if let test = s.test {
-        SpeedFigures(snapshot: s, test: test)
+    // The whole widget is the button: a click starts a test in the
+    // background, and the figures change when it is done.
+    Button(intent: StartTestIntent()) {
+      VStack(alignment: .leading, spacing: 0) {
+        HStack {
+          Wordmark()
+          Spacer()
+          StatusBadge(snapshot: s)
+        }
         Spacer(minLength: 4)
-        Age(date: test.date, now: entry.date)
-      } else {
-        NoTestYet(snapshot: s)
-        Spacer(minLength: 0)
+        if let test = s.test {
+          SpeedFigures(snapshot: s, test: test)
+            .opacity(s.isTesting ? 0.4 : 1)
+          Spacer(minLength: 4)
+          Age(date: test.date, now: entry.date)
+        } else {
+          NoTestYet(snapshot: s)
+          Spacer(minLength: 0)
+        }
       }
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+      .contentShape(Rectangle())
     }
-    .widgetURL(NovaLink.test)
+    .buttonStyle(.plain)
   }
 }
 
@@ -424,11 +509,12 @@ struct ToolsMediumView: View {
         HStack {
           Wordmark()
           Spacer()
-          if let test = s.test { GradeBadge(test: test) }
+          StatusBadge(snapshot: s)
         }
         Spacer(minLength: 4)
         if let test = s.test {
           SpeedFigures(snapshot: s, test: test, size: 36)
+            .opacity(s.isTesting ? 0.4 : 1)
           Spacer(minLength: 4)
           HStack {
             Age(date: test.date, now: entry.date)
@@ -445,7 +531,7 @@ struct ToolsMediumView: View {
       .frame(maxWidth: .infinity)
 
       VStack(spacing: 7) {
-        ActionButton(icon: "play.fill", title: s.label("runTest", "Start test"), url: NovaLink.test, primary: true)
+        TestButton(snapshot: s)
         ActionButton(icon: "video.fill", title: s.label("callCheck", "Call check"), url: NovaLink.call)
         ActionButton(icon: "stethoscope", title: s.label("findCause", "Find the cause"), url: NovaLink.cause)
       }
@@ -472,10 +558,10 @@ struct DashboardLargeView: View {
             .lineLimit(1)
         }
         Spacer()
-        if let test = s.test {
+        if let test = s.test, !s.isTesting {
           Age(date: test.date, now: entry.date)
-          GradeBadge(test: test)
         }
+        StatusBadge(snapshot: s)
       }
 
       if let test = s.test {
@@ -485,6 +571,7 @@ struct DashboardLargeView: View {
           figure(s.label("upload", "Upload"), formatted(test.up), "Mbps", Palette.up)
           figure(s.label("ping", "Ping"), formatted(test.ping), "ms", Palette.green)
         }
+        .opacity(s.isTesting ? 0.4 : 1)
       } else {
         Tile { NoTestYet(snapshot: s) }
       }
@@ -530,7 +617,7 @@ struct DashboardLargeView: View {
       // Icon above label: a third of the width is too narrow for both side
       // by side in every language.
       HStack(spacing: 6) {
-        ActionButton(icon: "play.fill", title: s.label("runTest", "Start test"), url: NovaLink.test, primary: true, stacked: true)
+        TestButton(snapshot: s, stacked: true)
         ActionButton(icon: "video.fill", title: s.label("callCheck", "Call check"), url: NovaLink.call, stacked: true)
         ActionButton(icon: "stethoscope", title: s.label("findCause", "Find the cause"), url: NovaLink.cause, stacked: true)
       }

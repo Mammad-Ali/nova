@@ -13,13 +13,14 @@ import '../services_ping/presentation/service_ping_provider.dart';
 import '../speedtest/data/datasources/ip_info.dart';
 import '../speedtest/domain/entities/speed_grade.dart';
 import '../speedtest/presentation/providers/speedtest_history_provider.dart';
+import '../speedtest/presentation/providers/speedtest_provider.dart';
 import '../speedtest/presentation/widgets/result_summary.dart';
 import '../traffic_monitor/presentation/providers/usage_stats_provider.dart';
 
 /// Keeps the Mac widgets (macos/NovaWidgets) up to date. They can't ask the
 /// app anything, so the app hands them a snapshot: written when a test
-/// finishes, when the latency to services is measured, when the language
-/// changes, and every half hour for the traffic totals. Each write redraws
+/// starts and finishes, when the latency to services is measured, when the
+/// language changes, and every half hour for the traffic totals. Each write redraws
 /// the widgets, and macOS limits how often that may happen, so nothing is
 /// sent twice.
 final widgetBridgeProvider = Provider<void>((ref) {
@@ -48,6 +49,8 @@ final widgetBridgeProvider = Provider<void>((ref) {
   }
 
   ref.listen(speedTestHistoryProvider, (_, _) => schedule());
+  // "Testing…" on the widgets while a test runs — often one they started.
+  ref.listen(speedTestControllerProvider.select((s) => s.isRunning), (_, _) => schedule());
   ref.listen(servicePingProvider, (_, next) {
     if (!next.running) schedule();
   });
@@ -112,6 +115,7 @@ Map<String, Object?> widgetSnapshot(Ref ref) {
       for (final ping in pings) {'name': ping.target.name, 'ms': ping.rttMs},
     ],
     'provider': isp,
+    'running': ref.read(speedTestControllerProvider).isRunning,
     'labels': widgetLabels(t),
   };
 }
@@ -123,6 +127,7 @@ Map<String, String> widgetLabels(AppStrings t) => {
       'ping': t.ping,
       'jitter': t.jitter,
       'runTest': t.startTest,
+      'testing': t.widgetTesting,
       'callCheck': t.widgetCallShort,
       'findCause': t.diagTitle,
       'services': t.servicesTitle,
