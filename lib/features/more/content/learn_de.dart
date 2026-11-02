@@ -88,7 +88,7 @@ const learnDe = LearnContent(
   privacy: [
     Article(
       'Wo deine Daten liegen',
-      'Ohne Konto bleiben Testergebnisse, Verlauf und Einstellungen nur auf deinem Gerät. Bist du mit Google angemeldet, liegt dein Testverlauf zusätzlich in deinem Nova-Konto bei Google Firebase, damit er auf allen Geräten gleich ist. Wenn du den Verlauf löschst, wird er auch dort gelöscht.',
+      'Ohne Konto bleiben Testergebnisse, Verlauf und Einstellungen nur auf deinem Gerät. Bist du mit Google angemeldet, liegt dein Testverlauf zusätzlich in deinem Nova-Konto bei Google Firebase, damit er auf allen Geräten gleich ist. Wenn du den Verlauf löschst, wird er auch dort gelöscht. Schaltest du die Update-E-Mails ein, liegt dort auch deine Adresse – nur um dir neue Versionen zu melden; beim Abschalten wird sie gelöscht.',
     ),
     Article(
       'Mit wem Nova kommuniziert',

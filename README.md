@@ -47,7 +47,9 @@ things that actually decide how the connection **feels**:
 | **Connection grade** | A single A+…E score, plus a plain-language tier |
 | **Comfort scale** | Whether the speed suits 4K, gaming, calls, streaming and large downloads |
 | **ISP throttling detector** | Compares a neutral CDN against Netflix's CDN to spot video throttling |
-| **Latency to services** | Round-trip times to YouTube, Discord, Steam, Cloudflare and more |
+| **Latency to services** | Round-trip times to YouTube, Discord, Steam, Cloudflare and more, right on the main screen |
+| **Call check** | Twenty seconds of round trips four times a second, judged for voice, HD video and group calls — with a tip for every problem |
+| **Find the cause** | Checks the Wi-Fi signal, the router, name lookups and the provider in turn, and names the weak link (apps only) |
 | **History** | Every completed run, with a trend chart, personal best and a comparison to the previous run |
 | **Sharing** | Copy results as text, save them as an image, export the history to CSV |
 | **Google account** | Optional sign-in on every platform, the website included; the test history follows you to every device |
@@ -65,7 +67,11 @@ things that actually decide how the connection **feels**:
 
 ### Desktop integration
 
-- Live speed in the **menu bar** (macOS) or **tray** (Windows)
+- Live speed in the **menu bar** (macOS) or **tray** (Windows), at a steady width
+- **Widgets** on the Mac desktop and in Notification Centre: *Speed*, *Speed & tools*,
+  *Dashboard* and *Traffic*. One click starts a test, a call check or "Find the cause"
+- **Update notice**: the apps check for a new release and offer the download;
+  signed-in people can also ask for an email when a new version is out
 - Click the icon for a **compact panel** — full readings without opening the app
 - Closing the window keeps monitoring in the background
 - Notifications when speed drops below a threshold or a daily limit is reached
@@ -133,6 +139,10 @@ lib/
 │  ├─ wifi/              signal strength and link rate
 │  ├─ lan_scan/          local subnet sweep, device names and kinds
 │  ├─ leaderboard/       sign-in, rankings, provider ranking (Firestore)
+│  ├─ call_check/        20-second call readiness check
+│  ├─ diagnose/          "Find the cause": Wi-Fi, router, DNS, provider
+│  ├─ updates/           new-release banner and opt-in update emails
+│  ├─ widgets/           data and click handling for the Mac widgets
 │  ├─ more/              More tab and site footer: Learn, About, Help pages
 │  ├─ alerts/            threshold notifications
 │  └─ settings/
@@ -216,6 +226,36 @@ contain Google keys — and passed with `--dart-define-from-file`. CI writes it
 from the `NOVA_CLOUD_CONFIG` repository secret. Without it, Nova builds with
 the local demo account and sample leaderboard. The database's security rules
 are in `firestore.rules`.
+
+### Mac widgets
+
+The widgets are a WidgetKit extension in `macos/NovaWidgets`, built and
+embedded by the normal `flutter build macos`. The app writes what they show
+to `~/Library/Application Support/Nova/widgets.json`; both sides hold a
+sandbox exception for that folder, because app groups — the usual way to
+share data — need a paid Apple developer team. A click opens a `nova://`
+link (`test`, `call`, `cause`, `open`) that the app turns into the action.
+
+### Update emails
+
+Signed-in people can switch on "Email me when a new version is out"; that
+writes their address and language to `subscribers/{uid}` (the rules accept
+only the account's own verified address). After each release,
+`.github/workflows/update-emails.yml` reads the list and sends the emails
+through Gmail with `tool/send_update_emails.py`. It holds no Google key:
+GitHub vouches for the run, and Workload Identity Federation lets it act as a
+service account that may only read the database. It needs these repository
+settings, and without them it quietly does nothing:
+
+| | |
+|---|---|
+| Variable `NOVA_WIF_PROVIDER` | the workload identity provider's full name |
+| Variable `NOVA_MAILER_ACCOUNT` | the read-only service account's address |
+| Variable `NOVA_FIREBASE_PROJECT` | the Firebase project id |
+| Secret `NOVA_SMTP_USER` | the Gmail address the emails come from |
+| Secret `NOVA_SMTP_PASSWORD` | an app password for that address |
+
+Run the workflow by hand with a test address to send yourself a sample.
 
 ### Publishing a release
 

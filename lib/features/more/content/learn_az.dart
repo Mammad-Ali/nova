@@ -88,7 +88,7 @@ const learnAz = LearnContent(
   privacy: [
     Article(
       'Məlumatlarınız harada saxlanılır',
-      'Hesab olmadan test nəticələri, tarixçə və tənzimləmələr yalnız cihazınızda qalır. Google ilə daxil olduqda test tarixçəniz Google Firebase-dəki Nova hesabınızda da saxlanılır, buna görə bütün cihazlarda eyni olur. Tarixçəni təmizləmək onu oradan da silir.',
+      'Hesab olmadan test nəticələri, tarixçə və tənzimləmələr yalnız cihazınızda qalır. Google ilə daxil olduqda test tarixçəniz Google Firebase-dəki Nova hesabınızda da saxlanılır, buna görə bütün cihazlarda eyni olur. Tarixçəni təmizləmək onu oradan da silir. Yeniləmə məktublarını açsanız, ünvanınız da orada saxlanılır — yalnız yeni versiya çıxanda xəbər vermək üçün; söndürdükdə silinir.',
     ),
     Article(
       'Nova kimlə əlaqə saxlayır',

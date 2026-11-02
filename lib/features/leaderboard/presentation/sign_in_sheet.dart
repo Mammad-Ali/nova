@@ -8,6 +8,7 @@ import '../../../core/cloud/google_identity.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../updates/update_emails.dart';
 import 'leaderboard_providers.dart';
 
 /// Opens sign-in, or the account panel when somebody is already signed in.
@@ -189,6 +190,11 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
                         style: TextStyle(color: AppColors.textMid, fontSize: 12.5),
                       ),
                     ),
+                  if (email != null && cloudConfigured)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+                      child: _UpdateEmailSwitch(email: email),
+                    ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextField(
@@ -274,6 +280,75 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Opt-in emails about new versions, off until switched on.
+class _UpdateEmailSwitch extends ConsumerStatefulWidget {
+  const _UpdateEmailSwitch({required this.email});
+  final String email;
+
+  @override
+  ConsumerState<_UpdateEmailSwitch> createState() => _UpdateEmailSwitchState();
+}
+
+class _UpdateEmailSwitchState extends ConsumerState<_UpdateEmailSwitch> {
+  var _failed = false;
+
+  Future<void> _set(bool on) async {
+    setState(() => _failed = false);
+    try {
+      await ref.read(updateEmailsProvider.notifier).setEnabled(on);
+    } catch (_) {
+      if (mounted) setState(() => _failed = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = ref.watch(stringsProvider);
+    final subscribed = ref.watch(updateEmailsProvider);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+      decoration: glassCard(radius: 14),
+      child: Row(
+        children: [
+          Icon(Icons.mark_email_unread_outlined, size: 20, color: AppColors.accentAlt),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  t.updateEmailLabel,
+                  style: TextStyle(
+                    color: AppColors.onGlass,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _failed ? t.updateEmailFailed : AppStrings.fill(t.updateEmailHint, [widget.email]),
+                  style: TextStyle(
+                    color: _failed ? AppColors.amber : AppColors.textLo,
+                    fontSize: 11.5,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: subscribed.value ?? false,
+            // Disabled until we know which way it is.
+            onChanged: subscribed.hasValue && subscribed.value != null ? _set : null,
+            activeTrackColor: AppColors.accentAlt,
+          ),
+        ],
       ),
     );
   }

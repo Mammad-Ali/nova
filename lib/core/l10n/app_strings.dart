@@ -289,6 +289,9 @@ class AppStrings {
     required this.widgetDashDesc,
     required this.widgetTrafficDesc,
     required this.widgetCallShort,
+    required this.updateEmailLabel,
+    required this.updateEmailHint,
+    required this.updateEmailFailed,
   });
 
   // Navigation and shared
@@ -587,6 +590,13 @@ class AppStrings {
   /// "Call check" on a widget button, where room is short.
   final String widgetCallShort;
 
+  /// The account panel's switch for update emails (opt-in).
+  final String updateEmailLabel;
+
+  /// {0} is the account's address.
+  final String updateEmailHint;
+  final String updateEmailFailed;
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -863,6 +873,9 @@ const _en = AppStrings(
   widgetDashDesc: 'Results, trend, latency to services and traffic — all at once.',
   widgetTrafficDesc: 'How much data you used this hour, today and this month.',
   widgetCallShort: 'Call check',
+  updateEmailLabel: 'Email me when a new version is out',
+  updateEmailHint: 'To {0}. Only about new versions, nothing else — turn it off here any time.',
+  updateEmailFailed: "Couldn't save that — check the connection and try again.",
 );
 
 const _az = AppStrings(
@@ -1123,6 +1136,9 @@ const _az = AppStrings(
   widgetDashDesc: 'Nəticələr, dinamika, xidmətlərə gecikmə və trafik — hamısı bir yerdə.',
   widgetTrafficDesc: 'Bu saat, bu gün və bu ay nə qədər data istifadə etdiniz.',
   widgetCallShort: 'Zəng testi',
+  updateEmailLabel: 'Yeni versiya çıxanda mənə e-poçt göndər',
+  updateEmailHint: '{0} ünvanına. Yalnız yeni versiyalar haqqında — istənilən vaxt burada söndürə bilərsiniz.',
+  updateEmailFailed: 'Yadda saxlamaq alınmadı — bağlantını yoxlayıb yenidən cəhd edin.',
 );
 
 const _ru = AppStrings(
@@ -1383,6 +1399,9 @@ const _ru = AppStrings(
   widgetDashDesc: 'Результаты, динамика, задержка до сервисов и трафик — всё сразу.',
   widgetTrafficDesc: 'Сколько данных вы израсходовали за час, день и месяц.',
   widgetCallShort: 'Тест звонка',
+  updateEmailLabel: 'Сообщать на почту о новых версиях',
+  updateEmailHint: 'На {0}. Только о новых версиях — отключить можно здесь в любой момент.',
+  updateEmailFailed: 'Не удалось сохранить — проверьте соединение и попробуйте снова.',
 );
 
 const _de = AppStrings(
@@ -1637,6 +1656,9 @@ const _de = AppStrings(
   widgetDashDesc: 'Ergebnisse, Verlauf, Latenz zu Diensten und Datenverkehr – alles auf einmal.',
   widgetTrafficDesc: 'Wie viele Daten du in dieser Stunde, heute und diesen Monat verbraucht hast.',
   widgetCallShort: 'Anruf-Check',
+  updateEmailLabel: 'Mir eine E-Mail schicken, wenn eine neue Version da ist',
+  updateEmailHint: 'An {0}. Nur zu neuen Versionen – du kannst es hier jederzeit abschalten.',
+  updateEmailFailed: 'Das ließ sich nicht speichern – prüf die Verbindung und versuch es noch einmal.',
 );
 
 const _hu = AppStrings(
@@ -1891,4 +1913,7 @@ const _hu = AppStrings(
   widgetDashDesc: 'Eredmények, trend, késleltetés és adatforgalom – egyszerre.',
   widgetTrafficDesc: 'Mennyi adatot használtál ebben az órában, ma és ebben a hónapban.',
   widgetCallShort: 'Hívásteszt',
+  updateEmailLabel: 'Küldj e-mailt, ha új verzió jelenik meg',
+  updateEmailHint: 'Ide: {0}. Csak az új verziókról – itt bármikor kikapcsolhatod.',
+  updateEmailFailed: 'Nem sikerült menteni – ellenőrizd a kapcsolatot, és próbáld újra.',
 );

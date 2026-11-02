@@ -88,7 +88,7 @@ const learnHu = LearnContent(
   privacy: [
     Article(
       'Hol vannak az adataid',
-      'Fiók nélkül a teszteredmények, az előzmények és a beállítások csak az eszközödön maradnak. Ha Google-fiókkal bejelentkezel, a teszt-előzményeid a Google Firebase-ben lévő Nova-fiókodban is megmaradnak, így minden eszközödön ugyanazok. Az előzmények törlése onnan is eltávolítja őket.',
+      'Fiók nélkül a teszteredmények, az előzmények és a beállítások csak az eszközödön maradnak. Ha Google-fiókkal bejelentkezel, a teszt-előzményeid a Google Firebase-ben lévő Nova-fiókodban is megmaradnak, így minden eszközödön ugyanazok. Az előzmények törlése onnan is eltávolítja őket. Ha bekapcsolod a frissítési e-maileket, a címed is ott tárolódik – csak hogy szóljunk az új verziókról; kikapcsoláskor törlődik.',
     ),
     Article(
       'Kivel kommunikál a Nova',

@@ -8,6 +8,7 @@ rules_version = '2';
 //   users/{uid}               a person's profile: nickname, country, provider
 //   users/{uid}/tests/{id}    their test history, one document per test
 //   leaderboard/{uid}         their best result, public
+//   subscribers/{uid}         their address, if they asked for update emails
 //
 // Each person reads and writes only their own profile and history. The
 // leaderboard is public to read; each entry can be written only by its
@@ -48,6 +49,20 @@ service cloud.firestore {
           && inRange(request.resource.data.j, 60000)
           && text(request.resource.data.platform, 16);
       }
+    }
+
+    // Opt-in emails about new versions. Only the account's own, verified
+    // Google address can be put on the list, so nobody can sign up someone
+    // else. The release workflow reads the list with its own credentials,
+    // which these rules don't govern.
+    match /subscribers/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['email', 'lang', 'since'])
+        && request.resource.data.email == request.auth.token.email
+        && request.auth.token.email_verified == true
+        && request.resource.data.lang in ['en', 'az', 'ru', 'de', 'hu']
+        && request.resource.data.since is timestamp;
     }
 
     match /leaderboard/{uid} {

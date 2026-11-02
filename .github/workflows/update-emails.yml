@@ -1,0 +1,66 @@
+name: Update emails
+
+# Tells the people who asked for it — Nova → account → "Email me when a new
+# version is out" — that a new version is out. build.yml calls this after
+# it publishes a release. It can also be run by hand from the Actions tab:
+# with a test address it sends that one email and nothing else.
+#
+# No keys are stored for Google: GitHub vouches for this run (OpenID
+# Connect), and Google lets runs of Mammad-Ali/nova act as a service
+# account that may only read the database (Workload Identity Federation).
+# Mail goes out through Gmail with an app password kept in the secrets.
+#
+# Setup, once (README → "Update emails"):
+#   variables  NOVA_WIF_PROVIDER, NOVA_MAILER_ACCOUNT, NOVA_FIREBASE_PROJECT
+#   secrets    NOVA_SMTP_USER, NOVA_SMTP_PASSWORD
+# Without them this workflow does nothing, so forks are unaffected.
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to announce, e.g. 1.4.0
+        required: true
+      test_address:
+        description: Send one test email to this address instead of to the subscribers
+        required: false
+      test_lang:
+        description: Language of the test email (en, az, ru, de, hu)
+        required: false
+        default: en
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    name: Email subscribers
+    if: vars.NOVA_WIF_PROVIDER != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # lets Google check that this really is a run of this repository
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: google
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.NOVA_WIF_PROVIDER }}
+          service_account: ${{ vars.NOVA_MAILER_ACCOUNT }}
+          token_format: access_token
+
+      - name: Send
+        env:
+          VERSION: ${{ inputs.version }}
+          ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
+          FIREBASE_PROJECT: ${{ vars.NOVA_FIREBASE_PROJECT }}
+          SMTP_USER: ${{ secrets.NOVA_SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.NOVA_SMTP_PASSWORD }}
+          TEST_ADDRESS: ${{ inputs.test_address }}
+          TEST_LANG: ${{ inputs.test_lang }}
+        run: python3 tool/send_update_emails.py

@@ -7,7 +7,9 @@ name: Build
 #                           version published to GitHub Pages;
 #   * every tag v1.2.3    — the same, plus a GitHub Release carrying the
 #                           installers under fixed names, so the links in the
-#                           README always point at the newest version.
+#                           README always point at the newest version, and an
+#                           email to everyone who asked for one
+#                           (update-emails.yml).
 on:
   push:
     branches: [main]
@@ -326,3 +328,16 @@ jobs:
           gh release create "$GITHUB_REF_NAME" out/* \
             --title "Nova ${GITHUB_REF_NAME#v}" \
             --notes-file .github/release-notes.md
+
+  # After the release is out, tell the people who asked to hear about it.
+  emails:
+    name: Email subscribers
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: release
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/update-emails.yml
+    with:
+      version: ${{ github.ref_name }}
+    secrets: inherit

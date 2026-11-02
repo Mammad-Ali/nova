@@ -88,7 +88,7 @@ const learnEn = LearnContent(
   privacy: [
     Article(
       'Where your data lives',
-      'Without an account, test results, history and settings stay only on your device. Signed in with Google, your test history is also kept in your Nova account in Google Firebase, so it is the same on every device. Clearing the history removes it there too.',
+      'Without an account, test results, history and settings stay only on your device. Signed in with Google, your test history is also kept in your Nova account in Google Firebase, so it is the same on every device. Clearing the history removes it there too. If you switch on update emails, your address is kept there too, only to tell you when a new version is out; switching them off deletes it.',
     ),
     Article(
       'Who Nova talks to',
