@@ -293,6 +293,7 @@ class AppStrings {
     required this.updateEmailHint,
     required this.updateEmailFailed,
     required this.widgetTesting,
+    required this.updateInstall,
   });
 
   // Navigation and shared
@@ -601,6 +602,9 @@ class AppStrings {
   /// On the Mac widgets while a test runs.
   final String widgetTesting;
 
+  /// The update banner's button on the Mac, where Nova updates itself in place.
+  final String updateInstall;
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -881,6 +885,7 @@ const _en = AppStrings(
   updateEmailHint: 'To {0}. Only about new versions, nothing else — turn it off here any time.',
   updateEmailFailed: "Couldn't save that — check the connection and try again.",
   widgetTesting: 'Testing…',
+  updateInstall: 'Update now',
 );
 
 const _az = AppStrings(
@@ -1145,6 +1150,7 @@ const _az = AppStrings(
   updateEmailHint: '{0} ünvanına. Yalnız yeni versiyalar haqqında — istənilən vaxt burada söndürə bilərsiniz.',
   updateEmailFailed: 'Yadda saxlamaq alınmadı — bağlantını yoxlayıb yenidən cəhd edin.',
   widgetTesting: 'Test gedir…',
+  updateInstall: 'İndi yenilə',
 );
 
 const _ru = AppStrings(
@@ -1409,6 +1415,7 @@ const _ru = AppStrings(
   updateEmailHint: 'На {0}. Только о новых версиях — отключить можно здесь в любой момент.',
   updateEmailFailed: 'Не удалось сохранить — проверьте соединение и попробуйте снова.',
   widgetTesting: 'Идёт тест…',
+  updateInstall: 'Обновить',
 );
 
 const _de = AppStrings(
@@ -1667,6 +1674,7 @@ const _de = AppStrings(
   updateEmailHint: 'An {0}. Nur zu neuen Versionen – du kannst es hier jederzeit abschalten.',
   updateEmailFailed: 'Das ließ sich nicht speichern – prüf die Verbindung und versuch es noch einmal.',
   widgetTesting: 'Test läuft…',
+  updateInstall: 'Jetzt aktualisieren',
 );
 
 const _hu = AppStrings(
@@ -1925,4 +1933,5 @@ const _hu = AppStrings(
   updateEmailHint: 'Ide: {0}. Csak az új verziókról – itt bármikor kikapcsolhatod.',
   updateEmailFailed: 'Nem sikerült menteni – ellenőrizd a kapcsolatot, és próbáld újra.',
   widgetTesting: 'Teszt fut…',
+  updateInstall: 'Frissítés most',
 );

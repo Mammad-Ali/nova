@@ -21,5 +21,12 @@
 	<array>
 		<string>/Library/Application Support/Nova/</string>
 	</array>
+	<!-- Sparkle's installer and its status reporter, which run outside the
+	     sandbox and are reached over these two Mach services. -->
+	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+	<array>
+		<string>com.example.netPulse-spks</string>
+		<string>com.example.netPulse-spki</string>
+	</array>
 </dict>
 </plist>

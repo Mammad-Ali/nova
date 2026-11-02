@@ -35,6 +35,19 @@
 			</array>
 		</dict>
 	</array>
+	<!-- In-app updates (Sparkle, see MainFlutterWindow.swift). Every release
+	     publishes appcast.xml next to its files, so "latest" always points at
+	     the newest one. Updates are signed with an EdDSA key whose private half
+	     is the SPARKLE_PRIVATE_KEY secret; this is its public half. Nova checks
+	     for new versions itself, so Sparkle doesn't check on its own. -->
+	<key>SUFeedURL</key>
+	<string>https://github.com/Mammad-Ali/nova/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>olBbHw8x+CJCQz6Y2jY2tdiR9b69XObp+5/pIVAkk6U=</string>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<false/>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>

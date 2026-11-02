@@ -237,10 +237,35 @@ jobs:
           ln -s /Applications dmg/Applications
           hdiutil create -volname Nova -srcfolder dmg -ov -format UDZO Nova-macOS.dmg
 
+      # The in-app update (Sparkle): the same app as a zip, signed with the
+      # EdDSA key in the SPARKLE_PRIVATE_KEY secret; the app only accepts
+      # updates carrying that signature. Releases only. sign_update comes from
+      # Sparkle's own release, checked against its published SHA-256.
+      - name: Sign the in-app update
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          if [ -z "$SPARKLE_PRIVATE_KEY" ]; then
+            echo "No SPARKLE_PRIVATE_KEY secret: this release has no in-app update."
+            exit 0
+          fi
+          ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/Nova.app Nova-macOS.zip
+          curl -sSfL -o sparkle.tar.xz https://github.com/sparkle-project/Sparkle/releases/download/2.10.1/Sparkle-2.10.1.tar.xz
+          echo "1a856d2a9edb8e628de88121d7be04cf0e2167f8641650b78fca00b14244cf27  sparkle.tar.xz" | shasum -a 256 -c -
+          mkdir sparkle && tar -xf sparkle.tar.xz -C sparkle
+          printf '%s' "$SPARKLE_PRIVATE_KEY" > sparkle.key
+          ./sparkle/bin/sign_update --ed-key-file sparkle.key Nova-macOS.zip > Nova-macOS.zip.sig
+          rm -P sparkle.key
+          cat Nova-macOS.zip.sig
+
       - uses: actions/upload-artifact@v4
         with:
           name: nova-macos
-          path: Nova-macOS.dmg
+          path: |
+            Nova-macOS.dmg
+            Nova-macOS.zip
+            Nova-macOS.zip.sig
           if-no-files-found: error
           retention-days: 30
 
@@ -320,6 +345,20 @@ jobs:
           cp dist/nova-windows-setup/Nova-Setup.exe out/Nova-Windows-Setup.exe
           cp dist/nova-macos/Nova-macOS.dmg out/Nova-macOS.dmg
           ls -lh out
+
+      # Sparkle's feed, published with the release so that
+      # releases/latest/download/appcast.xml — the address in the Mac app —
+      # always describes the newest version.
+      - name: In-app update feed
+        run: |
+          if [ ! -f dist/nova-macos/Nova-macOS.zip.sig ]; then
+            echo "No signed update in this build: no feed."
+            exit 0
+          fi
+          cp dist/nova-macos/Nova-macOS.zip out/Nova-macOS.zip
+          python3 tool/make_appcast.py --tag "$GITHUB_REF_NAME" \
+            --signature "$(cat dist/nova-macos/Nova-macOS.zip.sig)" > out/appcast.xml
+          cat out/appcast.xml
 
       - name: Create the release
         env:

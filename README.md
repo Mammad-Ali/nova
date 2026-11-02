@@ -91,8 +91,11 @@ things that actually decide how the connection **feels**:
 
 - Live speed in the **menu bar** (macOS) or **tray** (Windows), at a steady width
 - **Widgets** on the Mac desktop and in Notification Centre: *Speed*, *Speed & tools*,
-  *Dashboard* and *Traffic*. One click starts a test, a call check or "Find the cause"
-- **Update notice**: the apps check for a new release and offer the download
+  *Dashboard* and *Traffic*. One click runs a test in the background — the widget
+  shows "Testing…" and then the result — or opens a call check or "Find the cause"
+- **Updates**: the apps check for a new release. On the Mac, *Update now* (or
+  *Nova → Check for Updates…*) installs it in place and restarts Nova; on Windows
+  and Android the button downloads the installer
 - Click the icon for a **compact panel** — full readings without opening the app
 - Closing the window keeps monitoring in the background
 - Notifications when speed drops below a threshold or a daily limit is reached
@@ -257,6 +260,23 @@ to `~/Library/Application Support/Nova/widgets.json`; both sides hold a
 sandbox exception for that folder, because app groups — the usual way to
 share data — need a paid Apple developer team. A click opens a `nova://`
 link (`test`, `call`, `cause`, `open`) that the app turns into the action.
+*Start test* is an App Intent instead: it opens `nova://test?quiet=1` without
+activating Nova, so the test runs in the background.
+
+### In-app updates on the Mac
+
+The Mac app updates itself with [Sparkle](https://sparkle-project.org). A
+sandboxed app may not replace itself, so Sparkle's installer, which runs
+outside the sandbox, does that part. Every update is signed with an EdDSA
+key: the public half is `SUPublicEDKey` in `macos/Runner/Info.plist`, the
+private half is the `SPARKLE_PRIVATE_KEY` secret. For each release, CI zips
+the app, signs the zip with Sparkle's `sign_update`, and publishes it with an
+`appcast.xml` (`tool/make_appcast.py`); the app reads
+`releases/latest/download/appcast.xml`.
+
+Keep the private key safe. It also lives in the login Keychain of the Mac
+it was made on (Sparkle's `generate_keys --account nova-updates`). Without it,
+installed copies can't verify future updates and must be updated by hand.
 
 ### Update emails
 

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_strings.dart';
@@ -7,8 +9,10 @@ import '../../core/theme/app_theme.dart';
 import '../more/presentation/more_links.dart';
 import 'update_provider.dart';
 
-/// "Nova 1.3.1 is available" with a download button, at the top of the
-/// speed test screen. Takes no room at all while there is nothing new.
+/// "Nova 1.3.1 is available" at the top of the speed test screen. On the Mac
+/// the button updates Nova in place (Sparkle, see MainFlutterWindow.swift);
+/// elsewhere it downloads the installer. Takes no room at all while there is
+/// nothing new.
 class UpdateBanner extends ConsumerWidget {
   const UpdateBanner({super.key});
 
@@ -21,6 +25,19 @@ class UpdateBanner extends ConsumerWidget {
     final current = ref.watch(appVersionProvider).asData?.value;
     // The installer for this system; the release page where there is none.
     final target = visitorDownload();
+    final inPlace = !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
+
+    Future<void> install() async {
+      if (inPlace) {
+        try {
+          await const MethodChannel('net_pulse/updater').invokeMethod<bool>('checkForUpdates');
+          return;
+        } catch (_) {
+          // A build without Sparkle: fall back to the download.
+        }
+      }
+      target != null ? await startDownload(target) : await openLink(update.pageUrl);
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -63,11 +80,12 @@ class UpdateBanner extends ConsumerWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       FilledButton.icon(
-                        onPressed: () => target != null
-                            ? startDownload(target)
-                            : openLink(update.pageUrl),
-                        icon: const Icon(Icons.download_rounded, size: 18),
-                        label: Text(t.updateDownload),
+                        onPressed: install,
+                        icon: Icon(
+                          inPlace ? Icons.system_update_alt_rounded : Icons.download_rounded,
+                          size: 18,
+                        ),
+                        label: Text(inPlace ? t.updateInstall : t.updateDownload),
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,

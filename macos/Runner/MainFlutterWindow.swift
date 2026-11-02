@@ -1,6 +1,7 @@
 import Cocoa
 import CoreWLAN
 import FlutterMacOS
+import Sparkle
 import WidgetKit
 
 class MainFlutterWindow: NSWindow {
@@ -126,6 +127,35 @@ class MainFlutterWindow: NSWindow {
         }
     }
 
+    // --- In-app updates (Sparkle) ---
+    // The update banner's "Update now" opens Sparkle's window: the release
+    // notes, then download, signature check, install and restart. A
+    // sandboxed app may not replace itself; Sparkle's installer, launched
+    // outside the sandbox, does that part. Nova checks for new versions on
+    // its own (update_provider.dart), so Sparkle never checks unasked.
+    FlutterMethodChannel(
+        name: "net_pulse/updater",
+        binaryMessenger: flutterViewController.engine.binaryMessenger
+    ).setMethodCallHandler { [weak self] call, result in
+        guard call.method == "checkForUpdates", let updater = self?.updater else {
+            result(FlutterMethodNotImplemented); return
+        }
+        updater.checkForUpdates(nil)
+        result(true)
+    }
+
+    // "Check for Updates…" in the app menu, where Mac apps keep it. Added
+    // once the main menu exists, which the nib may finish after this window.
+    DispatchQueue.main.async { [weak self] in
+        guard let self, let appMenu = NSApp.mainMenu?.items.first?.submenu else { return }
+        let item = NSMenuItem(
+            title: "Check for Updates…",
+            action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+            keyEquivalent: "")
+        item.target = self.updater
+        appMenu.insertItem(item, at: 1)
+    }
+
     // A tap on a widget opens a nova:// link; Flutter's app delegate hands
     // it to whoever registered for opened URLs.
     links = NovaLinks(messenger: flutterViewController.engine.binaryMessenger)
@@ -140,6 +170,10 @@ class MainFlutterWindow: NSWindow {
 
   /// Kept here: the app delegate holds its lifecycle delegates weakly.
   private var links: NovaLinks?
+
+  /// Sparkle, reading the feed and key from Info.plist.
+  private let updater = SPUStandardUpdaterController(
+      startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
 }
 
 /// Where the app leaves what the widgets show. The widget extension runs in a
