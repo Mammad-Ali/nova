@@ -4,6 +4,10 @@ import '../../core/cloud/cloud_session.dart';
 import '../../core/cloud/firestore_client.dart';
 import '../../core/l10n/locale_provider.dart';
 
+/// The email side isn't set up yet (README → "Update emails"): until it is,
+/// the switch stays hidden rather than collect addresses nobody writes to.
+const kUpdateEmailsReady = false;
+
 /// Whether the signed-in person gets an email when a new version is out;
 /// null when nobody is signed in.
 ///

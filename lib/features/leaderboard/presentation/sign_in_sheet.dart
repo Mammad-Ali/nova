@@ -190,7 +190,7 @@ class _SignInSheetState extends ConsumerState<_SignInSheet> {
                         style: TextStyle(color: AppColors.textMid, fontSize: 12.5),
                       ),
                     ),
-                  if (email != null && cloudConfigured)
+                  if (email != null && cloudConfigured && kUpdateEmailsReady)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
                       child: _UpdateEmailSwitch(email: email),
