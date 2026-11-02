@@ -13,6 +13,17 @@ import '../shell/compact_mode.dart';
 import '../shell/compact_panel.dart';
 import 'starfield_background.dart';
 
+/// The tab on show: 0 speed test, 1 monitor, 2 more. A provider rather than
+/// widget state, so a tap on a Mac widget can bring the speed test forward.
+final homeTabProvider = NotifierProvider<HomeTabNotifier, int>(HomeTabNotifier.new);
+
+class HomeTabNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void show(int index) => state = index;
+}
+
 /// The app shell: shared backdrop plus two tabs in a glass navigation bar.
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -22,8 +33,6 @@ class HomeShell extends ConsumerStatefulWidget {
 }
 
 class _HomeShellState extends ConsumerState<HomeShell> {
-  int _index = 0;
-
   static const _pages = [SpeedTestScreen(), TrafficMonitorScreen(), MoreScreen()];
 
   @override
@@ -33,7 +42,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     // The monitor tab needs system traffic counters, which a browser has no
     // way to read — on the web the speed test is the whole app, so the tab
     // bar has nothing to switch between.
-    final index = kIsWeb ? 0 : _index;
+    final index = kIsWeb ? 0 : ref.watch(homeTabProvider);
 
     // In compact mode the window becomes a small panel under the menu-bar
     // icon: the same data, without tabs or a frame.
@@ -84,7 +93,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 (Icons.show_chart_rounded, t.tabMonitor),
                 (Icons.apps_rounded, t.tabMore),
               ],
-              onTap: (i) => setState(() => _index = i),
+              onTap: ref.read(homeTabProvider.notifier).show,
             ),
     );
   }

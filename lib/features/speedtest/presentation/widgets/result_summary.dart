@@ -89,7 +89,7 @@ class ResultSummary extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _tierLabel(strings, grade.tier),
+                      speedTierLabel(strings, grade.tier),
                       style: TextStyle(
                         color: color,
                         fontSize: 18,
@@ -365,7 +365,8 @@ Color _tierColor(SpeedTier tier) => switch (tier) {
       SpeedTier.slow => AppColors.red,
     };
 
-String _tierLabel(AppStrings t, SpeedTier tier) => switch (tier) {
+/// The tier's name in the current language — also what the Mac widgets show.
+String speedTierLabel(AppStrings t, SpeedTier tier) => switch (tier) {
       SpeedTier.blazing => t.gradeBlazing,
       SpeedTier.fast => t.gradeFast,
       SpeedTier.good => t.gradeGood,

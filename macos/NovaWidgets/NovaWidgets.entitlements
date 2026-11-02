@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<!-- The app writes what the widgets show to this folder (see
+	     widget_bridge.dart). App groups would be the usual way, but they
+	     need a paid Apple developer team; this exception works with Nova's
+	     own signature. Read-only: the widgets never write. -->
+	<key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+	<array>
+		<string>/Library/Application Support/Nova/</string>
+	</array>
+</dict>
+</plist>

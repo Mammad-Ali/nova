@@ -11,20 +11,36 @@ import '../domain/call_check.dart';
 import 'call_check_provider.dart';
 
 /// Opens the call check.
-void showCallCheckSheet(BuildContext context) {
+///
+/// With [start], the check begins right away — how the Mac widgets open it.
+void showCallCheckSheet(BuildContext context, {bool start = false}) {
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (_) => const _CallCheckSheet(),
+    builder: (_) => _CallCheckSheet(start: start),
   );
 }
 
-class _CallCheckSheet extends ConsumerWidget {
-  const _CallCheckSheet();
+class _CallCheckSheet extends ConsumerStatefulWidget {
+  const _CallCheckSheet({required this.start});
+
+  final bool start;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_CallCheckSheet> createState() => _CallCheckSheetState();
+}
+
+class _CallCheckSheetState extends ConsumerState<_CallCheckSheet> {
+  @override
+  void initState() {
+    super.initState();
+    // After the first frame, once the sheet is watching the check.
+    if (widget.start) Future.microtask(ref.read(callCheckProvider.notifier).run);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final t = ref.watch(stringsProvider);
     final s = ref.watch(callCheckProvider);
     final result = s.result;

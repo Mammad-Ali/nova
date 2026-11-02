@@ -278,6 +278,17 @@ class AppStrings {
     required this.diagCauseNoneTitle,
     required this.diagCauseNoneBody,
     required this.appOnlyCauseText,
+    required this.widgetNoTest,
+    required this.widgetTraffic,
+    required this.widgetTrafficEmpty,
+    required this.widgetSpeedName,
+    required this.widgetSpeedDesc,
+    required this.widgetToolsName,
+    required this.widgetToolsDesc,
+    required this.widgetDashName,
+    required this.widgetDashDesc,
+    required this.widgetTrafficDesc,
+    required this.widgetCallShort,
   });
 
   // Navigation and shared
@@ -559,6 +570,23 @@ class AppStrings {
   /// The website's card for "Find the cause", which needs the app.
   final String appOnlyCauseText;
 
+  /// Mac widgets (macos/NovaWidgets): shown before the first test.
+  final String widgetNoTest;
+  final String widgetTraffic;
+  final String widgetTrafficEmpty;
+
+  /// Widget names and descriptions in the macOS widget gallery.
+  final String widgetSpeedName;
+  final String widgetSpeedDesc;
+  final String widgetToolsName;
+  final String widgetToolsDesc;
+  final String widgetDashName;
+  final String widgetDashDesc;
+  final String widgetTrafficDesc;
+
+  /// "Call check" on a widget button, where room is short.
+  final String widgetCallShort;
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -824,6 +852,17 @@ const _en = AppStrings(
   diagCauseNoneTitle: 'Everything looks healthy',
   diagCauseNoneBody: 'Every link from this device to the internet is working well. If something still feels slow, the service itself may be the problem — compare the latency to services on the main screen.',
   appOnlyCauseText: 'Checks each link — Wi-Fi, router, name lookups, provider — and tells you which one is slowing you down.',
+  widgetNoTest: 'No test yet — click to run one',
+  widgetTraffic: 'Traffic',
+  widgetTrafficEmpty: 'Open Nova to start counting',
+  widgetSpeedName: 'Speed',
+  widgetSpeedDesc: 'Your last result at a glance. Click to run a new test.',
+  widgetToolsName: 'Speed & tools',
+  widgetToolsDesc: 'Your last result, with one click to test, check a call or find the cause.',
+  widgetDashName: 'Dashboard',
+  widgetDashDesc: 'Results, trend, latency to services and traffic — all at once.',
+  widgetTrafficDesc: 'How much data you used this hour, today and this month.',
+  widgetCallShort: 'Call check',
 );
 
 const _az = AppStrings(
@@ -1073,6 +1112,17 @@ const _az = AppStrings(
   diagCauseNoneTitle: 'Hər şey qaydasındadır',
   diagCauseNoneBody: 'Bu cihazdan internetə qədər hər halqa yaxşı işləyir. Hələ də nəsə yavaş görünürsə, problem xidmətin özündə ola bilər — əsas ekrandakı xidmətlərə gecikməni müqayisə edin.',
   appOnlyCauseText: 'Hər halqanı — Wi-Fi, router, ad axtarışı, provayder — yoxlayır və hansının sizi ləngitdiyini deyir.',
+  widgetNoTest: 'Hələ test yoxdur — başlatmaq üçün klikləyin',
+  widgetTraffic: 'Trafik',
+  widgetTrafficEmpty: 'Saymağa başlamaq üçün Nova-nı açın',
+  widgetSpeedName: 'Sürət',
+  widgetSpeedDesc: 'Son nəticəniz bir baxışda. Yeni test üçün klikləyin.',
+  widgetToolsName: 'Sürət və alətlər',
+  widgetToolsDesc: 'Son nəticəniz — test, zəng yoxlaması və səbəbin tapılması bir kliklə.',
+  widgetDashName: 'İdarə paneli',
+  widgetDashDesc: 'Nəticələr, dinamika, xidmətlərə gecikmə və trafik — hamısı bir yerdə.',
+  widgetTrafficDesc: 'Bu saat, bu gün və bu ay nə qədər data istifadə etdiniz.',
+  widgetCallShort: 'Zəng testi',
 );
 
 const _ru = AppStrings(
@@ -1322,6 +1372,17 @@ const _ru = AppStrings(
   diagCauseNoneTitle: 'Всё в порядке',
   diagCauseNoneBody: 'Все звенья от этого устройства до интернета работают хорошо. Если что-то всё равно тормозит, проблема может быть в самом сервисе — сравните задержку до сервисов на главном экране.',
   appOnlyCauseText: 'Проверяет каждое звено — Wi-Fi, роутер, поиск адресов, провайдера — и говорит, какое тормозит.',
+  widgetNoTest: 'Тестов пока нет — нажмите, чтобы запустить',
+  widgetTraffic: 'Трафик',
+  widgetTrafficEmpty: 'Откройте Nova, чтобы начать подсчёт',
+  widgetSpeedName: 'Скорость',
+  widgetSpeedDesc: 'Последний результат одним взглядом. Нажмите, чтобы запустить новый тест.',
+  widgetToolsName: 'Скорость и инструменты',
+  widgetToolsDesc: 'Последний результат и в один клик: тест, проверка для звонков, поиск причины.',
+  widgetDashName: 'Сводка',
+  widgetDashDesc: 'Результаты, динамика, задержка до сервисов и трафик — всё сразу.',
+  widgetTrafficDesc: 'Сколько данных вы израсходовали за час, день и месяц.',
+  widgetCallShort: 'Тест звонка',
 );
 
 const _de = AppStrings(
@@ -1565,6 +1626,17 @@ const _de = AppStrings(
   diagCauseNoneTitle: 'Alles sieht gesund aus',
   diagCauseNoneBody: 'Jedes Glied von diesem Gerät bis ins Internet funktioniert gut. Wirkt etwas trotzdem langsam, liegt es vielleicht am Dienst selbst – vergleiche die Latenz zu Diensten auf dem Hauptbildschirm.',
   appOnlyCauseText: 'Prüft jedes Glied – WLAN, Router, Namensauflösung, Anbieter – und sagt, welches dich ausbremst.',
+  widgetNoTest: 'Noch kein Test – klicke, um einen zu starten',
+  widgetTraffic: 'Datenverkehr',
+  widgetTrafficEmpty: 'Öffne Nova, um mit dem Zählen zu beginnen',
+  widgetSpeedName: 'Geschwindigkeit',
+  widgetSpeedDesc: 'Dein letztes Ergebnis auf einen Blick. Klicke für einen neuen Test.',
+  widgetToolsName: 'Geschwindigkeit & Werkzeuge',
+  widgetToolsDesc: 'Dein letztes Ergebnis – mit einem Klick testen, einen Anruf prüfen oder die Ursache finden.',
+  widgetDashName: 'Übersicht',
+  widgetDashDesc: 'Ergebnisse, Verlauf, Latenz zu Diensten und Datenverkehr – alles auf einmal.',
+  widgetTrafficDesc: 'Wie viele Daten du in dieser Stunde, heute und diesen Monat verbraucht hast.',
+  widgetCallShort: 'Anruf-Check',
 );
 
 const _hu = AppStrings(
@@ -1808,4 +1880,15 @@ const _hu = AppStrings(
   diagCauseNoneTitle: 'Minden rendben van',
   diagCauseNoneBody: 'Minden láncszem jól működik az eszköztől az internetig. Ha valami mégis lassúnak tűnik, maga a szolgáltatás lehet a gond – nézd meg a főképernyőn a szolgáltatások késleltetését.',
   appOnlyCauseText: 'Végignézi a láncszemeket – Wi-Fi, router, névfeloldás, szolgáltató –, és megmondja, melyik lassít.',
+  widgetNoTest: 'Még nincs teszt – kattints az indításhoz',
+  widgetTraffic: 'Adatforgalom',
+  widgetTrafficEmpty: 'Nyisd meg a Novát a számlálás indításához',
+  widgetSpeedName: 'Sebesség',
+  widgetSpeedDesc: 'A legutóbbi eredményed egy pillantással. Kattints egy új tesztért.',
+  widgetToolsName: 'Sebesség és eszközök',
+  widgetToolsDesc: 'A legutóbbi eredményed – egy kattintással teszt, hívásteszt vagy hibakeresés.',
+  widgetDashName: 'Áttekintés',
+  widgetDashDesc: 'Eredmények, trend, késleltetés és adatforgalom – egyszerre.',
+  widgetTrafficDesc: 'Mennyi adatot használtál ebben az órában, ma és ebben a hónapban.',
+  widgetCallShort: 'Hívásteszt',
 );

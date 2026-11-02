@@ -13,5 +13,13 @@
 	<!-- Saving the result image and CSV to a user-chosen location -->
 	<key>com.apple.security.files.user-selected.read-write</key>
 	<true/>
+	<!-- What the widgets show is written to this folder (WidgetStore in
+	     MainFlutterWindow.swift). App groups would be the usual way, but
+	     they need a paid Apple developer team; this exception works with
+	     Nova's own signature. The widget extension may only read it. -->
+	<key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
+	<array>
+		<string>/Library/Application Support/Nova/</string>
+	</array>
 </dict>
 </plist>

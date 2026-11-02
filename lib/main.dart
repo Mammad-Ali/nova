@@ -16,8 +16,14 @@ import 'features/traffic_monitor/presentation/providers/stability_provider.dart'
 import 'features/traffic_monitor/presentation/providers/traffic_provider.dart';
 import 'features/traffic_monitor/presentation/providers/usage_stats_provider.dart';
 import 'features/updates/update_provider.dart';
+import 'features/widgets/widget_bridge.dart';
+import 'features/widgets/widget_links.dart';
 import 'shell/compact_mode.dart';
 import 'shell/tray_service.dart';
+
+/// The app's navigator, for what opens sheets from outside the widget tree —
+/// a click on a Mac widget.
+final novaNavigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   // On the web, Google's sign-in reply arrives in the address bar; take it
@@ -56,6 +62,13 @@ class _NovaAppState extends ConsumerState<NovaApp> {
       // Looks for a newer release on GitHub; the website is always current.
       ref.read(updateProvider);
 
+      // The Mac widgets: what they show, and what a click on them asks for.
+      // Both stand down on every other platform.
+      ref.read(widgetBridgeProvider);
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => WidgetLinks(ref, novaNavigatorKey).listen(),
+      );
+
       // The tray icon shows current speed and hourly traffic; the two
       // providers update independently, so refresh on either one.
       void pushTrayStatus() {
@@ -90,6 +103,7 @@ class _NovaAppState extends ConsumerState<NovaApp> {
     final locale = ref.watch(localeProvider);
     return MaterialApp(
       title: 'Nova',
+      navigatorKey: novaNavigatorKey,
       debugShowCheckedModeBanner: false,
       theme: buildNovaTheme(),
       locale: locale.locale,

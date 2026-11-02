@@ -8,20 +8,36 @@ import '../domain/diagnosis.dart';
 import 'diagnosis_provider.dart';
 
 /// Opens "Find the cause".
-void showDiagnosisSheet(BuildContext context) {
+///
+/// With [start], the check begins right away — how the Mac widgets open it.
+void showDiagnosisSheet(BuildContext context, {bool start = false}) {
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (_) => const _DiagnosisSheet(),
+    builder: (_) => _DiagnosisSheet(start: start),
   );
 }
 
-class _DiagnosisSheet extends ConsumerWidget {
-  const _DiagnosisSheet();
+class _DiagnosisSheet extends ConsumerStatefulWidget {
+  const _DiagnosisSheet({required this.start});
+
+  final bool start;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DiagnosisSheet> createState() => _DiagnosisSheetState();
+}
+
+class _DiagnosisSheetState extends ConsumerState<_DiagnosisSheet> {
+  @override
+  void initState() {
+    super.initState();
+    // After the first frame, once the sheet is watching the check.
+    if (widget.start) Future.microtask(ref.read(diagnosisProvider.notifier).run);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final t = ref.watch(stringsProvider);
     final s = ref.watch(diagnosisProvider);
     final started = s.running || s.findings.isNotEmpty;

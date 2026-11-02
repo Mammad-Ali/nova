@@ -1,6 +1,7 @@
 import Cocoa
 import CoreWLAN
 import FlutterMacOS
+import WidgetKit
 
 class MainFlutterWindow: NSWindow {
   override func awakeFromNib() {
@@ -105,11 +106,96 @@ class MainFlutterWindow: NSWindow {
     }
     // --------------------------------------------------------
 
+    // --- Widgets: what they show, and the links they open ---
+    // Dart sends the widgets' data as JSON (widget_bridge.dart); it is left
+    // where the widget extension can read it, and the widgets are told to
+    // redraw.
+    FlutterMethodChannel(
+        name: "net_pulse/widgets",
+        binaryMessenger: flutterViewController.engine.binaryMessenger
+    ).setMethodCallHandler { call, result in
+        guard call.method == "update", let json = call.arguments as? String else {
+            result(FlutterMethodNotImplemented); return
+        }
+        do {
+            try WidgetStore.write(json)
+            WidgetCenter.shared.reloadAllTimelines()
+            result(true)
+        } catch {
+            result(FlutterError(code: "write", message: error.localizedDescription, details: nil))
+        }
+    }
+
+    // A tap on a widget opens a nova:// link; Flutter's app delegate hands
+    // it to whoever registered for opened URLs.
+    links = NovaLinks(messenger: flutterViewController.engine.binaryMessenger)
+    (NSApp.delegate as? FlutterAppDelegate)?.addApplicationLifecycleDelegate(links!)
+    // --------------------------------------------------------
+
     super.awakeFromNib()
   }
 
   /// Holds the menu-bar item at its widest title's width; see "net_pulse/tray".
   private var titleWidth: NSLayoutConstraint?
+
+  /// Kept here: the app delegate holds its lifecycle delegates weakly.
+  private var links: NovaLinks?
+}
+
+/// Where the app leaves what the widgets show. The widget extension runs in a
+/// sandbox of its own, so the file can't live in either container: it goes
+/// under the real home folder, which both sides' entitlements open for this
+/// one folder.
+enum WidgetStore {
+  private static let home: String = {
+    if let entry = getpwuid(getuid()), let dir = entry.pointee.pw_dir {
+      return String(cString: dir)
+    }
+    return NSHomeDirectory()
+  }()
+
+  static func write(_ json: String) throws {
+    let folder = URL(fileURLWithPath: home)
+      .appendingPathComponent("Library/Application Support/Nova", isDirectory: true)
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    try Data(json.utf8).write(to: folder.appendingPathComponent("widgets.json"), options: .atomic)
+  }
+}
+
+/// nova:// links from the widgets. A tap can launch Nova, and then the link
+/// arrives before Dart is listening, so links wait until Dart asks for them
+/// ("take") and go straight through ("open") after that.
+final class NovaLinks: NSObject, FlutterAppLifecycleDelegate {
+  private let channel: FlutterMethodChannel
+  private var pending: [String] = []
+  private var dartListening = false
+
+  init(messenger: FlutterBinaryMessenger) {
+    channel = FlutterMethodChannel(name: "net_pulse/links", binaryMessenger: messenger)
+    super.init()
+    channel.setMethodCallHandler { [weak self] call, result in
+      guard let self, call.method == "take" else {
+        result(FlutterMethodNotImplemented); return
+      }
+      self.dartListening = true
+      result(self.pending)
+      self.pending.removeAll()
+    }
+  }
+
+  @objc(handleOpenURLs:)
+  func handleOpen(_ urls: [URL]) -> Bool {
+    let ours = urls.filter { $0.scheme == "nova" }
+    guard !ours.isEmpty else { return false }
+    for url in ours {
+      if dartListening {
+        channel.invokeMethod("open", arguments: url.absoluteString)
+      } else {
+        pending.append(url.absoluteString)
+      }
+    }
+    return true
+  }
 }
 
 /// The menu-bar item's button inside [view], searched depth first.
