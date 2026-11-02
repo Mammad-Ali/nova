@@ -126,7 +126,7 @@ class _ServiceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _qualityColor(ping.quality);
+    final color = pingQualityColor(ping.quality);
     // Bar: shorter means faster (250 ms counts as a full-width scale).
     final frac = ping.rttMs == null
         ? 1.0
@@ -186,7 +186,9 @@ class _ServiceRow extends StatelessWidget {
   }
 }
 
-Color _qualityColor(PingQuality q) => switch (q) {
+/// The colour a latency reading is shown in, shared with the main screen's
+/// card.
+Color pingQualityColor(PingQuality q) => switch (q) {
       PingQuality.great => AppColors.green,
       PingQuality.good => AppColors.accentAlt,
       PingQuality.fair => AppColors.amber,

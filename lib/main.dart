@@ -15,6 +15,7 @@ import 'features/speedtest/presentation/providers/history_sync_provider.dart';
 import 'features/traffic_monitor/presentation/providers/stability_provider.dart';
 import 'features/traffic_monitor/presentation/providers/traffic_provider.dart';
 import 'features/traffic_monitor/presentation/providers/usage_stats_provider.dart';
+import 'features/updates/update_provider.dart';
 import 'shell/compact_mode.dart';
 import 'shell/tray_service.dart';
 
@@ -52,6 +53,8 @@ class _NovaAppState extends ConsumerState<NovaApp> {
       ref.read(usageStatsProvider);
       ref.read(stabilityProvider);
       ref.read(alertsWatcherProvider);
+      // Looks for a newer release on GitHub; the website is always current.
+      ref.read(updateProvider);
 
       // The tray icon shows current speed and hourly traffic; the two
       // providers update independently, so refresh on either one.

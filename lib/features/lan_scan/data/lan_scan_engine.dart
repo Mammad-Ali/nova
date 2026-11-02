@@ -74,10 +74,10 @@ const _concurrency = 32;
 /// "Connection refused" means something is there and actively said no, which
 /// is just as good a sign of life as an open port.
 /// 61 = macOS/BSD, 111 = Linux/Android, 10061 = Windows.
-const _refusedCodes = {61, 111, 10061};
+const kConnectionRefusedCodes = {61, 111, 10061};
 
 Future<void> _entry(SendPort toMain) async {
-  final self = await _localAddress();
+  final self = await localNetworkAddress();
   if (self == null) {
     toMain.send(const LanScanUpdate(
       devices: [],
@@ -195,7 +195,7 @@ Future<bool> _isAlive(String ip) async {
         },
         onError: (Object e) {
           final code = e is SocketException ? e.osError?.errorCode : null;
-          settle(alive: code != null && _refusedCodes.contains(code));
+          settle(alive: code != null && kConnectionRefusedCodes.contains(code));
         },
       ));
     } catch (_) {
@@ -228,7 +228,7 @@ Future<List<int>> _openPorts(String ip) async {
 
 /// This machine's address on the network the user means by "my network":
 /// a private IPv4 on a real interface, not a VPN tunnel or a virtual bridge.
-Future<String?> _localAddress() async {
+Future<String?> localNetworkAddress() async {
   const skip = ['utun', 'tun', 'tap', 'bridge', 'awdl', 'llw', 'ipsec', 'vmnet'];
   final interfaces = await NetworkInterface.list(
     type: InternetAddressType.IPv4,

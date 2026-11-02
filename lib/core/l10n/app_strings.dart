@@ -222,6 +222,62 @@ class AppStrings {
     required this.historyClearCloudBody,
     required this.cancel,
     required this.signIn,
+    required this.updateAvailable,
+    required this.updateYouHave,
+    required this.updateDownload,
+    required this.updateWhatsNew,
+    required this.updateLater,
+    required this.updateNotifyBody,
+    required this.callCheckTitle,
+    required this.callCheckHint,
+    required this.callCheckStart,
+    required this.callCheckAgain,
+    required this.callCheckLeft,
+    required this.callVoice,
+    required this.callVideo,
+    required this.callGroup,
+    required this.callReady,
+    required this.callShaky,
+    required this.callNotReady,
+    required this.callLoss,
+    required this.callSpeedFrom,
+    required this.callNoSpeed,
+    required this.callAllGood,
+    required this.callTipLatency,
+    required this.callTipJitter,
+    required this.callTipLoss,
+    required this.callTipUpload,
+    required this.callTipDownload,
+    required this.callTipUnreachable,
+    required this.diagTitle,
+    required this.diagHint,
+    required this.diagStart,
+    required this.diagChecking,
+    required this.diagThisDevice,
+    required this.diagStepWifi,
+    required this.diagStepRouter,
+    required this.diagStepDns,
+    required this.diagStepInternet,
+    required this.diagSignalStrong,
+    required this.diagSignalFair,
+    required this.diagSignalWeak,
+    required this.diagNotWifi,
+    required this.diagRouterHidden,
+    required this.diagLost,
+    required this.diagMinor,
+    required this.diagCauseWifiTitle,
+    required this.diagCauseWifiBody,
+    required this.diagCauseRouterTitle,
+    required this.diagCauseRouterBody,
+    required this.diagCauseDnsTitle,
+    required this.diagCauseDnsBody,
+    required this.diagCauseProviderTitle,
+    required this.diagCauseProviderBody,
+    required this.diagCauseOfflineTitle,
+    required this.diagCauseOfflineBody,
+    required this.diagCauseNoneTitle,
+    required this.diagCauseNoneBody,
+    required this.appOnlyCauseText,
   });
 
   // Navigation and shared
@@ -433,6 +489,76 @@ class AppStrings {
   /// The header button that opens sign-in, kept to a word or two.
   final String signIn;
 
+  /// Banner and notification title when a newer release exists; {0} is its version.
+  final String updateAvailable;
+  final String updateYouHave;
+  final String updateDownload;
+  final String updateWhatsNew;
+  final String updateLater;
+  final String updateNotifyBody;
+
+  /// Call check: 20 s of steady round trips, judged for voice, HD video and group calls.
+  final String callCheckTitle;
+  final String callCheckHint;
+  final String callCheckStart;
+  final String callCheckAgain;
+
+  /// On the button while the check runs; {0} is seconds.
+  final String callCheckLeft;
+  final String callVoice;
+  final String callVideo;
+  final String callGroup;
+  final String callReady;
+  final String callShaky;
+  final String callNotReady;
+  final String callLoss;
+
+  /// {0} is e.g. "↓ 90.3  ↑ 31.5 Mbps".
+  final String callSpeedFrom;
+  final String callNoSpeed;
+  final String callAllGood;
+  final String callTipLatency;
+  final String callTipJitter;
+  final String callTipLoss;
+  final String callTipUpload;
+  final String callTipDownload;
+  final String callTipUnreachable;
+
+  /// "Find the cause": checks Wi-Fi, router, DNS and the provider in turn.
+  final String diagTitle;
+  final String diagHint;
+  final String diagStart;
+  final String diagChecking;
+  final String diagThisDevice;
+  final String diagStepWifi;
+  final String diagStepRouter;
+  final String diagStepDns;
+  final String diagStepInternet;
+  final String diagSignalStrong;
+  final String diagSignalFair;
+  final String diagSignalWeak;
+  final String diagNotWifi;
+  final String diagRouterHidden;
+
+  /// {0} is a percentage.
+  final String diagLost;
+  final String diagMinor;
+  final String diagCauseWifiTitle;
+  final String diagCauseWifiBody;
+  final String diagCauseRouterTitle;
+  final String diagCauseRouterBody;
+  final String diagCauseDnsTitle;
+  final String diagCauseDnsBody;
+  final String diagCauseProviderTitle;
+  final String diagCauseProviderBody;
+  final String diagCauseOfflineTitle;
+  final String diagCauseOfflineBody;
+  final String diagCauseNoneTitle;
+  final String diagCauseNoneBody;
+
+  /// The website's card for "Find the cause", which needs the app.
+  final String appOnlyCauseText;
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -642,6 +768,62 @@ const _en = AppStrings(
   historyClearCloudBody: 'This also deletes it from your account on all your devices.',
   cancel: 'Cancel',
   signIn: 'Sign in',
+  updateAvailable: 'Nova {0} is available',
+  updateYouHave: 'You have {0}. Updating keeps your history and settings.',
+  updateDownload: 'Download',
+  updateWhatsNew: "What's new",
+  updateLater: 'Later',
+  updateNotifyBody: 'A new version is ready — open Nova to download it.',
+  callCheckTitle: 'Call check',
+  callCheckHint: 'Twenty seconds of the steady back-and-forth a video call needs. Is your connection ready for Zoom, Meet, Teams or Discord?',
+  callCheckStart: 'Start check',
+  callCheckAgain: 'Check again',
+  callCheckLeft: '{0} s left',
+  callVoice: 'Voice call',
+  callVideo: 'HD video call',
+  callGroup: 'Group video & screen sharing',
+  callReady: 'Ready',
+  callShaky: 'May stutter',
+  callNotReady: 'Not ready',
+  callLoss: 'Lost',
+  callSpeedFrom: 'Speed from your last test: {0}',
+  callNoSpeed: 'Run a speed test as well, to check the bandwidth a call needs.',
+  callAllGood: 'Your connection is ready for calls of every kind.',
+  callTipLatency: 'Replies take long — people will talk over each other. Pause downloads and streams; a cable helps.',
+  callTipJitter: 'The delay keeps changing — voices will sound choppy. Something else is using the connection, or the Wi-Fi is struggling.',
+  callTipLoss: 'Some replies never arrive — the picture will freeze. Usually Wi-Fi interference: move closer to the router or use a cable.',
+  callTipUpload: 'Upload is too slow for your video — others will see you blurry or frozen. Turn the camera off, or pause cloud backups.',
+  callTipDownload: "Download is too slow for this kind of call — others' video will be blurry. Close other streams and downloads.",
+  callTipUnreachable: 'Nothing came back — the connection is down right now.',
+  diagTitle: 'Find the cause',
+  diagHint: 'Nova checks each link between you and the internet — Wi-Fi, router, name lookups, your provider — and tells you which one is slowing you down.',
+  diagStart: 'Check my connection',
+  diagChecking: 'Checking…',
+  diagThisDevice: 'This device',
+  diagStepWifi: 'Wi-Fi signal',
+  diagStepRouter: 'Router',
+  diagStepDns: 'Name lookups (DNS)',
+  diagStepInternet: 'Provider & internet',
+  diagSignalStrong: 'strong',
+  diagSignalFair: 'fair',
+  diagSignalWeak: 'weak',
+  diagNotWifi: 'Not on Wi-Fi',
+  diagRouterHidden: "Didn't answer",
+  diagLost: '{0}% lost',
+  diagMinor: 'Minor',
+  diagCauseWifiTitle: 'Your Wi-Fi signal is the weak link',
+  diagCauseWifiBody: 'Between this device and the router the signal is weak, and everything after it suffers. Move closer to the router, keep it out of cupboards and away from thick walls, or use the 5 GHz network if you have one.',
+  diagCauseRouterTitle: 'Your router is struggling',
+  diagCauseRouterBody: 'Even inside your home it answers slowly or drops replies. Restart it by unplugging it for ten seconds. If this keeps happening, it may be overloaded by many devices, or simply old.',
+  diagCauseDnsTitle: 'Name lookups are slow',
+  diagCauseDnsBody: 'Sites take a while to start loading because finding their addresses is slow. Switching DNS to 1.1.1.1 or 8.8.8.8 — in your router or your system settings — usually fixes it.',
+  diagCauseProviderTitle: 'The problem is beyond your home',
+  diagCauseProviderBody: "Your Wi-Fi and router are fine, but the connection past them is slow or unstable — that's your provider's side. Restart the router once; if it stays like this, contact your provider. Your test history in Nova is good evidence.",
+  diagCauseOfflineTitle: 'Nothing gets past your router',
+  diagCauseOfflineBody: "Your home network works, but there's no internet beyond it. Check the router's internet light and cables, or ask your provider whether there's an outage.",
+  diagCauseNoneTitle: 'Everything looks healthy',
+  diagCauseNoneBody: 'Every link from this device to the internet is working well. If something still feels slow, the service itself may be the problem — compare the latency to services on the main screen.',
+  appOnlyCauseText: 'Checks each link — Wi-Fi, router, name lookups, provider — and tells you which one is slowing you down.',
 );
 
 const _az = AppStrings(
@@ -835,6 +1017,62 @@ const _az = AppStrings(
   historyClearCloudBody: 'O, hesabınızdan da — bütün cihazlarda silinəcək.',
   cancel: 'Ləğv et',
   signIn: 'Daxil ol',
+  updateAvailable: 'Nova {0} hazırdır',
+  updateYouHave: 'Sizdə {0} var. Yeniləmə tarixçəni və ayarları saxlayır.',
+  updateDownload: 'Yüklə',
+  updateWhatsNew: 'Nə yenidir',
+  updateLater: 'Sonra',
+  updateNotifyBody: 'Yeni versiya hazırdır — yükləmək üçün Nova-nı açın.',
+  callCheckTitle: 'Zəng yoxlaması',
+  callCheckHint: 'Video zəngin ehtiyac duyduğu bərabər mübadilə 20 saniyə yoxlanılır. Bağlantınız Zoom, Meet, Teams və ya Discord üçün hazırdırmı?',
+  callCheckStart: 'Yoxlamaya başla',
+  callCheckAgain: 'Yenidən yoxla',
+  callCheckLeft: '{0} san qaldı',
+  callVoice: 'Səsli zəng',
+  callVideo: 'HD video zəng',
+  callGroup: 'Qrup video və ekran paylaşımı',
+  callReady: 'Hazırdır',
+  callShaky: 'Kəsilə bilər',
+  callNotReady: 'Hazır deyil',
+  callLoss: 'İtki',
+  callSpeedFrom: 'Son testinizdən sürət: {0}',
+  callNoSpeed: 'Zəngin tələb etdiyi sürəti yoxlamaq üçün sürət testi də edin.',
+  callAllGood: 'Bağlantınız hər növ zəng üçün hazırdır.',
+  callTipLatency: 'Cavablar gec gəlir — həmsöhbətlər bir-birinin sözünü kəsəcək. Yükləmələri və yayımları dayandırın; kabel kömək edir.',
+  callTipJitter: 'Gecikmə daim dəyişir — səslər kəsik-kəsik eşidiləcək. Bağlantını başqa nəsə istifadə edir və ya Wi-Fi çətinlik çəkir.',
+  callTipLoss: 'Bəzi cavablar heç gəlmir — görüntü donacaq. Adətən Wi-Fi maneəsidir: routerə yaxınlaşın və ya kabeldən istifadə edin.',
+  callTipUpload: 'Göndərmə sürəti video üçün azdır — digərləri sizi bulanıq və ya donmuş görəcək. Kameranı söndürün və ya bulud ehtiyat nüsxələrini dayandırın.',
+  callTipDownload: 'Yükləmə sürəti bu növ zəng üçün azdır — digərlərinin videosu bulanıq olacaq. Digər yayımları və yükləmələri bağlayın.',
+  callTipUnreachable: 'Heç bir cavab gəlmədi — bağlantı hazırda yoxdur.',
+  diagTitle: 'Səbəbi tap',
+  diagHint: 'Nova sizinlə internet arasındakı hər halqanı — Wi-Fi, router, ad axtarışı, provayder — yoxlayır və hansının sizi ləngitdiyini deyir.',
+  diagStart: 'Bağlantımı yoxla',
+  diagChecking: 'Yoxlanılır…',
+  diagThisDevice: 'Bu cihaz',
+  diagStepWifi: 'Wi-Fi siqnalı',
+  diagStepRouter: 'Router',
+  diagStepDns: 'Ad axtarışı (DNS)',
+  diagStepInternet: 'Provayder və internet',
+  diagSignalStrong: 'güclü',
+  diagSignalFair: 'orta',
+  diagSignalWeak: 'zəif',
+  diagNotWifi: 'Wi-Fi-a qoşulmayıb',
+  diagRouterHidden: 'Cavab vermədi',
+  diagLost: '{0}% itki',
+  diagMinor: 'Kiçik',
+  diagCauseWifiTitle: 'Zəif halqa Wi-Fi siqnalıdır',
+  diagCauseWifiBody: 'Bu cihazla router arasında siqnal zəifdir və ondan sonrakı hər şey əziyyət çəkir. Routerə yaxınlaşın, onu şkafda və qalın divarların yanında saxlamayın və ya varsa 5 GHz şəbəkəsinə qoşulun.',
+  diagCauseRouterTitle: 'Router çətinlik çəkir',
+  diagCauseRouterBody: 'Hətta evinizin içində o, gec cavab verir və ya cavabları itirir. Onu on saniyəlik elektrikdən ayırıb yenidən qoşun. Bu təkrarlanırsa, çoxlu cihazdan yüklənmiş və ya sadəcə köhnə ola bilər.',
+  diagCauseDnsTitle: 'Ad axtarışı yavaşdır',
+  diagCauseDnsBody: 'Saytların ünvanını tapmaq yavaş olduğuna görə onlar gec açılmağa başlayır. DNS-i 1.1.1.1 və ya 8.8.8.8 ilə əvəz etmək — routerdə və ya sistem ayarlarında — adətən problemi həll edir.',
+  diagCauseProviderTitle: 'Problem evinizdən kənardadır',
+  diagCauseProviderBody: 'Wi-Fi və router qaydasındadır, lakin onlardan sonrakı bağlantı yavaş və ya qeyri-sabitdir — bu, provayderin tərəfidir. Routeri bir dəfə yenidən başladın; vəziyyət dəyişməsə, provayderə müraciət edin. Nova-dakı test tarixçəniz yaxşı sübutdur.',
+  diagCauseOfflineTitle: 'Routerdən o yana heç nə keçmir',
+  diagCauseOfflineBody: 'Ev şəbəkəniz işləyir, lakin ondan o yana internet yoxdur. Routerin internet işığını və kabelləri yoxlayın və ya provayderdən nasazlıq olub-olmadığını soruşun.',
+  diagCauseNoneTitle: 'Hər şey qaydasındadır',
+  diagCauseNoneBody: 'Bu cihazdan internetə qədər hər halqa yaxşı işləyir. Hələ də nəsə yavaş görünürsə, problem xidmətin özündə ola bilər — əsas ekrandakı xidmətlərə gecikməni müqayisə edin.',
+  appOnlyCauseText: 'Hər halqanı — Wi-Fi, router, ad axtarışı, provayder — yoxlayır və hansının sizi ləngitdiyini deyir.',
 );
 
 const _ru = AppStrings(
@@ -1028,6 +1266,62 @@ const _ru = AppStrings(
   historyClearCloudBody: 'Она удалится и из вашего аккаунта — на всех устройствах.',
   cancel: 'Отмена',
   signIn: 'Войти',
+  updateAvailable: 'Доступна Nova {0}',
+  updateYouHave: 'У вас {0}. История и настройки после обновления сохранятся.',
+  updateDownload: 'Скачать',
+  updateWhatsNew: 'Что нового',
+  updateLater: 'Позже',
+  updateNotifyBody: 'Готова новая версия — откройте Nova, чтобы скачать её.',
+  callCheckTitle: 'Проверка для звонков',
+  callCheckHint: 'Двадцать секунд ровного обмена данными, как во время видеозвонка. Готово ли соединение для Zoom, Meet, Teams или Discord?',
+  callCheckStart: 'Начать проверку',
+  callCheckAgain: 'Проверить снова',
+  callCheckLeft: 'Осталось {0} с',
+  callVoice: 'Голосовой звонок',
+  callVideo: 'Видеозвонок в HD',
+  callGroup: 'Групповое видео и показ экрана',
+  callReady: 'Готово',
+  callShaky: 'Возможны сбои',
+  callNotReady: 'Не готово',
+  callLoss: 'Потери',
+  callSpeedFrom: 'Скорость из последнего теста: {0}',
+  callNoSpeed: 'Запустите и тест скорости, чтобы проверить пропускную способность для звонка.',
+  callAllGood: 'Соединение готово к любым звонкам.',
+  callTipLatency: 'Ответы приходят с задержкой — собеседники будут перебивать друг друга. Поставьте загрузки и стримы на паузу; кабель поможет.',
+  callTipJitter: 'Задержка всё время скачет — голоса будут прерываться. Соединение занято чем-то ещё, или Wi-Fi не справляется.',
+  callTipLoss: 'Часть ответов теряется — картинка будет замирать. Обычно это помехи Wi-Fi: подойдите ближе к роутеру или подключите кабель.',
+  callTipUpload: 'Отдача слишком медленная для вашего видео — вас будут видеть размытым или замершим. Выключите камеру или поставьте облачные копии на паузу.',
+  callTipDownload: 'Загрузка слишком медленная для такого звонка — видео собеседников будет мутным. Закройте другие стримы и загрузки.',
+  callTipUnreachable: 'Ответа не пришло — соединения сейчас нет.',
+  diagTitle: 'Найти причину',
+  diagHint: 'Nova проверяет каждое звено между вами и интернетом — Wi-Fi, роутер, поиск адресов, провайдера — и говорит, какое из них всё тормозит.',
+  diagStart: 'Проверить соединение',
+  diagChecking: 'Проверяю…',
+  diagThisDevice: 'Это устройство',
+  diagStepWifi: 'Сигнал Wi-Fi',
+  diagStepRouter: 'Роутер',
+  diagStepDns: 'Поиск адресов (DNS)',
+  diagStepInternet: 'Провайдер и интернет',
+  diagSignalStrong: 'сильный',
+  diagSignalFair: 'средний',
+  diagSignalWeak: 'слабый',
+  diagNotWifi: 'Не через Wi-Fi',
+  diagRouterHidden: 'Не ответил',
+  diagLost: 'потеряно {0}%',
+  diagMinor: 'Незначительно',
+  diagCauseWifiTitle: 'Слабое звено — сигнал Wi-Fi',
+  diagCauseWifiBody: 'Между этим устройством и роутером слабый сигнал, и от этого страдает всё остальное. Подойдите ближе к роутеру, не прячьте его в шкаф и за толстые стены или подключитесь к сети 5 ГГц, если она есть.',
+  diagCauseRouterTitle: 'Роутер не справляется',
+  diagCauseRouterBody: 'Даже внутри дома он отвечает медленно или теряет ответы. Перезагрузите его — выньте из розетки на десять секунд. Если это повторяется, он может быть перегружен устройствами или просто устарел.',
+  diagCauseDnsTitle: 'Поиск адресов работает медленно',
+  diagCauseDnsBody: 'Сайты долго начинают открываться, потому что их адреса находятся медленно. Обычно помогает сменить DNS на 1.1.1.1 или 8.8.8.8 — в настройках роутера или системы.',
+  diagCauseProviderTitle: 'Проблема за пределами вашего дома',
+  diagCauseProviderBody: 'Wi-Fi и роутер в порядке, но связь за ними медленная или нестабильная — это сторона провайдера. Перезагрузите роутер; если не поможет, обратитесь к провайдеру. История тестов в Nova — хорошее доказательство.',
+  diagCauseOfflineTitle: 'Дальше роутера ничего не проходит',
+  diagCauseOfflineBody: 'Домашняя сеть работает, но дальше неё интернета нет. Проверьте индикатор интернета на роутере и кабели или спросите провайдера, нет ли аварии.',
+  diagCauseNoneTitle: 'Всё в порядке',
+  diagCauseNoneBody: 'Все звенья от этого устройства до интернета работают хорошо. Если что-то всё равно тормозит, проблема может быть в самом сервисе — сравните задержку до сервисов на главном экране.',
+  appOnlyCauseText: 'Проверяет каждое звено — Wi-Fi, роутер, поиск адресов, провайдера — и говорит, какое тормозит.',
 );
 
 const _de = AppStrings(
@@ -1215,6 +1509,62 @@ const _de = AppStrings(
   historyClearCloudBody: 'Er wird auch aus deinem Konto gelöscht – auf allen Geräten.',
   cancel: 'Abbrechen',
   signIn: 'Anmelden',
+  updateAvailable: 'Nova {0} ist da',
+  updateYouHave: 'Du hast {0}. Verlauf und Einstellungen bleiben beim Update erhalten.',
+  updateDownload: 'Herunterladen',
+  updateWhatsNew: 'Was ist neu',
+  updateLater: 'Später',
+  updateNotifyBody: 'Eine neue Version ist fertig – öffne Nova, um sie zu laden.',
+  callCheckTitle: 'Anruf-Check',
+  callCheckHint: 'Zwanzig Sekunden gleichmäßiger Austausch, wie ihn ein Videoanruf braucht. Ist deine Verbindung bereit für Zoom, Meet, Teams oder Discord?',
+  callCheckStart: 'Check starten',
+  callCheckAgain: 'Erneut prüfen',
+  callCheckLeft: 'Noch {0} s',
+  callVoice: 'Sprachanruf',
+  callVideo: 'HD-Videoanruf',
+  callGroup: 'Gruppenvideo & Bildschirmfreigabe',
+  callReady: 'Bereit',
+  callShaky: 'Kann ruckeln',
+  callNotReady: 'Nicht bereit',
+  callLoss: 'Verlust',
+  callSpeedFrom: 'Geschwindigkeit aus deinem letzten Test: {0}',
+  callNoSpeed: 'Mach auch einen Geschwindigkeitstest, um die Bandbreite für Anrufe zu prüfen.',
+  callAllGood: 'Deine Verbindung ist bereit für Anrufe aller Art.',
+  callTipLatency: 'Antworten brauchen lange – ihr werdet euch ins Wort fallen. Pausiere Downloads und Streams; ein Kabel hilft.',
+  callTipJitter: 'Die Verzögerung schwankt ständig – Stimmen klingen abgehackt. Etwas anderes nutzt die Verbindung, oder das WLAN kämpft.',
+  callTipLoss: 'Manche Antworten kommen nie an – das Bild friert ein. Meist WLAN-Störungen: Geh näher an den Router oder nimm ein Kabel.',
+  callTipUpload: 'Der Upload ist zu langsam für dein Video – andere sehen dich unscharf oder eingefroren. Schalte die Kamera aus oder pausiere Cloud-Backups.',
+  callTipDownload: 'Der Download ist zu langsam für diese Art Anruf – die Videos der anderen werden unscharf. Schließe andere Streams und Downloads.',
+  callTipUnreachable: 'Es kam nichts zurück – die Verbindung ist gerade weg.',
+  diagTitle: 'Ursache finden',
+  diagHint: 'Nova prüft jedes Glied zwischen dir und dem Internet – WLAN, Router, Namensauflösung, Anbieter – und sagt dir, welches dich ausbremst.',
+  diagStart: 'Verbindung prüfen',
+  diagChecking: 'Wird geprüft…',
+  diagThisDevice: 'Dieses Gerät',
+  diagStepWifi: 'WLAN-Signal',
+  diagStepRouter: 'Router',
+  diagStepDns: 'Namensauflösung (DNS)',
+  diagStepInternet: 'Anbieter & Internet',
+  diagSignalStrong: 'stark',
+  diagSignalFair: 'mittel',
+  diagSignalWeak: 'schwach',
+  diagNotWifi: 'Nicht im WLAN',
+  diagRouterHidden: 'Keine Antwort',
+  diagLost: '{0}% verloren',
+  diagMinor: 'Geringfügig',
+  diagCauseWifiTitle: 'Das schwache Glied ist dein WLAN-Signal',
+  diagCauseWifiBody: 'Zwischen diesem Gerät und dem Router ist das Signal schwach – und alles danach leidet. Geh näher an den Router, stell ihn nicht in einen Schrank oder hinter dicke Wände, oder nutze das 5-GHz-Netz, falls vorhanden.',
+  diagCauseRouterTitle: 'Dein Router kommt nicht hinterher',
+  diagCauseRouterBody: 'Selbst innerhalb deines Zuhauses antwortet er langsam oder verliert Antworten. Starte ihn neu, indem du ihn zehn Sekunden vom Strom nimmst. Passiert das öfter, ist er vielleicht mit zu vielen Geräten überlastet oder einfach alt.',
+  diagCauseDnsTitle: 'Die Namensauflösung ist langsam',
+  diagCauseDnsBody: 'Seiten brauchen lange zum Starten, weil ihre Adressen langsam gefunden werden. Meist hilft es, den DNS auf 1.1.1.1 oder 8.8.8.8 umzustellen – im Router oder in den Systemeinstellungen.',
+  diagCauseProviderTitle: 'Das Problem liegt außerhalb deines Zuhauses',
+  diagCauseProviderBody: 'WLAN und Router sind in Ordnung, aber die Verbindung dahinter ist langsam oder instabil – das ist die Seite deines Anbieters. Starte den Router einmal neu; bleibt es so, melde dich beim Anbieter. Dein Testverlauf in Nova ist ein guter Beleg.',
+  diagCauseOfflineTitle: 'Hinter deinem Router kommt nichts an',
+  diagCauseOfflineBody: 'Dein Heimnetz funktioniert, aber dahinter gibt es kein Internet. Prüfe die Internet-Leuchte am Router und die Kabel, oder frag deinen Anbieter, ob es eine Störung gibt.',
+  diagCauseNoneTitle: 'Alles sieht gesund aus',
+  diagCauseNoneBody: 'Jedes Glied von diesem Gerät bis ins Internet funktioniert gut. Wirkt etwas trotzdem langsam, liegt es vielleicht am Dienst selbst – vergleiche die Latenz zu Diensten auf dem Hauptbildschirm.',
+  appOnlyCauseText: 'Prüft jedes Glied – WLAN, Router, Namensauflösung, Anbieter – und sagt, welches dich ausbremst.',
 );
 
 const _hu = AppStrings(
@@ -1402,4 +1752,60 @@ const _hu = AppStrings(
   historyClearCloudBody: 'A fiókodból is törlődnek – minden eszközödön.',
   cancel: 'Mégse',
   signIn: 'Bejelentkezés',
+  updateAvailable: 'Elérhető a Nova {0}',
+  updateYouHave: 'Neked a {0} van. A frissítés után az előzmények és a beállítások megmaradnak.',
+  updateDownload: 'Letöltés',
+  updateWhatsNew: 'Újdonságok',
+  updateLater: 'Később',
+  updateNotifyBody: 'Elkészült egy új verzió – nyisd meg a Novát a letöltéshez.',
+  callCheckTitle: 'Hívásteszt',
+  callCheckHint: 'Húsz másodpercnyi egyenletes adatcsere, mint egy videóhívásban. Készen áll a kapcsolatod a Zoomra, a Meetre, a Teamsre vagy a Discordra?',
+  callCheckStart: 'Teszt indítása',
+  callCheckAgain: 'Újra',
+  callCheckLeft: 'Még {0} mp',
+  callVoice: 'Hanghívás',
+  callVideo: 'HD videóhívás',
+  callGroup: 'Csoportos videó és képernyőmegosztás',
+  callReady: 'Rendben',
+  callShaky: 'Akadozhat',
+  callNotReady: 'Nem megfelelő',
+  callLoss: 'Csomagvesztés',
+  callSpeedFrom: 'Sebesség a legutóbbi tesztből: {0}',
+  callNoSpeed: 'Futtass sebességtesztet is, hogy a híváshoz szükséges sávszélességet is ellenőrizzük.',
+  callAllGood: 'A kapcsolatod mindenféle hívásra készen áll.',
+  callTipLatency: 'Lassan jönnek a válaszok – egymás szavába fogtok vágni. Szüneteltesd a letöltéseket és a streameket; a kábel segít.',
+  callTipJitter: 'A késleltetés folyton változik – a hangok szaggatni fognak. Valami más is használja a kapcsolatot, vagy a Wi-Fi küszködik.',
+  callTipLoss: 'Néhány válasz meg sem érkezik – a kép megakad. Általában Wi-Fi-zavar: menj közelebb a routerhez, vagy használj kábelt.',
+  callTipUpload: 'A feltöltés túl lassú a videódhoz – a többiek elmosódva vagy kimerevedve látnak. Kapcsold ki a kamerát, vagy szüneteltesd a felhős mentést.',
+  callTipDownload: 'A letöltés túl lassú ehhez a hívásfajtához – a többiek videója elmosódott lesz. Zárd be a többi streamet és letöltést.',
+  callTipUnreachable: 'Semmi nem jött vissza – most nincs kapcsolat.',
+  diagTitle: 'Mi a gond?',
+  diagHint: 'A Nova végignézi a láncszemeket közted és az internet között – Wi-Fi, router, névfeloldás, szolgáltató –, és megmondja, melyik lassít.',
+  diagStart: 'Kapcsolat ellenőrzése',
+  diagChecking: 'Ellenőrzés…',
+  diagThisDevice: 'Ez az eszköz',
+  diagStepWifi: 'Wi-Fi-jel',
+  diagStepRouter: 'Router',
+  diagStepDns: 'Névfeloldás (DNS)',
+  diagStepInternet: 'Szolgáltató és internet',
+  diagSignalStrong: 'erős',
+  diagSignalFair: 'közepes',
+  diagSignalWeak: 'gyenge',
+  diagNotWifi: 'Nem Wi-Fin keresztül',
+  diagRouterHidden: 'Nem válaszolt',
+  diagLost: '{0}% elveszett',
+  diagMinor: 'Kisebb gond',
+  diagCauseWifiTitle: 'A gyenge láncszem a Wi-Fi-jel',
+  diagCauseWifiBody: 'Az eszköz és a router között gyenge a jel, és minden, ami utána jön, ezt sínyli meg. Menj közelebb a routerhez, ne tartsd szekrényben vagy vastag fal mögött, vagy használd az 5 GHz-es hálózatot, ha van.',
+  diagCauseRouterTitle: 'A router nem bírja',
+  diagCauseRouterBody: 'Még az otthonodon belül is lassan válaszol, vagy elhagy válaszokat. Indítsd újra: húzd ki tíz másodpercre. Ha ez ismétlődik, lehet, hogy túl sok eszköz terheli, vagy egyszerűen elavult.',
+  diagCauseDnsTitle: 'Lassú a névfeloldás',
+  diagCauseDnsBody: 'Az oldalak lassan kezdenek betöltődni, mert lassú a címük megkeresése. Általában segít, ha a DNS-t 1.1.1.1-re vagy 8.8.8.8-ra állítod – a routerben vagy a rendszerbeállításokban.',
+  diagCauseProviderTitle: 'A gond az otthonodon kívül van',
+  diagCauseProviderBody: 'A Wi-Fi és a router rendben van, de a mögöttük lévő kapcsolat lassú vagy instabil – ez a szolgáltató oldala. Indítsd újra egyszer a routert; ha így marad, keresd a szolgáltatót. A Novában lévő teszteredményeid jó bizonyítékok.',
+  diagCauseOfflineTitle: 'A routeren túl semmi sem jut el',
+  diagCauseOfflineBody: 'Az otthoni hálózat működik, de azon túl nincs internet. Nézd meg a router internetjelzőjét és a kábeleket, vagy kérdezd meg a szolgáltatót, nincs-e üzemzavar.',
+  diagCauseNoneTitle: 'Minden rendben van',
+  diagCauseNoneBody: 'Minden láncszem jól működik az eszköztől az internetig. Ha valami mégis lassúnak tűnik, maga a szolgáltatás lehet a gond – nézd meg a főképernyőn a szolgáltatások késleltetését.',
+  appOnlyCauseText: 'Végignézi a láncszemeket – Wi-Fi, router, névfeloldás, szolgáltató –, és megmondja, melyik lassít.',
 );

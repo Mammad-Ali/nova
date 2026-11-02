@@ -88,6 +88,7 @@ class _AppOnly extends ConsumerWidget {
       (Icons.devices_rounded, t.lanTitle, t.appOnlyLanText),
       (Icons.wifi_rounded, t.appOnlyWifiTitle, t.appOnlyWifiText),
       (Icons.ondemand_video_rounded, t.throttleTitle, t.appOnlyThrottleText),
+      (Icons.troubleshoot_rounded, t.diagTitle, t.appOnlyCauseText),
     ];
 
     return Column(
@@ -109,13 +110,15 @@ class _AppOnly extends ConsumerWidget {
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, box) {
-            // All four in a row on a desktop screen, two on a tablet, one on
-            // a phone.
-            final columns = box.maxWidth >= 960
-                ? 4
-                : box.maxWidth >= 520
-                    ? 2
-                    : 1;
+            // All five in a row on a large screen, three on a laptop, two on
+            // a tablet, one on a phone.
+            final columns = box.maxWidth >= 1180
+                ? 5
+                : box.maxWidth >= 760
+                    ? 3
+                    : box.maxWidth >= 520
+                        ? 2
+                        : 1;
             const gap = 12.0;
             final width = (box.maxWidth - gap * (columns - 1)) / columns;
             return Wrap(

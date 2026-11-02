@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/locale_provider.dart';
+import '../../call_check/presentation/call_check_sheet.dart';
+import '../../diagnose/presentation/diagnosis_sheet.dart';
 import '../../leaderboard/domain/leaderboard_models.dart';
 import '../../leaderboard/presentation/leaderboard_sheet.dart';
 import '../../leaderboard/presentation/provider_ranking_sheet.dart';
@@ -23,6 +26,8 @@ enum MoreEntry {
   leaderboard,
   ranking,
   services,
+  callCheck,
+  diagnose,
   about,
   privacy,
   source,
@@ -45,10 +50,13 @@ List<MoreSection> moreSections(AppStrings t) => [
         MoreEntry.guides,
         MoreEntry.faq,
       ]),
-      MoreSection(t.secTools, const [
+      MoreSection(t.secTools, [
         MoreEntry.leaderboard,
         MoreEntry.ranking,
         MoreEntry.services,
+        MoreEntry.callCheck,
+        // Needs the router and the system's name lookups: app only.
+        if (!kIsWeb) MoreEntry.diagnose,
       ]),
       MoreSection(t.secAbout, const [
         MoreEntry.about,
@@ -71,6 +79,8 @@ String moreEntryLabel(MoreEntry entry, AppStrings t, NovaAccount? account) =>
       MoreEntry.leaderboard => t.lbTitle,
       MoreEntry.ranking => t.toolsRanking,
       MoreEntry.services => t.servicesTitle,
+      MoreEntry.callCheck => t.callCheckTitle,
+      MoreEntry.diagnose => t.diagTitle,
       MoreEntry.about => t.aboutNova,
       MoreEntry.privacy => t.aboutPrivacy,
       MoreEntry.source => t.aboutSource,
@@ -89,6 +99,8 @@ IconData moreEntryIcon(MoreEntry entry) => switch (entry) {
       MoreEntry.leaderboard => Icons.emoji_events_rounded,
       MoreEntry.ranking => Icons.leaderboard_rounded,
       MoreEntry.services => Icons.travel_explore_rounded,
+      MoreEntry.callCheck => Icons.video_call_rounded,
+      MoreEntry.diagnose => Icons.troubleshoot_rounded,
       MoreEntry.about => Icons.info_outline_rounded,
       MoreEntry.privacy => Icons.shield_outlined,
       MoreEntry.source => Icons.code_rounded,
@@ -118,6 +130,10 @@ void openMoreEntry(BuildContext context, WidgetRef ref, MoreEntry entry) {
       showProviderRankingSheet(context);
     case MoreEntry.services:
       showServicePingSheet(context);
+    case MoreEntry.callCheck:
+      showCallCheckSheet(context);
+    case MoreEntry.diagnose:
+      showDiagnosisSheet(context);
     case MoreEntry.about:
       showAboutSheet(context);
     case MoreEntry.privacy:

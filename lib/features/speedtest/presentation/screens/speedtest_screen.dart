@@ -7,12 +7,16 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/l10n/language_button.dart';
 import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../call_check/presentation/call_check_sheet.dart';
+import '../../../diagnose/presentation/diagnosis_sheet.dart';
 import '../../../leaderboard/presentation/account_button.dart';
 import '../../../leaderboard/presentation/leaderboard_sheet.dart';
 import '../../../more/presentation/web_extras.dart';
-import '../../../services_ping/presentation/service_ping_sheet.dart';
+import '../../../services_ping/presentation/service_ping_provider.dart';
+import '../../../services_ping/presentation/services_card.dart';
 import '../../../settings/settings_sheet.dart';
 import '../../../throttling/presentation/throttle_card.dart';
+import '../../../updates/update_banner.dart';
 import '../../../wifi/wifi_chip.dart';
 import '../../data/datasources/ip_info.dart';
 import '../../domain/entities/speedtest_models.dart';
@@ -53,6 +57,8 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
     ref.listen(speedTestControllerProvider, (prev, next) {
       final justFinished = next.phase == TestPhase.done &&
           (prev == null || prev.phase != TestPhase.done);
+      // Fresh latencies to go with the fresh result.
+      if (justFinished) ref.read(servicePingProvider.notifier).run();
       if (justFinished && next.downloadMbps != null) {
         final hist = ref.read(speedTestHistoryProvider);
         if (hist.length >= 2) {
@@ -234,6 +240,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _Title(strings: t),
+                      const UpdateBanner(),
                       if (wide) ...[
                         const SizedBox(height: 28),
                         Row(
@@ -248,6 +255,8 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                                   const SizedBox(height: 12),
                                   phaseBar,
                                   ...underGauge,
+                                  const SizedBox(height: 16),
+                                  const ServicesCard(),
                                 ],
                               ),
                             ),
@@ -262,6 +271,8 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                                   ...origin,
                                   const SizedBox(height: 22),
                                   action,
+                                  const SizedBox(height: 12),
+                                  _ToolsRow(strings: t),
                                   ...besideGauge,
                                 ],
                               ),
@@ -281,6 +292,10 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                         ...besideGauge,
                         const SizedBox(height: 28),
                         action,
+                        const SizedBox(height: 12),
+                        _ToolsRow(strings: t),
+                        const SizedBox(height: 16),
+                        const ServicesCard(),
                       ],
                       // The browser has no tab bar: what the app keeps under
                       // Monitor and More appears here instead, below the test.
@@ -346,11 +361,6 @@ class _Title extends StatelessWidget {
         );
         final actions = [
           const LanguageButton(),
-          IconButton(
-            onPressed: () => showServicePingSheet(context),
-            icon: Icon(Icons.travel_explore_rounded, color: AppColors.textMid),
-            tooltip: strings.servicesTitle,
-          ),
           IconButton(
             onPressed: () => showLeaderboardSheet(context),
             icon: Icon(Icons.emoji_events_rounded, color: AppColors.textMid),
@@ -640,6 +650,65 @@ class _ProviderRow extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ───────────────────────────── tools ─────────────────────────────
+
+/// Call check and "Find the cause", right under the start button. "Find the
+/// cause" needs the router and the system's name lookups, so the website
+/// shows only the call check.
+class _ToolsRow extends StatelessWidget {
+  const _ToolsRow({required this.strings});
+  final AppStrings strings;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _ToolButton(
+            icon: Icons.video_call_rounded,
+            label: strings.callCheckTitle,
+            onTap: () => showCallCheckSheet(context),
+          ),
+        ),
+        if (!kIsWeb) ...[
+          const SizedBox(width: 12),
+          Expanded(
+            child: _ToolButton(
+              icon: Icons.troubleshoot_rounded,
+              label: strings.diagTitle,
+              onTap: () => showDiagnosisSheet(context),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ToolButton extends StatelessWidget {
+  const _ToolButton({required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 19, color: AppColors.accentAlt),
+      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.onGlass,
+        backgroundColor: AppColors.onGlass.withValues(alpha: 0.04),
+        side: BorderSide(color: AppColors.onGlass.withValues(alpha: 0.14)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     );
   }
