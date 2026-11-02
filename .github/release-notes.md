@@ -1,8 +1,8 @@
 ## Use it in the browser — nothing to install
 
-**[Open Nova](https://mammad-ali.github.io/nova/)** — the speed test runs right in the page.
-The browser version measures speed only; the traffic monitor, the network
-scan and Wi-Fi details need the app.
+**[Open Nova](https://mammad-ali.github.io/nova/)** — the speed test, latency to
+services and the call check run right in the page. The traffic monitor, the
+network scan, Wi-Fi details, "Find the cause" and the Mac widgets need the app.
 
 ## Install the app
 

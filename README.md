@@ -17,6 +17,10 @@ system-wide traffic monitor, in one app.
 **[Open in the browser](https://mammad-ali.github.io/nova/)** ·
 **[Download for Windows, macOS or Android](#install)**
 
+<br>
+
+<img src="docs/screenshots/website.png" alt="Nova in a desktop browser: the speed gauge and latency to services on the left, the readings, the start button and the call check on the right" width="100%">
+
 </div>
 
 ---
@@ -34,6 +38,24 @@ things that actually decide how the connection **feels**:
   enough for 4K, for gaming, for streaming?
 - **What happens between tests.** A passive monitor keeps watching the link, so
   brief outages and slow hours don't go unnoticed.
+
+## Screenshots
+
+| The app on a Mac | After a test |
+|:---:|:---:|
+| <img src="docs/screenshots/app-speed-test.png" alt="Nova on macOS: the speed gauge showing 86.5 Mbps" width="100%"> | <img src="docs/screenshots/app-results.png" alt="Download and upload, latency under load and the connection grade" width="100%"> |
+| **Find the cause** | **Call check** |
+| <img src="docs/screenshots/app-find-the-cause.png" alt="Find the cause: Wi-Fi, router, name lookups and provider checked one by one, with the Wi-Fi signal named as the weak link" width="100%"> | <img src="docs/screenshots/app-call-check.png" alt="Call check: twenty seconds of round trips, ready for voice, HD video and group calls" width="100%"> |
+
+<p align="center">
+  <img src="docs/screenshots/mac-widgets.jpg" alt="The Mac widgets: Speed, Traffic, Speed &amp; tools and Dashboard" width="100%">
+  <br><sub>Mac widgets — <i>Speed</i>, <i>Traffic</i>, <i>Speed &amp; tools</i> and <i>Dashboard</i></sub>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/website-phone.png" alt="The website on a phone" width="300">
+  <br><sub>The website on a phone</sub>
+</p>
 
 ## Features
 
@@ -70,8 +92,7 @@ things that actually decide how the connection **feels**:
 - Live speed in the **menu bar** (macOS) or **tray** (Windows), at a steady width
 - **Widgets** on the Mac desktop and in Notification Centre: *Speed*, *Speed & tools*,
   *Dashboard* and *Traffic*. One click starts a test, a call check or "Find the cause"
-- **Update notice**: the apps check for a new release and offer the download;
-  signed-in people can also ask for an email when a new version is out
+- **Update notice**: the apps check for a new release and offer the download
 - Click the icon for a **compact panel** — full readings without opening the app
 - Closing the window keeps monitoring in the background
 - Notifications when speed drops below a threshold or a daily limit is reached
@@ -92,11 +113,12 @@ things that actually decide how the connection **feels**:
 
 **[mammad-ali.github.io/nova](https://mammad-ali.github.io/nova/)** runs the
 speed test right in the page, together with everything a browser can do: the
-history with CSV and image export, latency to services, the leaderboard and
-provider ranking, and the Learn, About and Help pages. A browser cannot read
-system traffic counters, scan the local network, see Wi-Fi details or run the
-throttling check, so those live in the app — the site lists them and offers
-the download for the visitor's own system.
+history with CSV and image export, latency to services, the call check, the
+leaderboard and provider ranking, and the Learn, About and Help pages. A
+browser cannot read system traffic counters, scan the local network, see
+Wi-Fi details, run the throttling check or "Find the cause", so those live in
+the app — the site lists them and offers the download for the visitor's own
+system. On a laptop or desktop screen the page spreads into two columns.
 
 ### The app
 
@@ -262,8 +284,8 @@ Run the workflow by hand with a test address to send yourself a sample.
 Bump `version:` in `pubspec.yaml`, then push a matching tag:
 
 ```bash
-git tag v1.3.0
-git push origin v1.3.0
+git tag v1.4.0
+git push origin v1.4.0
 ```
 
 CI builds every platform and publishes a GitHub Release with the installers
