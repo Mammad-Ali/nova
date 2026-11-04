@@ -211,22 +211,27 @@ jobs:
           fi
       - run: flutter build macos --release $DEFINES
 
-      # Ad-hoc signature with the release entitlements, then a check that
-      # they are really there. Signing without --entitlements silently strips
-      # the sandbox and the network permissions — that once shipped a build
-      # whose network scan could not name a single device.
+      # Ad-hoc signature with the release entitlements, then a check of the
+      # two signatures that matter: the app runs outside the App Sandbox,
+      # where it can see per-app traffic and the ARP table, and the widget
+      # extension inside it, or macOS won't load the widgets.
       - name: Sign and check entitlements
         run: |
           APP=build/macos/Build/Products/Release/Nova.app
           codesign --force --sign - --entitlements macos/Runner/Release.entitlements "$APP"
-          ENT=$(codesign -d --entitlements - "$APP" 2>/dev/null)
-          for key in app-sandbox network.client network.server; do
-            if ! echo "$ENT" | grep -q "$key"; then
-              echo "::error::$key is missing from the signed app"
-              exit 1
-            fi
-          done
-          echo "Entitlements present: sandbox, network client and server."
+          sandboxed() {
+            codesign -d --entitlements - --xml "$1" 2>/dev/null \
+              | grep -Eq 'app-sandbox</key>[[:space:]]*<true/>'
+          }
+          if sandboxed "$APP"; then
+            echo "::error::the app is signed into the sandbox"
+            exit 1
+          fi
+          if ! sandboxed "$APP/Contents/PlugIns/NovaWidgets.appex"; then
+            echo "::error::the widget extension is not sandboxed: macOS would not load it"
+            exit 1
+          fi
+          echo "App outside the sandbox, widget extension inside it."
 
       # A disk image with the app next to a link to Applications: open it,
       # drag one icon onto the other — the way Mac apps are installed.

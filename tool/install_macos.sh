@@ -34,16 +34,17 @@ rm -rf "$DEST"
 cp -R "$SRC" "$DEST"
 
 # Clear quarantine and ad-hoc sign, otherwise Gatekeeper complains on every
-# launch. The entitlements must be passed again: re-signing without them
-# strips the sandbox and the network permissions, and the app then runs with
-# none of the restrictions it was developed and tested under.
+# launch. The widget extension inside keeps its own signature: macOS loads
+# widgets only from a sandboxed extension, while the app itself runs outside
+# the sandbox (macos/Runner/Release.entitlements says why).
 echo "==> Clearing quarantine and signing…"
 xattr -dr com.apple.quarantine "$DEST" 2>/dev/null || true
 codesign --force --sign - --entitlements macos/Runner/Release.entitlements "$DEST"
 
-# Fail loudly if the sandbox did not survive, rather than ship without it.
-if ! codesign -d --entitlements - "$DEST" 2>/dev/null | grep -q app-sandbox; then
-  echo "Signing lost the entitlements — not installing a broken build." >&2
+# Fail loudly if the widgets would no longer load, rather than install that.
+if ! codesign -d --entitlements - --xml "$DEST/Contents/PlugIns/NovaWidgets.appex" 2>/dev/null \
+    | grep -Eq 'app-sandbox</key>[[:space:]]*<true/>'; then
+  echo "The widget extension lost its sandbox — not installing a broken build." >&2
   exit 1
 fi
 

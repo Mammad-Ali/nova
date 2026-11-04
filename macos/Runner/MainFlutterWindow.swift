@@ -7,6 +7,9 @@ import WidgetKit
 
 class MainFlutterWindow: NSWindow {
   override func awakeFromNib() {
+    // Before the engine starts: Dart reads its settings right away.
+    SandboxMigration.run()
+
     let flutterViewController = FlutterViewController()
     let windowFrame = self.frame
     self.contentViewController = flutterViewController
@@ -149,10 +152,9 @@ class MainFlutterWindow: NSWindow {
 
     // --- In-app updates (Sparkle) ---
     // The update banner's "Update now" opens Sparkle's window: the release
-    // notes, then download, signature check, install and restart. A
-    // sandboxed app may not replace itself; Sparkle's installer, launched
-    // outside the sandbox, does that part. Nova checks for new versions on
-    // its own (update_provider.dart), so Sparkle never checks unasked.
+    // notes, then download, signature check, install and restart. Nova
+    // checks for new versions on its own (update_provider.dart), so Sparkle
+    // never checks unasked.
     FlutterMethodChannel(
         name: "net_pulse/updater",
         binaryMessenger: flutterViewController.engine.binaryMessenger
@@ -199,10 +201,40 @@ class MainFlutterWindow: NSWindow {
       startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
 }
 
+/// Nova ran in the App Sandbox up to 1.4, which kept its settings, test
+/// history and sign-in in a container of its own. Outside the sandbox they
+/// are read from the usual place, so the first launch copies them over,
+/// once. The container is left as it was, so an older Nova still finds its
+/// data there.
+enum SandboxMigration {
+  private static let doneKey = "nova_left_sandbox"
+
+  static func run() {
+    let defaults = UserDefaults.standard
+    guard ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] == nil,
+          !defaults.bool(forKey: doneKey),
+          let id = Bundle.main.bundleIdentifier else { return }
+    defer { defaults.set(true, forKey: doneKey) }
+
+    let saved = URL(fileURLWithPath: NSHomeDirectory())
+      .appendingPathComponent("Library/Containers/\(id)/Data/Library/Preferences/\(id).plist")
+    guard let old = NSDictionary(contentsOf: saved) as? [String: Any],
+          old.keys.contains(where: { $0.hasPrefix("flutter.") }) else { return }
+    // Whatever is here already came from development builds that ran
+    // unsandboxed: the container holds the real data.
+    for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("flutter.") {
+      defaults.removeObject(forKey: key)
+    }
+    for (key, value) in old where key.hasPrefix("flutter.") {
+      defaults.set(value, forKey: key)
+    }
+  }
+}
+
 /// Where the app leaves what the widgets show. The widget extension runs in a
-/// sandbox of its own, so the file can't live in either container: it goes
-/// under the real home folder, which both sides' entitlements open for this
-/// one folder.
+/// sandbox, so the file can't live in its container: it goes under the real
+/// home folder, which the extension's entitlements open, read-only, for
+/// this one folder.
 enum WidgetStore {
   private static let home: String = {
     if let entry = getpwuid(getuid()), let dir = entry.pointee.pw_dir {

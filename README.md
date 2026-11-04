@@ -224,8 +224,9 @@ flutter build web --release        # browser
 ```
 
 On a Mac, `./tool/install_macos.sh` builds the app, installs it into
-`/Applications` with its sandbox entitlements intact, and clears the
-quarantine flag so it opens with a double click.
+`/Applications`, checks that the widget extension kept its sandbox (macOS
+loads no other kind), and clears the quarantine flag so it opens with a
+double click.
 
 Android release signing expects `android/key.properties` and a keystore in
 `android/keys/`; neither is committed. Without them the build falls back to the
@@ -256,18 +257,18 @@ are in `firestore.rules`.
 
 The widgets are a WidgetKit extension in `macos/NovaWidgets`, built and
 embedded by the normal `flutter build macos`. The app writes what they show
-to `~/Library/Application Support/Nova/widgets.json`; both sides hold a
-sandbox exception for that folder, because app groups — the usual way to
-share data — need a paid Apple developer team. A click opens a `nova://`
+to `~/Library/Application Support/Nova/widgets.json`, and the extension,
+which must be sandboxed, holds a read-only exception for that folder,
+because app groups — the usual way to share data — need a paid Apple
+developer team. A click opens a `nova://`
 link (`test`, `call`, `cause`, `open`) that the app turns into the action.
 *Start test* is an App Intent instead: it opens `nova://test?quiet=1` without
 activating Nova, so the test runs in the background.
 
 ### In-app updates on the Mac
 
-The Mac app updates itself with [Sparkle](https://sparkle-project.org). A
-sandboxed app may not replace itself, so Sparkle's installer, which runs
-outside the sandbox, does that part. Every update is signed with an EdDSA
+The Mac app updates itself with [Sparkle](https://sparkle-project.org).
+Every update is signed with an EdDSA
 key: the public half is `SUPublicEDKey` in `macos/Runner/Info.plist`, the
 private half is the `SPARKLE_PRIVATE_KEY` secret. For each release, CI zips
 the app, signs the zip with Sparkle's `sign_update`, and publishes it with an

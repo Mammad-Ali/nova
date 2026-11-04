@@ -99,7 +99,7 @@ class CloudSessionNotifier extends Notifier<FirebaseSession?> {
     }
   }
 
-  /// Kept in the app's private preferences: the macOS sandbox container,
+  /// Kept in the app's private preferences: the Mac app's preferences file,
   /// Android's app storage, the browser's storage for this site. The
   /// system keychain would need entitlements an ad-hoc signed Mac app
   /// cannot carry.

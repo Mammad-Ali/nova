@@ -63,8 +63,6 @@ Future<String> _desktop(String doneText) async {
   if (CloudConfig.desktopClientId.isEmpty) {
     throw const GoogleSignInFailed('desktop sign-in is not configured');
   }
-  // Binding counts as a "server" in the macOS sandbox, which is one more
-  // reason the release entitlements carry network.server.
   final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
   try {
     final redirectUri = 'http://127.0.0.1:${server.port}';

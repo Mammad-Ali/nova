@@ -2,34 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Nova runs outside the App Sandbox (since 1.5). Inside it, the
+	     system hides what Nova is for: which apps use the network (nettop
+	     sees only Nova itself) and the ARP table that lists every device on
+	     the network (arp prints nothing). Nova isn't sold through the App
+	     Store, the one place the sandbox is required. The widget extension
+	     stays sandboxed: macOS loads no widget that isn't.
+	     Settings and history kept in the old container are carried over on
+	     the first launch (SandboxMigration in MainFlutterWindow.swift). -->
 	<key>com.apple.security.app-sandbox</key>
-	<true/>
-	<key>com.apple.security.network.client</key>
-	<true/>
-	<!-- The network scan asks each device its name over UDP (unicast mDNS
-	     and NetBIOS). Binding the reply socket counts as "server" in the
-	     sandbox: with the client entitlement alone bind() fails with
-	     EPERM, and every device came out nameless in release builds while
-	     debug builds, which carry this entitlement, worked. -->
-	<key>com.apple.security.network.server</key>
-	<true/>
-	<!-- Saving the result image and CSV to a user-chosen location -->
-	<key>com.apple.security.files.user-selected.read-write</key>
-	<true/>
-	<!-- What the widgets show is written to this folder (WidgetStore in
-	     MainFlutterWindow.swift). App groups would be the usual way, but
-	     they need a paid Apple developer team; this exception works with
-	     Nova's own signature. The widget extension may only read it. -->
-	<key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
-	<array>
-		<string>/Library/Application Support/Nova/</string>
-	</array>
-	<!-- Sparkle's installer and its status reporter, which run outside the
-	     sandbox and are reached over these two Mach services. -->
-	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
-	<array>
-		<string>com.example.netPulse-spks</string>
-		<string>com.example.netPulse-spki</string>
-	</array>
+	<false/>
 </dict>
 </plist>

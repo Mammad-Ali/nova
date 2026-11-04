@@ -2,31 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Outside the sandbox, as in Release.entitlements, which says why. -->
 	<key>com.apple.security.app-sandbox</key>
-	<true/>
+	<false/>
 	<key>com.apple.security.cs.allow-jit</key>
 	<true/>
-	<key>com.apple.security.network.server</key>
-	<true/>
-    <key>com.apple.security.network.client</key>
-	<true/>
-	<!-- Saving the result image and CSV to a user-chosen location -->
-	<key>com.apple.security.files.user-selected.read-write</key>
-	<true/>
-	<!-- What the widgets show is written to this folder (WidgetStore in
-	     MainFlutterWindow.swift). App groups would be the usual way, but
-	     they need a paid Apple developer team; this exception works with
-	     Nova's own signature. The widget extension may only read it. -->
-	<key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
-	<array>
-		<string>/Library/Application Support/Nova/</string>
-	</array>
-	<!-- Sparkle's installer and its status reporter, which run outside the
-	     sandbox and are reached over these two Mach services. -->
-	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
-	<array>
-		<string>com.example.netPulse-spks</string>
-		<string>com.example.netPulse-spki</string>
-	</array>
 </dict>
 </plist>

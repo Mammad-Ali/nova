@@ -8,8 +8,7 @@ import 'history_csv.dart';
 
 /// Saves results to disk as an image or CSV.
 ///
-/// The user picks the path through the system dialog, which also satisfies
-/// the macOS sandbox: access is granted for exactly the chosen file.
+/// The user picks the path through the system dialog.
 class ExportService {
   const ExportService();
 

@@ -44,8 +44,6 @@
 	<string>https://github.com/Mammad-Ali/nova/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>olBbHw8x+CJCQz6Y2jY2tdiR9b69XObp+5/pIVAkk6U=</string>
-	<key>SUEnableInstallerLauncherService</key>
-	<true/>
 	<key>SUEnableAutomaticChecks</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
