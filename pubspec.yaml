@@ -110,6 +110,7 @@ flutter:
   assets:
     - assets/icon/
     - assets/tray/
+    - assets/oui/ # MAC prefixes → makers, for the network scan
 
   # To add assets to your application, add an assets section, like this:
   # assets:

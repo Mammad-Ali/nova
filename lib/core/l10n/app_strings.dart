@@ -311,6 +311,9 @@ class AppStrings {
     required this.autoTestHint,
     required this.autoTestEvery,
     required this.autoTestHours,
+    required this.lanKindSmartHome,
+    required this.lanKindConsole,
+    required this.lanPrivateAddress,
   });
 
   // Navigation and shared
@@ -644,6 +647,12 @@ class AppStrings {
 
   /// {0} is a number of hours.
   final String autoTestHours;
+  final String lanKindSmartHome;
+  final String lanKindConsole;
+
+  /// Follows a device's address when its hardware address is a random one,
+  /// as phones use to stay anonymous; lower case, it continues a line.
+  final String lanPrivateAddress;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -943,6 +952,9 @@ const _en = AppStrings(
   autoTestHint: 'While Nova is running. Each test uses about 100–200 MB, so it never runs on mobile data or a hotspot. A result under 50 Mbps is tested once more.',
   autoTestEvery: 'Every',
   autoTestHours: '{0} h',
+  lanKindSmartHome: 'Smart home device',
+  lanKindConsole: 'Game console',
+  lanPrivateAddress: 'private address',
 );
 
 const _az = AppStrings(
@@ -1225,6 +1237,9 @@ const _az = AppStrings(
   autoTestHint: 'Nova işlədiyi müddətdə. Hər test təxminən 100–200 MB işlədir, buna görə mobil internetdə və hotspotda işləmir. 50 Mbps-dən aşağı nəticə bir dəfə də yoxlanılır.',
   autoTestEvery: 'Hər',
   autoTestHours: '{0} saat',
+  lanKindSmartHome: 'Ağıllı ev cihazı',
+  lanKindConsole: 'Oyun konsolu',
+  lanPrivateAddress: 'məxfi ünvan',
 );
 
 const _ru = AppStrings(
@@ -1507,6 +1522,9 @@ const _ru = AppStrings(
   autoTestHint: 'Пока Nova запущена. Каждый тест расходует около 100–200 МБ, поэтому на мобильном интернете и через точку доступа он не запускается. Результат ниже 50 Мбит/с проверяется ещё раз.',
   autoTestEvery: 'Каждые',
   autoTestHours: '{0} ч',
+  lanKindSmartHome: 'Умный дом',
+  lanKindConsole: 'Игровая приставка',
+  lanPrivateAddress: 'частный адрес',
 );
 
 const _de = AppStrings(
@@ -1783,6 +1801,9 @@ const _de = AppStrings(
   autoTestHint: 'Solange Nova läuft. Jeder Test verbraucht etwa 100–200 MB, deshalb läuft er nie über mobile Daten oder einen Hotspot. Ein Ergebnis unter 50 Mbit/s wird einmal wiederholt.',
   autoTestEvery: 'Alle',
   autoTestHours: '{0} Std.',
+  lanKindSmartHome: 'Smart-Home-Gerät',
+  lanKindConsole: 'Spielkonsole',
+  lanPrivateAddress: 'private Adresse',
 );
 
 const _hu = AppStrings(
@@ -2059,4 +2080,7 @@ const _hu = AppStrings(
   autoTestHint: 'Amíg a Nova fut. Egy teszt kb. 100–200 MB adatot használ, ezért mobilneten és hotspoton sosem fut. Az 50 Mbps alatti eredményt egyszer újramérjük.',
   autoTestEvery: 'Gyakoriság',
   autoTestHours: '{0} óra',
+  lanKindSmartHome: 'Okosotthon-eszköz',
+  lanKindConsole: 'Játékkonzol',
+  lanPrivateAddress: 'privát cím',
 );

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/lan_scan_engine.dart';
@@ -31,7 +33,7 @@ final lanScanProvider =
 
 class LanScanNotifier extends Notifier<LanScanState> {
   LanScanEngine? _engine;
-  StreamSubscription<LanScanUpdate>? _subscription;
+  StreamSubscription<void>? _subscription;
 
   @override
   LanScanState build() {
@@ -46,9 +48,17 @@ class LanScanNotifier extends Notifier<LanScanState> {
     state = const LanScanState(running: true);
 
     final engine = _engine = LanScanEngine();
-    _subscription = engine.run().listen((update) {
+    final vendors = _vendors ??= loadVendors();
+    _subscription = engine
+        .run()
+        .asyncMap((update) async => (update, await vendors))
+        .listen((pair) {
+      final (update, vendors) = pair;
       state = LanScanState(
-        devices: update.devices,
+        devices: [
+          for (final device in update.devices)
+            device.copyWith(vendor: vendors[device.macPrefix]),
+        ],
         running: !update.done,
         scanned: update.scanned,
         total: update.total,
@@ -66,3 +76,23 @@ class LanScanNotifier extends Notifier<LanScanState> {
     _engine = null;
   }
 }
+
+/// Makers by MAC prefix, read once per app run.
+Future<Map<String, String>>? _vendors;
+
+/// assets/oui/vendors.txt ("B4B024 TP-Link" per line, made by
+/// tool/make_vendor_list.py) as prefix → maker. Empty if it can't be read:
+/// the list then just shows no makers.
+Future<Map<String, String>> loadVendors() async {
+  try {
+    return parseVendors(await rootBundle.loadString('assets/oui/vendors.txt'));
+  } catch (_) {
+    return const {};
+  }
+}
+
+Map<String, String> parseVendors(String text) => {
+      for (final line in const LineSplitter().convert(text))
+        if (line.length > 7 && !line.startsWith('#'))
+          line.substring(0, 6): line.substring(7),
+    };

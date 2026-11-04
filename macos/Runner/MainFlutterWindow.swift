@@ -10,6 +10,16 @@ class MainFlutterWindow: NSWindow {
     // Before the engine starts: Dart reads its settings right away.
     SandboxMigration.run()
 
+    // Apps opened from the Finder or the Dock may hold 256 open files. The
+    // network scan (lan_scan_engine.dart) keeps a few hundred sockets and
+    // pings going at once, and past the limit every new one fails — the
+    // scan then quietly finds nothing. Raise it as far as the system allows.
+    var files = rlimit()
+    if getrlimit(RLIMIT_NOFILE, &files) == 0, files.rlim_cur < 4096 {
+      files.rlim_cur = min(files.rlim_max, 4096)
+      setrlimit(RLIMIT_NOFILE, &files)
+    }
+
     let flutterViewController = FlutterViewController()
     let windowFrame = self.frame
     self.contentViewController = flutterViewController

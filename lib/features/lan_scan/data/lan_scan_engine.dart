@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import '../domain/lan_device.dart';
+import 'discovery.dart';
 import 'name_lookup.dart';
 
 /// Finds the devices sharing this network.
@@ -15,8 +16,8 @@ class LanScanEngine {
   StreamController<LanScanUpdate>? _updates;
   var _cancelled = false;
 
-  /// Emits progressively: devices appear as they answer, then fill in with
-  /// names and open ports.
+  /// Emits progressively: devices appear as they answer, then the ones the
+  /// sweep missed (see [Discovery]), then all fill in with names and ports.
   Stream<LanScanUpdate> run() {
     final updates = _updates = StreamController<LanScanUpdate>();
     final port = _port = ReceivePort();
@@ -71,6 +72,11 @@ const _connectTimeout = Duration(milliseconds: 500);
 /// really 256 in flight — comfortably under every platform's descriptor limit.
 const _concurrency = 32;
 
+/// Pings in flight at once. Each is a short-lived process, not a socket
+/// held open, so more of them fit than probes: 254 addresses at up to a
+/// second each take about as long as the port sweep.
+const _pingConcurrency = 64;
+
 /// "Connection refused" means something is there and actively said no, which
 /// is just as good a sign of life as an open port.
 /// 61 = macOS/BSD, 111 = Linux/Android, 10061 = Windows.
@@ -94,48 +100,108 @@ Future<void> _entry(SendPort toMain) async {
   final prefix = self.substring(0, self.lastIndexOf('.') + 1);
   final targets = [for (var i = 1; i <= 254; i++) '$prefix$i'];
   final found = <LanDevice>[];
-  var scanned = 0;
-  var next = 0;
+  final known = <String>{};
+  // Each address gets a port probe and, where it helps, a ping; it counts
+  // as scanned once both are done.
+  final pinging = Discovery.canPing;
+  var probed = 0;
+  var pinged = 0;
+  int scanned() => pinging ? (probed + pinged) ~/ 2 : probed;
 
   void emit({bool done = false}) {
     final devices = [...found]..sort(_order);
     toMain.send(LanScanUpdate(
       devices: devices,
-      scanned: scanned,
+      scanned: scanned(),
       total: targets.length,
       subnet: '${prefix}x',
       done: done,
     ));
   }
 
+  LanDevice device(String ip) => LanDevice(
+        ip: ip,
+        isSelf: ip == self,
+        isGateway: ip != self && _looksLikeGateway(ip),
+      );
+
+  void add(String ip) {
+    if (!known.add(ip)) return;
+    found.add(device(ip));
+    emit();
+  }
+
+  var nextProbe = 0;
   Future<void> sweep() async {
     while (true) {
-      final index = next++;
+      final index = nextProbe++;
       if (index >= targets.length) return;
       final ip = targets[index];
       final alive = ip == self || await _isAlive(ip);
-      scanned++;
+      probed++;
       if (alive) {
-        found.add(LanDevice(
-          ip: ip,
-          isSelf: ip == self,
-          isGateway: ip != self && _looksLikeGateway(ip),
-        ));
-        emit();
-      } else if (scanned % 16 == 0) {
+        add(ip);
+      } else if (probed % 16 == 0) {
         emit(); // keep the progress bar moving through empty stretches
       }
     }
   }
 
-  await Future.wait([for (var i = 0; i < _concurrency; i++) sweep()]);
+  var nextPing = 0;
+  Future<void> pingSweep() async {
+    while (true) {
+      final index = nextPing++;
+      if (index >= targets.length) return;
+      final ip = targets[index];
+      final alive = !known.contains(ip) && ip != self && await Discovery.ping(ip);
+      pinged++;
+      if (alive) {
+        add(ip);
+      } else if (pinged % 16 == 0) {
+        emit();
+      }
+    }
+  }
+
+  // The multicast questions take a couple of seconds of listening, so they
+  // run alongside the sweep.
+  final ssdp = Discovery.ssdp(self);
+  final mdns = Discovery.mdns(self);
+  await Future.wait([
+    for (var i = 0; i < _concurrency; i++) sweep(),
+    if (pinging)
+      for (var i = 0; i < _pingConcurrency; i++) pingSweep(),
+  ]);
+
+  // The sweep has made the system look up every address, so its ARP table
+  // now lists whoever is switched on — including devices that ignored
+  // every port.
+  final macs = await Discovery.arpTable(prefix);
+  final answers = <String, Set<String>>{};
+  for (final heard in [await ssdp, await mdns]) {
+    heard.forEach((ip, hints) => answers.putIfAbsent(ip, () => {}).addAll(hints));
+  }
+  final inRange = targets.toSet();
+  for (final ip in {...macs.keys, ...answers.keys}) {
+    if (inRange.contains(ip) && known.add(ip)) found.add(device(ip));
+  }
+
+  final locations = <String, String>{};
+  for (var i = 0; i < found.length; i++) {
+    final ip = found[i].ip;
+    final hints = {...?answers[ip]};
+    final location = hints.where((h) => h.startsWith(Discovery.locationHint)).firstOrNull;
+    if (location != null) locations[ip] = location.substring(Discovery.locationHint.length);
+    hints.removeWhere((h) => h.startsWith(Discovery.locationHint));
+    found[i] = found[i].copyWith(mac: macs[ip], hints: hints);
+  }
   emit();
 
   // Second pass: ask the live hosts who they are. Runs in parallel — there
   // are only a handful of them, and each query waits on a timeout.
   await Future.wait([
     for (var i = 0; i < found.length; i++)
-      _describe(found[i]).then((device) {
+      _describe(found[i], locations[found[i].ip]).then((device) {
         found[i] = device;
         emit();
       }),
@@ -144,13 +210,17 @@ Future<void> _entry(SendPort toMain) async {
   emit(done: true);
 }
 
-Future<LanDevice> _describe(LanDevice device) async {
+Future<LanDevice> _describe(LanDevice device, String? location) async {
   final results = await Future.wait([
     lookupDeviceName(device.ip),
     _openPorts(device.ip),
+    if (location != null) Discovery.upnpName(device.ip, location),
   ]);
+  // Bonjour and NetBIOS names are the ones people chose; a UPnP name is
+  // the next best thing — TVs and speakers put their model or room there.
+  final name = results[0] as String? ?? (location != null ? results[2] as String? : null);
   return device.copyWith(
-    name: results[0] as String?,
+    name: name,
     openPorts: results[1] as List<int>,
   );
 }

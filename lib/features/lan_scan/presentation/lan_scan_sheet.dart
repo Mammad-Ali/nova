@@ -211,7 +211,13 @@ class _DeviceRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  device.ip,
+                  [
+                    device.ip,
+                    if (device.vendor != null) device.vendor!,
+                    if (device.privateMac && !device.isSelf) strings.lanPrivateAddress,
+                  ].join('  ·  '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.textLo,
                     fontSize: 12,
@@ -262,6 +268,8 @@ IconData _kindIcon(DeviceKind kind) => switch (kind) {
       DeviceKind.tv => Icons.tv_rounded,
       DeviceKind.printer => Icons.print_rounded,
       DeviceKind.nas => Icons.storage_rounded,
+      DeviceKind.smartHome => Icons.lightbulb_outline_rounded,
+      DeviceKind.console => Icons.sports_esports_rounded,
       DeviceKind.unknown => Icons.devices_other_rounded,
     };
 
@@ -272,5 +280,7 @@ String _kindLabel(DeviceKind kind, AppStrings s) => switch (kind) {
       DeviceKind.tv => s.lanKindTv,
       DeviceKind.printer => s.lanKindPrinter,
       DeviceKind.nas => s.lanKindNas,
+      DeviceKind.smartHome => s.lanKindSmartHome,
+      DeviceKind.console => s.lanKindConsole,
       DeviceKind.unknown => s.lanDeviceGeneric,
     };
