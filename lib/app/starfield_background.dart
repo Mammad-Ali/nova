@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/app_activity.dart';
 import '../core/theme/app_theme.dart';
 import '../features/speedtest/presentation/providers/speedtest_provider.dart';
+import '../features/speedtest/presentation/widgets/speed_gauge.dart' show warpMbps;
 import '../features/traffic_monitor/presentation/providers/traffic_provider.dart';
 
 /// Nova's living backdrop: a black sky, three parallax layers of white stars
@@ -15,7 +16,8 @@ import '../features/traffic_monitor/presentation/providers/traffic_provider.dart
 /// Physics: every particle is pulled toward the centre by `a = GM/r²`,
 /// integrated with semi-implicit Euler. The cursor acts as a repulsor, so a
 /// bubble of empty space follows it. Connection speed only brightens the
-/// particles — the backdrop itself stays colourless.
+/// particles — the backdrop itself stays colourless — until a test passes
+/// 500 Mbps: then the stars go to warp speed, streaking out from the centre.
 class StarfieldBackground extends ConsumerStatefulWidget {
   const StarfieldBackground({super.key});
 
@@ -64,12 +66,12 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
 
     // Energy level: the gauge value during a test, live traffic otherwise.
     final st = ref.watch(speedTestControllerProvider);
-    final speedFrac =
-        st.gaugeMax > 0 ? (st.displayMbps / st.gaugeMax).clamp(0.0, 1.0) : 0.0;
+    final speedFrac = st.scale.fractionOf(st.displayMbps);
     final hist = ref.watch(trafficHistoryProvider);
     final rate = (hist.currentRxPerSec + hist.currentTxPerSec).toDouble();
     final trafficFrac = (rate / (12.5 * 1024 * 1024)).clamp(0.0, 1.0);
     _sim.level = math.max(speedFrac, trafficFrac).toDouble();
+    _sim.warpTarget = st.isRunning && st.displayMbps >= warpMbps ? 1 : 0;
 
     return Positioned.fill(
       child: MouseRegion(
@@ -143,6 +145,13 @@ class _SpaceSim extends ChangeNotifier {
   double level = 0;
   Offset? cursor;
 
+  /// Warp speed: eased towards [warpTarget] so the jump in and out is smooth.
+  double warp = 0;
+  double warpTarget = 0;
+
+  /// Advances only while in warp, so each jump picks up where the last left.
+  double warpClock = 0;
+
   /// Accumulated layer drift. Integrated over dt rather than computed as
   /// time × speed — otherwise stars jump whenever the speed changes.
   double drift = 0;
@@ -173,6 +182,8 @@ class _SpaceSim extends ChangeNotifier {
   void step(double dt) {
     time += dt;
     drift += dt * (0.006 + level * 0.02);
+    warp += (warpTarget - warp) * (1 - math.exp(-dt * 2.5));
+    if (warp > 0.001) warpClock += dt * (0.3 + 0.9 * warp);
 
     if (_size != Size.zero) {
       final center = Offset(_size.width / 2, _size.height * 0.42);
@@ -266,22 +277,42 @@ class _SpacePainter extends CustomPainter {
   }
 
   /// Three star layers: far ones nearly still, near ones visibly drifting.
+  /// In warp every star flies out from the centre along its own ray, nearer
+  /// layers faster, trailing a streak that grows as it comes closer.
   void _drawStars(Canvas canvas, Size size) {
     final paint = Paint();
+    final streak = Paint()..strokeCap = StrokeCap.round;
+    final warp = sim.warp;
+    final center = Offset(size.width / 2, size.height * 0.42);
     for (final s in sim.stars) {
       final speed = _SpaceSim.layerSpeed(s.layer);
       final y = ((s.y - sim.drift * speed) % 1.0 + 1.0) % 1.0;
+      final base = Offset(s.x * size.width, y * size.height);
 
       final tw = 0.55 + 0.45 * math.sin(sim.time * s.twinkleRate + s.phase);
       // Far layers are dimmer — that is what sells the depth.
       final depth = 0.45 + 0.275 * s.layer;
-      paint.color =
-          AppColors.starColor.withValues(alpha: (0.30 + 0.55 * tw) * depth);
-      canvas.drawCircle(
-        Offset(s.x * size.width, y * size.height),
-        s.size * (0.9 + 0.2 * tw),
-        paint,
-      );
+
+      if (warp < 0.01) {
+        paint.color =
+            AppColors.starColor.withValues(alpha: (0.30 + 0.55 * tw) * depth);
+        canvas.drawCircle(base, s.size * (0.9 + 0.2 * tw), paint);
+        continue;
+      }
+
+      final rel = base - center;
+      final t = (sim.warpClock * (0.35 + 0.5 * speed) + s.phase / (2 * math.pi)) % 1.0;
+      final out = 0.08 + t * t * 1.9; // accelerating outwards
+      final trail = math.max(0.0, out - (0.05 + 0.3 * t) * (0.6 + speed));
+      final head = Offset.lerp(base, center + rel * out, warp)!;
+      final tail = Offset.lerp(base, center + rel * trail, warp)!;
+      // Each streak fades in as it leaves the centre, so they don't knot
+      // into a burst behind the number.
+      final emerge = ((out - 0.08) / 0.45).clamp(0.0, 1.0);
+      streak
+        ..color = AppColors.starColor.withValues(alpha: ((0.35 + 0.6 * t) * depth * emerge).clamp(0.0, 1.0))
+        ..strokeWidth = s.size * (0.6 + 1.3 * t);
+      canvas.drawLine(tail, head, streak);
     }
   }
 
@@ -290,7 +321,8 @@ class _SpacePainter extends CustomPainter {
     final paint = Paint();
     for (final o in sim.orbiters) {
       // Particles are white like the stars: no colour on the backdrop at all.
-      final alpha = (0.35 + 0.35 * sim.level) * o.mass;
+      // They make way for the streaks in warp.
+      final alpha = (0.35 + 0.35 * sim.level) * o.mass * (1 - 0.7 * sim.warp);
       paint.color = AppColors.starColor.withValues(alpha: alpha.clamp(0.0, 0.95));
       canvas.drawCircle(o.pos, 1.1 + 1.5 * o.mass, paint);
     }

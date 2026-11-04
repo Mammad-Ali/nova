@@ -17,7 +17,7 @@ class FakeCtrl extends SpeedTestController {
 
   @override
   void start() =>
-      state = const SpeedTestState(phase: TestPhase.ping, gaugeMax: 100);
+      state = const SpeedTestState(phase: TestPhase.ping);
 
   @override
   void stop() => state = state.copyWith(phase: TestPhase.idle);
@@ -25,7 +25,6 @@ class FakeCtrl extends SpeedTestController {
   void finish(double d) {
     state = SpeedTestState(
       phase: TestPhase.done,
-      gaugeMax: 100,
       downloadMbps: d,
       uploadMbps: d * 0.4,
       pingMs: 18,

@@ -92,7 +92,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
             constraints: BoxConstraints(maxWidth: wide ? 400 : 340),
             child: SpeedGauge(
               value: gaugeValue,
-              max: s.gaugeMax,
+              scale: s.scale,
               color: gaugeColor,
               active: s.isRunning,
               paused: !ref.watch(uiActiveProvider),

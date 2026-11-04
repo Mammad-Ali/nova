@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/datasources/speedtest_engine.dart';
 import '../../domain/entities/speedtest_models.dart';
 import '../../domain/entities/speedtest_record.dart';
+import '../../domain/gauge_scale.dart';
 import 'speedtest_history_provider.dart';
 
 /// Immutable state of the Speedtest tab.
@@ -13,7 +14,7 @@ class SpeedTestState {
     this.phase = TestPhase.idle,
     this.displayMbps = 0,
     this.phaseProgress = 0,
-    this.gaugeMax = 100,
+    this.scale = GaugeScale.standard,
     this.pingMs,
     this.jitterMs,
     this.downloadMbps,
@@ -28,7 +29,8 @@ class SpeedTestState {
   final double phaseProgress;
 
   /// Top of the gauge scale. Grows in steps and never jumps back down.
-  final double gaugeMax;
+  /// The speedometer's scale for this test.
+  final GaugeScale scale;
 
   final double? pingMs;
   final double? jitterMs;
@@ -50,7 +52,7 @@ class SpeedTestState {
     TestPhase? phase,
     double? displayMbps,
     double? phaseProgress,
-    double? gaugeMax,
+    GaugeScale? scale,
     double? pingMs,
     double? jitterMs,
     double? downloadMbps,
@@ -63,7 +65,7 @@ class SpeedTestState {
       phase: phase ?? this.phase,
       displayMbps: displayMbps ?? this.displayMbps,
       phaseProgress: phaseProgress ?? this.phaseProgress,
-      gaugeMax: gaugeMax ?? this.gaugeMax,
+      scale: scale ?? this.scale,
       pingMs: pingMs ?? this.pingMs,
       jitterMs: jitterMs ?? this.jitterMs,
       downloadMbps: downloadMbps ?? this.downloadMbps,
@@ -75,12 +77,12 @@ class SpeedTestState {
   }
 
   /// Applies an engine event while keeping metrics gathered so far.
-  SpeedTestState applyProgress(SpeedTestProgress p, double gaugeMax) {
+  SpeedTestState applyProgress(SpeedTestProgress p, GaugeScale scale) {
     return SpeedTestState(
       phase: p.phase,
       displayMbps: p.displayMbps,
       phaseProgress: p.phaseProgress,
-      gaugeMax: gaugeMax,
+      scale: scale,
       pingMs: p.pingMs ?? pingMs,
       jitterMs: p.jitterMs ?? jitterMs,
       downloadMbps: p.downloadMbps ?? downloadMbps,
@@ -100,9 +102,6 @@ class SpeedTestController extends Notifier<SpeedTestState> {
   SpeedTestEngine? _engine;
   StreamSubscription<SpeedTestProgress>? _sub;
 
-  // Gauge scale steps (Mbps).
-  static const _steps = [50.0, 100.0, 250.0, 500.0, 1000.0, 2000.0, 5000.0];
-
   @override
   SpeedTestState build() {
     ref.onDispose(_teardown);
@@ -113,7 +112,11 @@ class SpeedTestController extends Notifier<SpeedTestState> {
   void start() {
     if (state.isRunning) return;
     _teardown();
-    state = const SpeedTestState(phase: TestPhase.ping, gaugeMax: 100);
+    // A multi-gigabit line gets the big dial from the start, so the scale
+    // doesn't switch under the needle mid-test.
+    final history = ref.read(speedTestHistoryProvider);
+    final lastBest = history.isEmpty ? 0.0 : history.last.downloadMbps;
+    state = SpeedTestState(phase: TestPhase.ping, scale: GaugeScale.fitting(lastBest));
 
     final engine = _engine = SpeedTestEngine();
     _sub = engine.run().listen(
@@ -123,7 +126,7 @@ class SpeedTestController extends Notifier<SpeedTestState> {
           p.downloadMbps ?? 0,
           p.uploadMbps ?? 0,
         ].reduce((a, b) => a > b ? a : b);
-        state = state.applyProgress(p, _fitMax(observed, state.gaugeMax));
+        state = state.applyProgress(p, _fitScale(observed, state.scale));
 
         if (p.phase == TestPhase.done) _saveToHistory();
       },
@@ -179,15 +182,10 @@ class SpeedTestController extends Notifier<SpeedTestState> {
   }
 
   /// Picks the next scale step above the value, never below the current one.
-  double _fitMax(double v, double current) {
-    final needed = (v * 1.15).clamp(1.0, double.infinity);
-    var chosen = _steps.last;
-    for (final s in _steps) {
-      if (s >= needed) {
-        chosen = s;
-        break;
-      }
-    }
-    return chosen > current ? chosen : current;
+  /// The scale only ever grows during a test: a dial whose numbers change
+  /// under the needle is exactly what made results hard to read.
+  GaugeScale _fitScale(double observed, GaugeScale current) {
+    final needed = GaugeScale.fitting(observed);
+    return needed.max > current.max ? needed : current;
   }
 }

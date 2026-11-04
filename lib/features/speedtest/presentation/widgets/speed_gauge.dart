@@ -4,17 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../domain/gauge_scale.dart';
 
-/// A 270° radial gauge with a sun-yellow scale.
+/// A 270° radial gauge with a sun-yellow, numbered scale ([GaugeScale]).
 ///
 /// The current value is marked by a thin ray running from the centre to the
 /// scale. Yellow particles orbit the dial, and their rotation speed follows
 /// the measured connection speed: the faster the link, the faster the corona.
+///
+/// Fast lines get a show during the test: from [glowMbps] the arc glows and
+/// sparks fly off the needle; from [warpMbps] the sparks thicken, a shockwave
+/// rings out as the needle crosses, and the number shimmers gold (the stars
+/// behind go to warp speed — see starfield_background.dart).
 class SpeedGauge extends StatefulWidget {
   const SpeedGauge({
     super.key,
     required this.value,
-    required this.max,
+    required this.scale,
     required this.child,
     this.color,
     this.active = false,
@@ -22,7 +28,7 @@ class SpeedGauge extends StatefulWidget {
   });
 
   final double value;
-  final double max;
+  final GaugeScale scale;
   final Widget child;
 
   /// Scale colour. null means the app's sun-yellow accent.
@@ -38,6 +44,24 @@ class SpeedGauge extends StatefulWidget {
   State<SpeedGauge> createState() => _SpeedGaugeState();
 }
 
+/// Where the gauge starts to glow and spark.
+const glowMbps = 100.0;
+
+/// Where it goes to warp speed.
+const warpMbps = 500.0;
+
+/// A spark thrown off the needle tip. Position and velocity are in units of
+/// the dial's radius, so they scale with the gauge.
+class _Spark {
+  _Spark(this.pos, this.vel, this.life, this.size);
+
+  Offset pos;
+  Offset vel;
+  double age = 0;
+  final double life;
+  final double size;
+}
+
 class _SpeedGaugeState extends State<SpeedGauge>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
@@ -50,6 +74,15 @@ class _SpeedGaugeState extends State<SpeedGauge>
   double _revStart = -1; // when the sweep started
   bool _prevActive = false;
   late Color _color = widget.color ?? AppColors.sun;
+
+  // The fast-line show: both ease in and out rather than switch.
+  double _glow = 0;
+  double _warp = 0;
+  double _shockAt = -1;
+  bool _wasWarp = false;
+  double _sparkDebt = 0;
+  final List<_Spark> _sparks = [];
+  final math.Random _rnd = math.Random();
 
   @override
   void initState() {
@@ -72,9 +105,7 @@ class _SpeedGaugeState extends State<SpeedGauge>
     final dtc = dt.clamp(0.0, 0.05);
     _clock += dtc;
 
-    final target = widget.max <= 0
-        ? 0.0
-        : (widget.value / widget.max).clamp(0.0, 1.0).toDouble();
+    final target = widget.scale.fractionOf(widget.value);
     _display += (target - _display) * (1 - math.exp(-dtc * 6));
 
     // Sweep the ray when a test starts: a quick 0 → 1 → actual value.
@@ -91,13 +122,54 @@ class _SpeedGaugeState extends State<SpeedGauge>
     }
     final shown = math.max(_display, rev);
 
+    _animateShow(dtc, shown);
+
     // Corona rotation: barely creeping at rest, a vortex at full speed.
     _orbit += dtc * (0.05 + shown * 1.6);
     // Ease the colour across phase changes (download ↔ upload).
     _color = Color.lerp(
         _color, widget.color ?? AppColors.sun, 1 - math.exp(-dtc * 5))!;
 
-    _anim.update(shown, _orbit, shown, widget.active, _color);
+    _anim.update(shown, _orbit, shown, widget.active, _color, widget.scale);
+  }
+
+  /// Glow, sparks, shockwave and gold: only while a test runs and the needle
+  /// is past [glowMbps] / [warpMbps].
+  void _animateShow(double dt, double fraction) {
+    final mbps = widget.active ? widget.value : 0.0;
+    _glow += ((mbps >= glowMbps ? 1.0 : 0.0) - _glow) * (1 - math.exp(-dt * 4));
+    _warp += ((mbps >= warpMbps ? 1.0 : 0.0) - _warp) * (1 - math.exp(-dt * 3));
+
+    final inWarp = mbps >= warpMbps;
+    if (inWarp && !_wasWarp) _shockAt = _clock;
+    _wasWarp = inWarp;
+
+    // Sparks: a steady stream past 100 Mbps, a fountain past 500.
+    if (mbps >= glowMbps) _sparkDebt += dt * (16 + 70 * _warp);
+    final a = _GaugePainter.startAngle + _GaugePainter.sweepAngle * fraction;
+    final dir = Offset(math.cos(a), math.sin(a));
+    final tangent = Offset(-dir.dy, dir.dx);
+    while (_sparkDebt >= 1) {
+      _sparkDebt -= 1;
+      final out = 0.25 + _rnd.nextDouble() * (0.5 + 0.6 * _warp);
+      final side = (_rnd.nextDouble() - 0.5) * 0.7;
+      _sparks.add(_Spark(
+        dir * 0.95,
+        dir * out + tangent * side,
+        0.5 + _rnd.nextDouble() * 0.6,
+        1.0 + _rnd.nextDouble() * (1.4 + _warp),
+      ));
+    }
+    for (final s in _sparks) {
+      s.age += dt;
+      s.pos += s.vel * dt;
+      s.vel *= 1 - 1.4 * dt; // air drag: they slow as they fade
+    }
+    _sparks.removeWhere((s) => s.age >= s.life);
+
+    final shock = _shockAt < 0 ? -1.0 : (_clock - _shockAt) / 1.2;
+    if (shock > 1) _shockAt = -1;
+    _anim.show(_glow, _warp, _sparks, shock, _clock);
   }
 
   @override
@@ -117,7 +189,7 @@ class _SpeedGaugeState extends State<SpeedGauge>
       aspectRatio: 1,
       child: CustomPaint(
         painter: _GaugePainter(_anim),
-        child: Center(child: widget.child),
+        child: Center(child: _GoldOnWarp(anim: _anim, child: widget.child)),
       ),
     );
   }
@@ -129,13 +201,31 @@ class _GaugeAnim extends ChangeNotifier {
   double speed = 0;
   bool active = false;
   Color color = AppColors.sun;
+  GaugeScale scale = GaugeScale.standard;
+  double glow = 0;
+  double warp = 0;
+  List<_Spark> sparks = const [];
 
-  void update(double f, double o, double s, bool a, Color c) {
+  /// 0..1 through the shockwave, or below 0 when there is none.
+  double shock = -1;
+  double clock = 0;
+
+  /// Set before [update], which repaints.
+  void show(double g, double w, List<_Spark> s, double sh, double c) {
+    glow = g;
+    warp = w;
+    sparks = s;
+    shock = sh;
+    clock = c;
+  }
+
+  void update(double f, double o, double s, bool a, Color c, GaugeScale sc) {
     fraction = f;
     orbit = o;
     speed = s;
     active = a;
     color = c;
+    scale = sc;
     notifyListeners();
   }
 }
@@ -147,6 +237,8 @@ class _GaugePainter extends CustomPainter {
 
   static const _startDeg = 135.0;
   static const _sweepDeg = 270.0;
+  static const startAngle = _startDeg * math.pi / 180;
+  static const sweepAngle = _sweepDeg * math.pi / 180;
 
   /// Orbiting particle count: 12 at rest, 64 at full speed — during a test a
   /// dense corona spins up around the scale.
@@ -179,15 +271,24 @@ class _GaugePainter extends CustomPainter {
         ..color = AppColors.onGlass.withValues(alpha: 0.05),
     );
 
-    // Ticks.
-    final tick = Paint()
-      ..color = AppColors.onGlass.withValues(alpha: 0.13)
-      ..strokeWidth = 1.6;
-    for (var i = 0; i <= 9; i++) {
-      final a = start + sweep * (i / 9);
-      final d = Offset(math.cos(a), math.sin(a));
-      canvas.drawLine(
-          center + d * (radius - 9), center + d * (radius - 1), tick);
+    _drawScale(canvas, center, radius, start, sweep, f);
+    _drawShockwave(canvas, center, radius);
+
+    // Past 100 Mbps the filled part glows from beneath.
+    if (anim.glow > 0.01) {
+      canvas.drawArc(
+        rect,
+        start,
+        sweep * f,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 14 + 12 * anim.glow
+          ..strokeCap = StrokeCap.round
+          ..color = Color.lerp(baseColor, Colors.white, 0.25 * anim.warp)!
+              .withValues(alpha: (0.40 + 0.25 * anim.warp) * anim.glow)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, 8 + 10 * anim.glow),
+      );
     }
 
     // Filled part of the scale.
@@ -213,6 +314,87 @@ class _GaugePainter extends CustomPainter {
     );
 
     _drawRay(canvas, center, radius, start, sweep, f, baseColor, speed);
+    _drawSparks(canvas, center, radius, baseColor);
+  }
+
+  void _drawSparks(Canvas canvas, Offset center, double radius, Color color) {
+    if (anim.sparks.isEmpty) return;
+    final paint = Paint();
+    final hot = Color.lerp(color, Colors.white, 0.35 + 0.4 * anim.warp)!;
+    for (final s in anim.sparks) {
+      final left = 1 - s.age / s.life;
+      paint.color = Color.lerp(color, hot, left)!.withValues(alpha: left.clamp(0.0, 1.0));
+      canvas.drawCircle(center + s.pos * radius, s.size * (0.4 + 0.6 * left), paint);
+    }
+  }
+
+  /// One ring bursting outwards as the needle crosses 500 Mbps.
+  void _drawShockwave(Canvas canvas, Offset center, double radius) {
+    final t = anim.shock;
+    if (t < 0 || t > 1) return;
+    final ease = 1 - math.pow(1 - t, 3).toDouble();
+    canvas.drawCircle(
+      center,
+      radius * (1.0 + 1.4 * ease),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2 + 10 * (1 - t)
+        ..color = Color.lerp(AppColors.sun, Colors.white, 0.5)!.withValues(alpha: 0.7 * (1 - t))
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 2 + 6 * t),
+    );
+  }
+
+  /// The numbered marks, with a short tick halfway between each pair. Marks
+  /// the needle has passed light up; the rest stay dim.
+  void _drawScale(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double start,
+    double sweep,
+    double f,
+  ) {
+    final scale = anim.scale;
+    final marks = scale.marks;
+    final major = Paint()..strokeWidth = 1.8;
+    final minor = Paint()
+      ..strokeWidth = 1.2
+      ..color = AppColors.onGlass.withValues(alpha: 0.10);
+    final fontSize = (radius * 0.072).clamp(9.0, 13.0);
+
+    for (var i = 0; i < marks.length; i++) {
+      final at = scale.markFraction(i);
+      final passed = f >= at - 0.001;
+      final a = start + sweep * at;
+      final d = Offset(math.cos(a), math.sin(a));
+
+      major.color = passed
+          ? AppColors.onGlass.withValues(alpha: 0.55)
+          : AppColors.onGlass.withValues(alpha: 0.22);
+      canvas.drawLine(center + d * (radius - 12), center + d * (radius - 1), major);
+
+      if (i < marks.length - 1) {
+        final mid = start + sweep * (at + scale.markFraction(1) / 2);
+        final m = Offset(math.cos(mid), math.sin(mid));
+        canvas.drawLine(center + m * (radius - 6), center + m * (radius - 1), minor);
+      }
+
+      final text = TextPainter(
+        text: TextSpan(
+          text: GaugeScale.label(marks[i]),
+          style: TextStyle(
+            color: passed ? AppColors.textMid : AppColors.textLo,
+            fontSize: fontSize,
+            fontWeight: passed ? FontWeight.w700 : FontWeight.w500,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      // Just inside the ticks, centred on the mark's direction.
+      final at2 = center + d * (radius - 16 - fontSize * 1.1);
+      text.paint(canvas, at2 - Offset(text.width / 2, text.height / 2));
+    }
   }
 
   /// A thin pointer ray from the centre to the current scale position.
@@ -287,4 +469,40 @@ class _GaugePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _GaugePainter oldDelegate) => false;
+}
+
+/// Past 500 Mbps the number and its labels turn shimmering gold.
+class _GoldOnWarp extends StatelessWidget {
+  const _GoldOnWarp({required this.anim, required this.child});
+
+  final _GaugeAnim anim;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: anim,
+      builder: (context, _) {
+        if (anim.warp < 0.3) return child;
+        // A bright band sweeping across, once a second and a half.
+        final sweep = (anim.clock / 1.5) % 1.0;
+        return ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (bounds) => LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: const [Color(0xFFFFB300), Color(0xFFFFE082), Colors.white, Color(0xFFFFE082), Color(0xFFFFB300)],
+            stops: [
+              0,
+              (sweep - 0.15).clamp(0.0, 1.0),
+              sweep,
+              (sweep + 0.15).clamp(0.0, 1.0),
+              1,
+            ],
+          ).createShader(bounds),
+          child: child,
+        );
+      },
+    );
+  }
 }
