@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- The speed test makes HTTP requests; without this permission a release
          build cannot reach the network (Flutter adds it to the debug manifest
          automatically). -->
@@ -7,6 +8,12 @@
     <!-- Wi-Fi signal strength and link rate. The SSID would require location
          access, which we don't request — the SSID is simply not shown. -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!-- Traffic per app (Monitor tab). Not granted by installing: the user
+         switches Nova on under Settings → Usage access, which the app
+         offers to open. -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
 
     <application
         android:label="Nova"

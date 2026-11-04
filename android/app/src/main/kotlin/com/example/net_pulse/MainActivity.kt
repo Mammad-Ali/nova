@@ -44,6 +44,9 @@ class MainActivity : FlutterActivity() {
                 }
             }
 
+        // Which apps used the network today (Monitor tab).
+        AppTraffic(applicationContext).register(flutterEngine.dartExecutor.binaryMessenger)
+
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, wifiChannelName)
             .setMethodCallHandler { call, result ->
                 if (call.method == "getInfo") {

@@ -9,6 +9,7 @@ import '../../../../core/utils/byte_format.dart';
 import '../../../lan_scan/presentation/lan_scan_sheet.dart';
 import '../providers/traffic_provider.dart';
 import '../providers/usage_stats_provider.dart';
+import '../widgets/app_traffic_card.dart';
 import '../widgets/live_traffic_chart.dart';
 import '../widgets/monthly_usage_card.dart';
 import '../widgets/stability_card.dart';
@@ -78,6 +79,7 @@ class TrafficMonitorScreen extends ConsumerWidget {
             error: feed.hasError ? feed.error : null,
           ),
           const SizedBox(height: 16),
+          AppTrafficCard(strings: t), // brings its own gap, or nothing
           MonthlyUsageCard(strings: t, stats: usage),
           const SizedBox(height: 16),
           StabilityCard(strings: t),

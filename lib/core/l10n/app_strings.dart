@@ -314,6 +314,18 @@ class AppStrings {
     required this.lanKindSmartHome,
     required this.lanKindConsole,
     required this.lanPrivateAddress,
+    required this.appsTitle,
+    required this.appsHintLive,
+    required this.appsHintToday,
+    required this.appsSystemMac,
+    required this.appsSystemAndroid,
+    required this.appsRemoved,
+    required this.appsHotspot,
+    required this.appsAccess,
+    required this.appsAllow,
+    required this.appsShowAll,
+    required this.appsShowLess,
+    required this.appsNone,
   });
 
   // Navigation and shared
@@ -653,6 +665,20 @@ class AppStrings {
   /// Follows a device's address when its hardware address is a random one,
   /// as phones use to stay anonymous; lower case, it continues a line.
   final String lanPrivateAddress;
+  final String appsTitle;
+  final String appsHintLive;
+  final String appsHintToday;
+  final String appsSystemMac;
+  final String appsSystemAndroid;
+  final String appsRemoved;
+  final String appsHotspot;
+  final String appsAccess;
+  final String appsAllow;
+
+  /// {0} is how many apps there are.
+  final String appsShowAll;
+  final String appsShowLess;
+  final String appsNone;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -955,6 +981,18 @@ const _en = AppStrings(
   lanKindSmartHome: 'Smart home device',
   lanKindConsole: 'Game console',
   lanPrivateAddress: 'private address',
+  appsTitle: 'Apps using the network',
+  appsHintLive: 'Speed right now, and how much each app has used since it started',
+  appsHintToday: 'Today, over Wi-Fi and mobile data',
+  appsSystemMac: 'macOS services',
+  appsSystemAndroid: 'Android system',
+  appsRemoved: 'Removed apps',
+  appsHotspot: 'Hotspot',
+  appsAccess: "Android shows each app's traffic only to apps you allow under Usage access.",
+  appsAllow: 'Allow access',
+  appsShowAll: 'Show all {0}',
+  appsShowLess: 'Show fewer',
+  appsNone: 'No app has used the network yet.',
 );
 
 const _az = AppStrings(
@@ -1240,6 +1278,18 @@ const _az = AppStrings(
   lanKindSmartHome: 'Ağıllı ev cihazı',
   lanKindConsole: 'Oyun konsolu',
   lanPrivateAddress: 'məxfi ünvan',
+  appsTitle: 'Şəbəkədən istifadə edən tətbiqlər',
+  appsHintLive: 'Hazırkı sürət və hər tətbiqin açıldığı andan bəri işlətdiyi trafik',
+  appsHintToday: 'Bu gün, Wi-Fi və mobil internet üzrə',
+  appsSystemMac: 'macOS xidmətləri',
+  appsSystemAndroid: 'Android sistemi',
+  appsRemoved: 'Silinmiş tətbiqlər',
+  appsHotspot: 'Hotspot',
+  appsAccess: 'Android hər tətbiqin trafikini yalnız «İstifadəyə giriş» bölməsində icazə verdiyiniz tətbiqlərə göstərir.',
+  appsAllow: 'İcazə ver',
+  appsShowAll: 'Hamısını göstər ({0})',
+  appsShowLess: 'Daha az göstər',
+  appsNone: 'Hələ heç bir tətbiq şəbəkədən istifadə etməyib.',
 );
 
 const _ru = AppStrings(
@@ -1525,6 +1575,18 @@ const _ru = AppStrings(
   lanKindSmartHome: 'Умный дом',
   lanKindConsole: 'Игровая приставка',
   lanPrivateAddress: 'частный адрес',
+  appsTitle: 'Приложения в сети',
+  appsHintLive: 'Скорость сейчас и сколько каждое приложение израсходовало с момента запуска',
+  appsHintToday: 'Сегодня, по Wi-Fi и мобильному интернету',
+  appsSystemMac: 'Службы macOS',
+  appsSystemAndroid: 'Система Android',
+  appsRemoved: 'Удалённые приложения',
+  appsHotspot: 'Точка доступа',
+  appsAccess: 'Android показывает трафик каждого приложения только тем приложениям, которым вы разрешили «Доступ к истории использования».',
+  appsAllow: 'Разрешить доступ',
+  appsShowAll: 'Показать все ({0})',
+  appsShowLess: 'Свернуть',
+  appsNone: 'Пока ни одно приложение не пользовалось сетью.',
 );
 
 const _de = AppStrings(
@@ -1804,6 +1866,18 @@ const _de = AppStrings(
   lanKindSmartHome: 'Smart-Home-Gerät',
   lanKindConsole: 'Spielkonsole',
   lanPrivateAddress: 'private Adresse',
+  appsTitle: 'Apps im Netzwerk',
+  appsHintLive: 'Tempo gerade jetzt und wie viel jede App seit ihrem Start verbraucht hat',
+  appsHintToday: 'Heute, über WLAN und mobile Daten',
+  appsSystemMac: 'macOS-Dienste',
+  appsSystemAndroid: 'Android-System',
+  appsRemoved: 'Entfernte Apps',
+  appsHotspot: 'Hotspot',
+  appsAccess: 'Android zeigt den Verbrauch jeder App nur Apps, die du unter „Nutzungsdatenzugriff“ erlaubst.',
+  appsAllow: 'Zugriff erlauben',
+  appsShowAll: 'Alle {0} zeigen',
+  appsShowLess: 'Weniger zeigen',
+  appsNone: 'Noch hat keine App das Netzwerk genutzt.',
 );
 
 const _hu = AppStrings(
@@ -2083,4 +2157,16 @@ const _hu = AppStrings(
   lanKindSmartHome: 'Okosotthon-eszköz',
   lanKindConsole: 'Játékkonzol',
   lanPrivateAddress: 'privát cím',
+  appsTitle: 'Hálózatot használó appok',
+  appsHintLive: 'A mostani sebesség, és hogy indulása óta mennyit forgalmazott az egyes appok',
+  appsHintToday: 'Ma, Wi-Fi-n és mobilneten',
+  appsSystemMac: 'macOS-szolgáltatások',
+  appsSystemAndroid: 'Android-rendszer',
+  appsRemoved: 'Eltávolított appok',
+  appsHotspot: 'Hotspot',
+  appsAccess: 'Az Android csak azoknak az appoknak mutatja meg az egyes appok forgalmát, amelyeket engedélyezel a „Használati hozzáférés” alatt.',
+  appsAllow: 'Hozzáférés engedélyezése',
+  appsShowAll: 'Mind a(z) {0} mutatása',
+  appsShowLess: 'Kevesebb mutatása',
+  appsNone: 'Még egyetlen app sem használta a hálózatot.',
 );
