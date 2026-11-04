@@ -76,6 +76,8 @@ things that actually decide how the connection **feels**:
 | **Sharing** | Copy results as text, save them as an image, export the history to CSV |
 | **Google account** | Optional sign-in on every platform, the website included; the test history follows you to every device |
 | **Leaderboard** | Best results ranked worldwide, by country or by ISP; only a nickname is shown |
+| **Speedometer** | A fixed, numbered scale (0–1 Gbps, 10 Gbps for multi-gig lines); past 100 Mbps the needle glows, past 500 Mbps the backdrop goes to warp speed |
+| **Automatic tests** | Optional: a test every 1, 3 or 6 hours, never on mobile data or a hotspot, with a second try when a result comes in under 50 Mbps |
 
 ### Traffic monitor
 
@@ -85,11 +87,14 @@ things that actually decide how the connection **feels**:
 | **Usage totals** | Hour, day and month, with a projection for the end of the month |
 | **Connection stability** | A rolling latency chart with packet loss and outage detection |
 | **Wi-Fi context** | Signal strength and link rate, so "slow" can be traced to the router |
-| **Who's on my network** | Sweeps the local subnet and lists every device that answers, with the name it announces and a guess at what it is |
+| **Apps using the network** | Which apps took how much — on the Mac live, with each app's speed right now; on Android for today (needs Usage access) |
+| **Who's on my network** | Port sweep, ping sweep, ARP table, SSDP and Bonjour together, so even phones that ignore every port show up — with their name, maker and a guess at what they are |
 
 ### Desktop integration
 
-- Live speed in the **menu bar** (macOS) or **tray** (Windows), at a steady width
+- Live speed in the **menu bar** (macOS) or **tray** (Windows), at a steady width.
+  Settings turn it off or choose what it shows: speed and the past hour, speed,
+  download and upload, today's traffic or just the icon — in bytes or bits
 - **Widgets** on the Mac desktop and in Notification Centre: *Speed*, *Speed & tools*,
   *Dashboard* and *Traffic*. One click runs a test in the background — the widget
   shows "Testing…" and then the result — or opens a call check or "Find the cause"
