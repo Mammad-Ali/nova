@@ -294,6 +294,23 @@ class AppStrings {
     required this.updateEmailFailed,
     required this.widgetTesting,
     required this.updateInstall,
+    required this.settingsMenuBar,
+    required this.settingsTray,
+    required this.menuBarShow,
+    required this.trayShow,
+    required this.menuBarOffHint,
+    required this.menuBarShows,
+    required this.menuBarSpeedHour,
+    required this.menuBarSpeed,
+    required this.menuBarDownUp,
+    required this.menuBarToday,
+    required this.menuBarIcon,
+    required this.menuBarBits,
+    required this.autoTestTitle,
+    required this.autoTestEnable,
+    required this.autoTestHint,
+    required this.autoTestEvery,
+    required this.autoTestHours,
   });
 
   // Navigation and shared
@@ -605,6 +622,29 @@ class AppStrings {
   /// The update banner's button on the Mac, where Nova updates itself in place.
   final String updateInstall;
 
+  /// Settings → Menu bar (macOS) / Tray (Windows).
+  final String settingsMenuBar;
+  final String settingsTray;
+  final String menuBarShow;
+  final String trayShow;
+  final String menuBarOffHint;
+  final String menuBarShows;
+  final String menuBarSpeedHour;
+  final String menuBarSpeed;
+  final String menuBarDownUp;
+  final String menuBarToday;
+  final String menuBarIcon;
+  final String menuBarBits;
+
+  /// Settings → Automatic tests.
+  final String autoTestTitle;
+  final String autoTestEnable;
+  final String autoTestHint;
+  final String autoTestEvery;
+
+  /// {0} is a number of hours.
+  final String autoTestHours;
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -886,6 +926,23 @@ const _en = AppStrings(
   updateEmailFailed: "Couldn't save that — check the connection and try again.",
   widgetTesting: 'Testing…',
   updateInstall: 'Update now',
+  settingsMenuBar: 'Menu bar',
+  settingsTray: 'Tray',
+  menuBarShow: 'Show Nova in the menu bar',
+  trayShow: 'Show Nova in the tray',
+  menuBarOffHint: 'Without it, closing the window quits Nova and monitoring stops.',
+  menuBarShows: 'Shows',
+  menuBarSpeedHour: 'Speed and past hour',
+  menuBarSpeed: 'Speed',
+  menuBarDownUp: 'Download and upload',
+  menuBarToday: 'Traffic today',
+  menuBarIcon: 'Icon only',
+  menuBarBits: 'Speed in megabits (Mbps)',
+  autoTestTitle: 'Automatic tests',
+  autoTestEnable: 'Test the speed on its own',
+  autoTestHint: 'While Nova is running. Each test uses about 100–200 MB, so it never runs on mobile data or a hotspot. A result under 50 Mbps is tested once more.',
+  autoTestEvery: 'Every',
+  autoTestHours: '{0} h',
 );
 
 const _az = AppStrings(
@@ -1151,6 +1208,23 @@ const _az = AppStrings(
   updateEmailFailed: 'Yadda saxlamaq alınmadı — bağlantını yoxlayıb yenidən cəhd edin.',
   widgetTesting: 'Test gedir…',
   updateInstall: 'İndi yenilə',
+  settingsMenuBar: 'Menyu sətri',
+  settingsTray: 'Bildiriş sahəsi',
+  menuBarShow: 'Nova-nı menyu sətrində göstər',
+  trayShow: 'Nova-nı bildiriş sahəsində göstər',
+  menuBarOffHint: 'Onsuz pəncərəni bağlamaq Nova-nı söndürür və izləmə dayanır.',
+  menuBarShows: 'Göstərir',
+  menuBarSpeedHour: 'Sürət və son saat',
+  menuBarSpeed: 'Sürət',
+  menuBarDownUp: 'Yükləmə və göndərmə',
+  menuBarToday: 'Bu günkü trafik',
+  menuBarIcon: 'Yalnız ikon',
+  menuBarBits: 'Sürət megabitlə (Mbps)',
+  autoTestTitle: 'Avtomatik testlər',
+  autoTestEnable: 'Sürəti avtomatik yoxla',
+  autoTestHint: 'Nova işlədiyi müddətdə. Hər test təxminən 100–200 MB işlədir, buna görə mobil internetdə və hotspotda işləmir. 50 Mbps-dən aşağı nəticə bir dəfə də yoxlanılır.',
+  autoTestEvery: 'Hər',
+  autoTestHours: '{0} saat',
 );
 
 const _ru = AppStrings(
@@ -1416,6 +1490,23 @@ const _ru = AppStrings(
   updateEmailFailed: 'Не удалось сохранить — проверьте соединение и попробуйте снова.',
   widgetTesting: 'Идёт тест…',
   updateInstall: 'Обновить',
+  settingsMenuBar: 'Строка меню',
+  settingsTray: 'Трей',
+  menuBarShow: 'Показывать Nova в строке меню',
+  trayShow: 'Показывать Nova в трее',
+  menuBarOffHint: 'Без него закрытие окна завершает Nova, и мониторинг останавливается.',
+  menuBarShows: 'Показывать',
+  menuBarSpeedHour: 'Скорость и трафик за час',
+  menuBarSpeed: 'Скорость',
+  menuBarDownUp: 'Загрузка и отдача',
+  menuBarToday: 'Трафик за сегодня',
+  menuBarIcon: 'Только значок',
+  menuBarBits: 'Скорость в мегабитах (Мбит/с)',
+  autoTestTitle: 'Автоматические тесты',
+  autoTestEnable: 'Проверять скорость автоматически',
+  autoTestHint: 'Пока Nova запущена. Каждый тест расходует около 100–200 МБ, поэтому на мобильном интернете и через точку доступа он не запускается. Результат ниже 50 Мбит/с проверяется ещё раз.',
+  autoTestEvery: 'Каждые',
+  autoTestHours: '{0} ч',
 );
 
 const _de = AppStrings(
@@ -1675,6 +1766,23 @@ const _de = AppStrings(
   updateEmailFailed: 'Das ließ sich nicht speichern – prüf die Verbindung und versuch es noch einmal.',
   widgetTesting: 'Test läuft…',
   updateInstall: 'Jetzt aktualisieren',
+  settingsMenuBar: 'Menüleiste',
+  settingsTray: 'Infobereich',
+  menuBarShow: 'Nova in der Menüleiste zeigen',
+  trayShow: 'Nova im Infobereich zeigen',
+  menuBarOffHint: 'Ohne das Symbol beendet das Schließen des Fensters Nova, und die Überwachung stoppt.',
+  menuBarShows: 'Zeigt',
+  menuBarSpeedHour: 'Tempo und letzte Stunde',
+  menuBarSpeed: 'Tempo',
+  menuBarDownUp: 'Download und Upload',
+  menuBarToday: 'Datenverkehr heute',
+  menuBarIcon: 'Nur Symbol',
+  menuBarBits: 'Tempo in Megabit (Mbit/s)',
+  autoTestTitle: 'Automatische Tests',
+  autoTestEnable: 'Geschwindigkeit automatisch testen',
+  autoTestHint: 'Solange Nova läuft. Jeder Test verbraucht etwa 100–200 MB, deshalb läuft er nie über mobile Daten oder einen Hotspot. Ein Ergebnis unter 50 Mbit/s wird einmal wiederholt.',
+  autoTestEvery: 'Alle',
+  autoTestHours: '{0} Std.',
 );
 
 const _hu = AppStrings(
@@ -1934,4 +2042,21 @@ const _hu = AppStrings(
   updateEmailFailed: 'Nem sikerült menteni – ellenőrizd a kapcsolatot, és próbáld újra.',
   widgetTesting: 'Teszt fut…',
   updateInstall: 'Frissítés most',
+  settingsMenuBar: 'Menüsor',
+  settingsTray: 'Tálca',
+  menuBarShow: 'A Nova megjelenítése a menüsorban',
+  trayShow: 'A Nova megjelenítése a tálcán',
+  menuBarOffHint: 'Nélküle az ablak bezárása kilép a Novából, és a figyelés leáll.',
+  menuBarShows: 'Megjelenítés',
+  menuBarSpeedHour: 'Sebesség és az utolsó óra',
+  menuBarSpeed: 'Sebesség',
+  menuBarDownUp: 'Letöltés és feltöltés',
+  menuBarToday: 'Mai adatforgalom',
+  menuBarIcon: 'Csak ikon',
+  menuBarBits: 'Sebesség megabitben (Mbps)',
+  autoTestTitle: 'Automatikus tesztek',
+  autoTestEnable: 'Sebesség automatikus mérése',
+  autoTestHint: 'Amíg a Nova fut. Egy teszt kb. 100–200 MB adatot használ, ezért mobilneten és hotspoton sosem fut. Az 50 Mbps alatti eredményt egyszer újramérjük.',
+  autoTestEvery: 'Gyakoriság',
+  autoTestHours: '{0} óra',
 );

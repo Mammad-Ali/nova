@@ -24,14 +24,19 @@ const String punctuationSpace = ' ';
 /// three digits, and "620" gets a [punctuationSpace] where the others have a
 /// point. Units switch before a fourth digit would appear, and start at K so
 /// idle traffic doesn't flicker in and out of "B".
-String formatFixedWidth(num bytes) {
+///
+/// [base] and [units] switch it to bits: 1000 and k, M, G.
+String formatFixedWidth(
+  num bytes, {
+  int base = _kib,
   // Up to E, so even a 64-bit counter's largest value keeps three digits.
-  const units = ['K', 'M', 'G', 'T', 'P', 'E'];
+  List<String> units = const ['K', 'M', 'G', 'T', 'P', 'E'],
+}) {
   final raw = bytes.toDouble();
-  var value = (raw.isFinite && raw > 0 ? raw : 0.0) / _kib;
+  var value = (raw.isFinite && raw > 0 ? raw : 0.0) / base;
   var i = 0;
   while (value >= 999.5 && i < units.length - 1) {
-    value /= _kib;
+    value /= base;
     i++;
   }
   // The bounds sit where rounding would add a digit: 9.996 is "10.0", not
@@ -43,6 +48,11 @@ String formatFixedWidth(num bytes) {
           : '$punctuationSpace${value.toStringAsFixed(0)}';
   return number + units[i];
 }
+
+/// [bytesPerSecond] in bits — "48.1Mbps" — at the same fixed width as
+/// [formatFixedWidth].
+String formatFixedWidthBits(num bytesPerSecond) =>
+    '${formatFixedWidth(bytesPerSecond * 8, base: 1000, units: const ['k', 'M', 'G', 'T', 'P', 'E'])}bps';
 
 FormattedRate _humanize(num amount, List<String> units) {
   var value = amount.toDouble();

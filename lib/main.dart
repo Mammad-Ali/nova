@@ -8,9 +8,11 @@ import 'core/app_activity.dart';
 import 'core/cloud/google_identity.dart';
 import 'core/l10n/app_strings.dart';
 import 'core/l10n/locale_provider.dart';
+import 'core/settings/app_settings.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/alerts/alerts_watcher.dart';
+import 'features/speedtest/presentation/providers/auto_test_provider.dart';
 import 'features/speedtest/presentation/providers/history_sync_provider.dart';
 import 'features/traffic_monitor/presentation/providers/stability_provider.dart';
 import 'features/traffic_monitor/presentation/providers/traffic_provider.dart';
@@ -62,6 +64,9 @@ class _NovaAppState extends ConsumerState<NovaApp> {
       // Looks for a newer release on GitHub; the website is always current.
       ref.read(updateProvider);
 
+      // Settings → Automatic tests.
+      ref.read(autoTestProvider);
+
       // The Mac widgets: what they show, and what a click on them asks for.
       // Both stand down on every other platform.
       ref.read(widgetBridgeProvider);
@@ -78,12 +83,23 @@ class _NovaAppState extends ConsumerState<NovaApp> {
           rxPerSec: traffic.currentRxPerSec,
           txPerSec: traffic.currentTxPerSec,
           hourBytes: usage.hourBytes,
+          dayBytes: usage.dayBytes,
         );
       }
 
       ref.listenManual(
           trafficHistoryProvider, (prev, next) => pushTrayStatus());
       ref.listenManual(usageStatsProvider, (prev, next) => pushTrayStatus());
+
+      // Settings → Menu bar: the icon on or off, and what it shows.
+      ref.listenManual(appSettingsProvider, (prev, next) async {
+        await TrayService.instance.configure(
+          enabled: next.menuBarEnabled,
+          content: next.menuBarContent,
+          bits: next.menuBarBits,
+        );
+        pushTrayStatus();
+      }, fireImmediately: true);
 
       // A left click on the tray icon toggles the compact panel.
       TrayService.instance.onIconTap =

@@ -1,6 +1,7 @@
 import Cocoa
 import CoreWLAN
 import FlutterMacOS
+import Network
 import Sparkle
 import WidgetKit
 
@@ -127,6 +128,25 @@ class MainFlutterWindow: NSWindow {
         }
     }
 
+    // --- Metered connections ---
+    // The automatic test (auto_test_provider.dart) skips connections macOS
+    // calls costly — a phone's hotspot — or Low Data Mode.
+    pathMonitor.start(queue: DispatchQueue(label: "net_pulse.path"))
+    FlutterMethodChannel(
+        name: "net_pulse/network",
+        binaryMessenger: flutterViewController.engine.binaryMessenger
+    ).setMethodCallHandler { [weak self] call, result in
+        switch call.method {
+        case "isMetered":
+            guard let path = self?.pathMonitor.currentPath else {
+                result(nil); return
+            }
+            result(path.isExpensive || path.isConstrained)
+        default:
+            result(FlutterMethodNotImplemented)
+        }
+    }
+
     // --- In-app updates (Sparkle) ---
     // The update banner's "Update now" opens Sparkle's window: the release
     // notes, then download, signature check, install and restart. A
@@ -170,6 +190,9 @@ class MainFlutterWindow: NSWindow {
 
   /// Kept here: the app delegate holds its lifecycle delegates weakly.
   private var links: NovaLinks?
+
+  /// Watches the network for the metered check above.
+  private let pathMonitor = NWPathMonitor()
 
   /// Sparkle, reading the feed and key from Info.plist.
   private let updater = SPUStandardUpdaterController(

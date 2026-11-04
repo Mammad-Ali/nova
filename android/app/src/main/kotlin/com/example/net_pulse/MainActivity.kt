@@ -1,6 +1,7 @@
 package com.example.net_pulse
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.net.TrafficStats
 import android.net.wifi.WifiManager
 import io.flutter.embedding.android.FlutterActivity
@@ -10,6 +11,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private val trafficChannelName = "net_pulse/traffic"
     private val wifiChannelName = "net_pulse/wifi"
+    private val networkChannelName = "net_pulse/network"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -25,6 +27,18 @@ class MainActivity : FlutterActivity() {
                             TrafficStats.getTotalTxBytes(),
                         )
                     )
+                } else {
+                    result.notImplemented()
+                }
+            }
+
+        // The automatic test skips metered connections: mobile data, hotspots.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, networkChannelName)
+            .setMethodCallHandler { call, result ->
+                if (call.method == "isMetered") {
+                    val connectivity = applicationContext
+                        .getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+                    result.success(connectivity?.isActiveNetworkMetered ?: false)
                 } else {
                     result.notImplemented()
                 }
