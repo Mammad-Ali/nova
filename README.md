@@ -71,6 +71,9 @@ things that actually decide how the connection **feels**:
 | **ISP throttling detector** | Compares a neutral CDN against Netflix's CDN to spot video throttling |
 | **Latency to services** | Round-trip times to YouTube, Discord, Steam, Cloudflare and more, right on the main screen |
 | **Call check** | Twenty seconds of round trips four times a second, judged for voice, HD video and group calls — with a tip for every problem |
+| **Gaming check** | Ping, jitter and loss to the data centres online games run in (Frankfurt, Stockholm, London, Paris, Tel Aviv, the UAE, Mumbai), with the games that play there and a verdict per region |
+| **DNS speed test** | Your DNS server against Cloudflare, Google, Quad9, AdGuard and OpenDNS, and the steps to switch when one is clearly faster (apps only) |
+| **Report for your provider** | Your tests against the speed you pay for, as a PDF to send with a complaint — averages, slowest times, every test — or as one image to share |
 | **Find the cause** | Checks the Wi-Fi signal, the router, name lookups and the provider in turn, and names the weak link (apps only) |
 | **History** | Every completed run, with a trend chart, personal best and a comparison to the previous run |
 | **Sharing** | Copy results as text, save them as an image, export the history to CSV |
@@ -87,8 +90,8 @@ things that actually decide how the connection **feels**:
 | **Usage totals** | Hour, day and month, with a projection for the end of the month |
 | **Connection stability** | A rolling latency chart with packet loss and outage detection |
 | **Wi-Fi context** | Signal strength and link rate, so "slow" can be traced to the router |
-| **Apps using the network** | Which apps took how much — on the Mac live, with each app's speed right now; on Android for today (needs Usage access) |
-| **Who's on my network** | Port sweep, ping sweep, ARP table, SSDP and Bonjour together, so even phones that ignore every port show up — with their name, maker and a guess at what they are |
+| **Apps using the network** | Which apps took how much, with their real icons — now, today or over 7 days; a daily limit per app with a warning. Mac: Nova counts while it runs; Android: the system's statistics (needs Usage access) |
+| **Who's on my network** | Port sweep, ping sweep, ARP table, SSDP and Bonjour together, so even phones that ignore every port show up — with their name, maker and a guess at what they are. Name your devices; new ones are marked |
 
 ### Desktop integration
 
@@ -96,8 +99,10 @@ things that actually decide how the connection **feels**:
   Settings turn it off or choose what it shows: speed and the past hour, speed,
   download and upload, today's traffic or just the icon — in bytes or bits
 - **Widgets** on the Mac desktop and in Notification Centre: *Speed*, *Speed & tools*,
-  *Dashboard* and *Traffic*. One click runs a test in the background — the widget
-  shows "Testing…" and then the result — or opens a call check or "Find the cause"
+  *Dashboard*, *Traffic*, *Apps today* (small and medium, with the apps' icons) and
+  *Network* (devices online, and who's new). One click runs a test in the background —
+  the widget shows "Testing…" and then the result — or opens a call check or "Find the cause"
+- **Android home-screen widgets**: *Speed*, and *Speed and traffic*, with a Start test button
 - **Updates**: the apps check for a new release. On the Mac, *Update now* (or
   *Nova → Check for Updates…*) installs it in place and restarts Nova; on Windows
   and Android the button downloads the installer

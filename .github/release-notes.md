@@ -1,28 +1,20 @@
-## What's new in 1.5
+## What's new in 1.6
 
-- **A speedometer you can read.** A fixed scale with numbers on it — 5, 10,
-  50, 100, 250, 500, 750, 1G (up to 10G for multi-gig lines) — instead of
-  one that stretched with every test. Past **100 Mbps** the needle glows;
-  past **500 Mbps** the stars go to warp speed.
-- **Which apps use the network.** A new card on the Monitor tab. On the Mac
-  it is live: each app's speed right now and how much it has used since it
-  started. On Android it shows today's traffic per app (after you allow
-  *Usage access*).
-- **More devices in "Who's on my network".** Phones and TVs that ignore
-  every port are now found by ping, the ARP table, UPnP and Bonjour, with
-  their maker and a better guess at what they are.
-- **Automatic speed tests.** Optional, in Settings: every 1, 3 or 6 hours,
-  never on mobile data or a hotspot, with a second try when a result comes
-  in under 50 Mbps.
-- **Menu bar your way.** Turn it off, or choose what it shows: speed and the
-  past hour, speed, download and upload, today's traffic or just the icon —
-  in bytes or bits.
-- **Start a test from a Mac widget** without opening Nova, and **update
-  the Mac app in place**: *Update now* installs the new version and restarts.
-
-On the Mac, Nova now runs outside the App Sandbox — inside it, macOS hides
-which apps use the network. Your settings, history and sign-in move over
-on the first launch.
+- **Apps using the network, day by day.** *Now*, *Today* and *7 days*, every
+  app with its real icon. Tap an app for its week and a daily limit: past it,
+  the Mac sends a notification and Android marks the app.
+- **New Mac widgets.** *Apps today* (small and medium) and *Network* — devices
+  online and who's new. The Dashboard widget gets a row of today's top apps.
+- **Widgets on Android.** *Speed*, and *Speed and traffic*, with a Start test
+  button.
+- **Name your devices.** Tap one in "Who's on my network" to name it and say
+  what it is. Newcomers are marked *New*.
+- **Gaming check.** Ping and jitter to the data centres games run in —
+  Frankfurt, Stockholm, London, Paris and more — and which suits shooters.
+- **DNS speed test.** Your DNS against Cloudflare, Google, Quad9, AdGuard and
+  OpenDNS, and how to switch when one is clearly faster.
+- **Report for your provider.** Enter the speed you pay for; Nova makes a PDF of
+  your tests to send with a complaint — or one image to share.
 
 ## Use it in the browser — nothing to install
 
