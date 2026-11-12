@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/lan_scan_engine.dart';
 import '../domain/lan_device.dart';
+import 'network_watch_provider.dart';
 
 /// State of the "who is on my network" scan.
 class LanScanState {
@@ -65,7 +66,12 @@ class LanScanNotifier extends Notifier<LanScanState> {
         subnet: update.subnet,
         failure: update.failure,
       );
-      if (update.done) _stop();
+      if (update.done) {
+        _stop();
+        if (update.failure == null) {
+          ref.read(networkWatchProvider.notifier).publish(state.devices);
+        }
+      }
     });
   }
 

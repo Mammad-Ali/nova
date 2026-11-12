@@ -290,6 +290,29 @@ enum WidgetStore {
       .appendingPathComponent("Library/Application Support/Nova", isDirectory: true)
     try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
     try Data(json.utf8).write(to: folder.appendingPathComponent("widgets.json"), options: .atomic)
+    saveIcons(for: json, in: folder.appendingPathComponent("icons", isDirectory: true))
+  }
+
+  /// The apps widgets show each app's icon, but can't ask macOS for it from
+  /// their sandbox: every app listed ("bundle" → "icon" file name, see
+  /// widget_bridge.dart) gets its icon saved next to the JSON, once a week.
+  private static func saveIcons(for json: String, in folder: URL) {
+    guard let root = try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any],
+          let apps = root["apps"] as? [String: Any],
+          let list = apps["list"] as? [[String: Any]] else { return }
+    try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+    let weekAgo = Date().addingTimeInterval(-7 * 24 * 3600)
+    for app in list {
+      guard let bundle = app["bundle"] as? String, let name = app["icon"] as? String,
+            !name.contains("/") else { continue }
+      let file = folder.appendingPathComponent(name)
+      let saved = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?
+        .contentModificationDate
+      if let saved, saved > weekAgo { continue }
+      if let png = AppIcons.png(path: bundle, side: 64) {
+        try? png.write(to: file, options: .atomic)
+      }
+    }
   }
 }
 

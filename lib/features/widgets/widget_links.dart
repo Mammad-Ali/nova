@@ -8,6 +8,7 @@ import '../../shell/compact_mode.dart';
 import '../../shell/tray_service.dart';
 import '../call_check/presentation/call_check_sheet.dart';
 import '../diagnose/presentation/diagnosis_sheet.dart';
+import '../lan_scan/presentation/lan_scan_sheet.dart';
 import '../speedtest/presentation/providers/speedtest_provider.dart';
 
 /// Carries out a click on a Mac widget. Each one arrives as a nova:// link
@@ -64,7 +65,9 @@ class WidgetLinks {
     final compact = _ref.read(compactModeProvider.notifier);
     if (_ref.read(compactModeProvider)) await compact.exit();
     await TrayService.instance.showWindow();
-    _ref.read(homeTabProvider.notifier).show(0);
+    // The apps and network widgets open on the Monitor tab, the rest on
+    // the speed test.
+    _ref.read(homeTabProvider.notifier).show(action == 'apps' || action == 'lan' ? 1 : 0);
 
     // Whatever sheet was open gives way to the one asked for.
     final navigator = _navigator.currentState;
@@ -79,8 +82,10 @@ class WidgetLinks {
         if (context != null && context.mounted) showCallCheckSheet(context, start: true);
       case 'cause':
         if (context != null && context.mounted) showDiagnosisSheet(context, start: true);
+      case 'lan':
+        if (context != null && context.mounted) showLanScanSheet(context);
       default:
-        break; // "open": being in front is the whole point
+        break; // "open", "apps": being in front is the whole point
     }
   }
 }

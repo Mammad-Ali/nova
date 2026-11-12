@@ -40,6 +40,31 @@ struct NovaSnapshot: Decodable {
     let ms: Double?
   }
 
+  /// Today's busiest apps, from Nova's own count (1.6 and later).
+  struct Apps: Decodable {
+    struct App: Decodable {
+      let name: String
+      let kind: String
+      let bytes: String
+      /// Of the busiest app's total, 0–1.
+      let share: Double
+      /// The icon Nova saved for the widgets, by file name.
+      let icon: String?
+    }
+    let total: String
+    let count: Int
+    let list: [App]
+  }
+
+  /// The last scan of the network (1.6 and later).
+  struct Network: Decodable {
+    let online: Int
+    let t: Double
+    let newest: String?
+
+    var date: Date { Date(timeIntervalSince1970: t / 1000) }
+  }
+
   let test: Test?
   let recent: [Double]
   let best: Double?
@@ -50,6 +75,8 @@ struct NovaSnapshot: Decodable {
 
   /// A test is running right now; absent in files from before 1.5.
   var running: Bool? = nil
+  var apps: Apps? = nil
+  var network: Network? = nil
 
   var isTesting: Bool { running == true }
 
@@ -72,7 +99,16 @@ struct NovaSnapshot: Decodable {
       Service(name: "Telegram", ms: 63), Service(name: "Steam", ms: 131),
     ],
     provider: "Your provider",
-    labels: [:])
+    labels: [:],
+    apps: Apps(total: "4.2 GB", count: 8, list: [
+      Apps.App(name: "Google Chrome", kind: "app", bytes: "2.1 GB", share: 1, icon: nil),
+      Apps.App(name: "Telegram", kind: "app", bytes: "880 MB", share: 0.42, icon: nil),
+      Apps.App(name: "Music", kind: "app", bytes: "620 MB", share: 0.3, icon: nil),
+      Apps.App(name: "macOS services", kind: "system", bytes: "290 MB", share: 0.14, icon: nil),
+      Apps.App(name: "Mail", kind: "app", bytes: "120 MB", share: 0.06, icon: nil),
+    ]),
+    network: Network(online: 6, t: Date().addingTimeInterval(-720).timeIntervalSince1970 * 1000,
+                     newest: "Xiaomi · Phone"))
 
   /// No test yet: the widgets invite one.
   static let empty = NovaSnapshot(
@@ -93,6 +129,13 @@ enum NovaStore {
   static var file: URL {
     URL(fileURLWithPath: home)
       .appendingPathComponent("Library/Application Support/Nova/widgets.json")
+  }
+
+  /// An app's icon, saved by the app next to the JSON.
+  static func icon(_ name: String?) -> NSImage? {
+    guard let name, !name.contains("/") else { return nil }
+    return NSImage(contentsOf: file.deletingLastPathComponent()
+      .appendingPathComponent("icons").appendingPathComponent(name))
   }
 
   static func load() -> NovaSnapshot? {
@@ -201,6 +244,8 @@ enum NovaLink {
   static let call = URL(string: "nova://call")!
   static let cause = URL(string: "nova://cause")!
   static let open = URL(string: "nova://open")!
+  static let apps = URL(string: "nova://apps")!
+  static let lan = URL(string: "nova://lan")!
   /// The test, but without bringing Nova forward.
   static let quietTest = URL(string: "nova://test?quiet=1")!
 }
@@ -586,7 +631,8 @@ struct DashboardLargeView: View {
           .font(.system(size: 10, weight: .semibold))
           .foregroundStyle(Palette.textLo)
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 3), spacing: 6) {
-          ForEach(Array(s.services.prefix(6).enumerated()), id: \.offset) { _, service in
+          // One row of them when today's apps need the room below.
+          ForEach(Array(s.services.prefix(hasApps(s) ? 3 : 6).enumerated()), id: \.offset) { _, service in
             Tile {
               HStack(spacing: 4) {
                 Text(service.name)
@@ -598,6 +644,27 @@ struct DashboardLargeView: View {
                   .font(.system(size: 11, weight: .bold, design: .rounded))
                   .monospacedDigit()
                   .foregroundStyle(Palette.latency(service.ms))
+              }
+            }
+          }
+        }
+      }
+
+      if let apps = s.apps, !apps.list.isEmpty {
+        Text(s.label("appsToday", "Apps today"))
+          .font(.system(size: 10, weight: .semibold))
+          .foregroundStyle(Palette.textLo)
+        HStack(spacing: 6) {
+          ForEach(Array(apps.list.prefix(3).enumerated()), id: \.offset) { _, app in
+            Tile {
+              HStack(spacing: 6) {
+                AppIcon(app: app, size: 18)
+                Text(app.bytes)
+                  .font(.system(size: 11, weight: .bold, design: .rounded))
+                  .monospacedDigit()
+                  .foregroundStyle(.white)
+                  .lineLimit(1)
+                  .minimumScaleFactor(0.7)
               }
             }
           }
@@ -648,6 +715,8 @@ struct DashboardLargeView: View {
       }
     }
   }
+
+  private func hasApps(_ s: NovaSnapshot) -> Bool { !(s.apps?.list.isEmpty ?? true) }
 
   private func usageTile(_ label: String, _ value: String) -> some View {
     Tile {
@@ -756,6 +825,247 @@ struct TrafficSmallView: View {
   }
 }
 
+// MARK: - Apps today (small, medium)
+
+/// The icon Nova saved for an app; a letter in a coloured square until there
+/// is one, and a gear for macOS's own services.
+struct AppIcon: View {
+  let app: NovaSnapshot.Apps.App
+  let size: CGFloat
+
+  var body: some View {
+    if let image = NovaStore.icon(app.icon) {
+      Image(nsImage: image)
+        .resizable()
+        .interpolation(.high)
+        .frame(width: size, height: size)
+    } else {
+      let color = app.kind == "app" ? AppIcon.color(app.name) : Palette.textMid
+      ZStack {
+        RoundedRectangle(cornerRadius: size * 0.26, style: .continuous)
+          .fill(color.opacity(0.18))
+        if app.kind == "app" {
+          Text(String(app.name.prefix(1)).uppercased())
+            .font(.system(size: size * 0.5, weight: .heavy, design: .rounded))
+            .foregroundStyle(color)
+        } else {
+          Image(systemName: "gearshape.fill")
+            .font(.system(size: size * 0.5, weight: .bold))
+            .foregroundStyle(color)
+        }
+      }
+      .frame(width: size, height: size)
+    }
+  }
+
+  /// The same colour for an app every time (app_badge.dart picks alike).
+  static func color(_ name: String) -> Color {
+    let palette = [Palette.down, Palette.up, Palette.alt, Palette.green, Palette.amber,
+                   Palette.red, Palette.sun, Color(hex: 0x9333EA)]
+    var hash = 0
+    for unit in name.utf16 { hash = (hash &* 31 &+ Int(unit)) & 0x7fffffff }
+    return palette[hash % palette.count]
+  }
+}
+
+/// "Apps today" with Nova's wordmark; the total on the right when there's room.
+struct AppsHeader: View {
+  let snapshot: NovaSnapshot
+  var total: String? = nil
+
+  var body: some View {
+    HStack(spacing: 6) {
+      Wordmark()
+      Text(snapshot.label("appsToday", "Apps today"))
+        .font(.system(size: 10.5, weight: .semibold))
+        .foregroundStyle(Palette.textLo)
+        .lineLimit(1)
+      Spacer(minLength: 2)
+      if let total {
+        Text(total)
+          .font(.system(size: 12, weight: .bold, design: .rounded))
+          .monospacedDigit()
+          .foregroundStyle(.white)
+      }
+    }
+  }
+}
+
+struct AppsEmpty: View {
+  let snapshot: NovaSnapshot
+
+  var body: some View {
+    Text(snapshot.label("appsEmpty", "Nova counts each app's traffic while it runs"))
+      .font(.system(size: 12, weight: .semibold))
+      .foregroundStyle(Palette.textMid)
+  }
+}
+
+/// A: today's busiest app large, the next three as icons.
+struct AppsSmallView: View {
+  let entry: NovaEntry
+
+  var body: some View {
+    let s = entry.snapshot
+    VStack(alignment: .leading, spacing: 0) {
+      AppsHeader(snapshot: s)
+      Spacer(minLength: 6)
+      if let apps = s.apps, let top = apps.list.first {
+        HStack(spacing: 8) {
+          AppIcon(app: top, size: 34)
+          VStack(alignment: .leading, spacing: 0) {
+            Text(top.name)
+              .font(.system(size: 11, weight: .semibold))
+              .foregroundStyle(Palette.textMid)
+              .lineLimit(1)
+            Text(top.bytes)
+              .font(.system(size: 20, weight: .bold, design: .rounded))
+              .monospacedDigit()
+              .foregroundStyle(.white)
+              .lineLimit(1)
+              .minimumScaleFactor(0.6)
+          }
+        }
+        Spacer(minLength: 6)
+        HStack(spacing: 5) {
+          ForEach(Array(apps.list.dropFirst().prefix(3).enumerated()), id: \.offset) { _, app in
+            AppIcon(app: app, size: 22)
+          }
+          if apps.count > 4 {
+            Text(s.label("appsMore", "+{0} more").replacingOccurrences(of: "{0}", with: "\(apps.count - 4)"))
+              .font(.system(size: 10, weight: .semibold))
+              .foregroundStyle(Palette.textLo)
+              .lineLimit(1)
+          }
+        }
+        Spacer(minLength: 6)
+        HStack(spacing: 4) {
+          Text(s.label("appsTotal", "Total"))
+          Text(apps.total).monospacedDigit().foregroundStyle(Palette.textMid)
+        }
+        .font(.system(size: 10.5, weight: .semibold))
+        .foregroundStyle(Palette.textLo)
+      } else {
+        AppsEmpty(snapshot: s)
+        Spacer(minLength: 0)
+      }
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .widgetURL(NovaLink.apps)
+  }
+}
+
+/// B: today's four busiest apps, each with a bar against the busiest.
+struct AppsMediumView: View {
+  let entry: NovaEntry
+
+  var body: some View {
+    let s = entry.snapshot
+    VStack(alignment: .leading, spacing: 7) {
+      AppsHeader(snapshot: s, total: s.apps?.total)
+      if let apps = s.apps, !apps.list.isEmpty {
+        ForEach(Array(apps.list.prefix(4).enumerated()), id: \.offset) { _, app in
+          HStack(spacing: 8) {
+            AppIcon(app: app, size: 22)
+            VStack(alignment: .leading, spacing: 3) {
+              HStack {
+                Text(app.name)
+                  .font(.system(size: 11.5, weight: .semibold))
+                  .foregroundStyle(.white)
+                  .lineLimit(1)
+                Spacer(minLength: 4)
+                Text(app.bytes)
+                  .font(.system(size: 11.5, weight: .bold, design: .rounded))
+                  .monospacedDigit()
+                  .foregroundStyle(Palette.textMid)
+              }
+              GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                  Capsule().fill(Palette.glass)
+                  Capsule()
+                    .fill(Palette.down)
+                    .frame(width: max(4, geo.size.width * min(1, app.share)))
+                }
+              }
+              .frame(height: 4)
+            }
+          }
+        }
+        Spacer(minLength: 0)
+      } else {
+        Spacer(minLength: 0)
+        AppsEmpty(snapshot: s)
+        Spacer(minLength: 0)
+      }
+    }
+    .widgetURL(NovaLink.apps)
+  }
+}
+
+struct AppsView: View {
+  let entry: NovaEntry
+  @Environment(\.widgetFamily) private var family
+
+  var body: some View {
+    if family == .systemSmall {
+      AppsSmallView(entry: entry)
+    } else {
+      AppsMediumView(entry: entry)
+    }
+  }
+}
+
+// MARK: - Network (small)
+
+struct NetworkSmallView: View {
+  let entry: NovaEntry
+
+  var body: some View {
+    let s = entry.snapshot
+    VStack(alignment: .leading, spacing: 0) {
+      HStack(spacing: 5) {
+        Text(s.label("network", "Network"))
+          .font(.system(size: 13, weight: .black, design: .rounded))
+          .foregroundStyle(Palette.sun)
+        Spacer()
+        Image(systemName: "laptopcomputer.and.iphone")
+          .font(.system(size: 12, weight: .semibold))
+          .foregroundStyle(Palette.alt)
+      }
+      Spacer(minLength: 4)
+      if let network = s.network {
+        Text("\(network.online)")
+          .font(.system(size: 34, weight: .bold, design: .rounded))
+          .monospacedDigit()
+          .foregroundStyle(.white)
+        Text(s.label("online", "devices online"))
+          .font(.system(size: 11, weight: .semibold))
+          .foregroundStyle(Palette.textMid)
+          .lineLimit(1)
+        Spacer(minLength: 4)
+        if let newest = network.newest {
+          Text(s.label("newDevice", "New: {0}").replacingOccurrences(of: "{0}", with: newest))
+            .font(.system(size: 10.5, weight: .bold))
+            .foregroundStyle(Palette.amber)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
+            .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Palette.amber.opacity(0.15)))
+          Spacer(minLength: 4)
+        }
+        Age(date: network.date, now: entry.date)
+      } else {
+        Text(s.label("networkEmpty", "Nova scans your network every half hour"))
+          .font(.system(size: 12, weight: .semibold))
+          .foregroundStyle(Palette.textMid)
+        Spacer(minLength: 0)
+      }
+    }
+    .widgetURL(NovaLink.lan)
+  }
+}
+
 // MARK: - Widgets
 
 /// The gallery's names come from the app's language once it has written its
@@ -806,6 +1116,28 @@ struct TrafficWidget: Widget {
   }
 }
 
+struct AppsWidget: Widget {
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: "NovaApps", provider: NovaProvider()) { entry in
+      AppsView(entry: entry).containerBackground(for: .widget) { NovaBackground() }
+    }
+    .configurationDisplayName(galleryLabels.label("appsName", "Apps today"))
+    .description(galleryLabels.label("appsDesc", "Which apps used the most data today."))
+    .supportedFamilies([.systemSmall, .systemMedium])
+  }
+}
+
+struct NetworkWidget: Widget {
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: "NovaNetwork", provider: NovaProvider()) { entry in
+      NetworkSmallView(entry: entry).containerBackground(for: .widget) { NovaBackground() }
+    }
+    .configurationDisplayName(galleryLabels.label("networkName", "Network"))
+    .description(galleryLabels.label("networkDesc", "How many devices are on your network, and who's new."))
+    .supportedFamilies([.systemSmall])
+  }
+}
+
 @main
 struct NovaWidgets: WidgetBundle {
   var body: some Widget {
@@ -813,5 +1145,7 @@ struct NovaWidgets: WidgetBundle {
     ToolsWidget()
     DashboardWidget()
     TrafficWidget()
+    AppsWidget()
+    NetworkWidget()
   }
 }

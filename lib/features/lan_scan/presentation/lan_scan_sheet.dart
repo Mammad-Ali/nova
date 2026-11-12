@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../domain/known_device.dart';
 import '../domain/lan_device.dart';
+import 'device_name_sheet.dart';
+import 'known_devices_provider.dart';
 import 'lan_scan_provider.dart';
 
 /// Opens the "who's on my network" sheet.
@@ -114,7 +117,7 @@ class _LanScanSheet extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: 8),
-              Flexible(child: _Body(state: s, strings: t)),
+              Flexible(child: _Body(state: s, strings: t, known: ref.watch(knownDevicesProvider))),
               const SizedBox(height: 12),
             ],
           ),
@@ -125,9 +128,10 @@ class _LanScanSheet extends ConsumerWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.state, required this.strings});
+  const _Body({required this.state, required this.strings, required this.known});
   final LanScanState state;
   final AppStrings strings;
+  final Map<String, KnownDevice> known;
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +148,15 @@ class _Body extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       itemCount: state.devices.length,
-      itemBuilder: (_, i) =>
-          _DeviceRow(device: state.devices[i], strings: strings),
+      itemBuilder: (context, i) {
+        final device = state.devices[i];
+        return _DeviceRow(
+          device: device,
+          known: known[deviceId(device)],
+          strings: strings,
+          onTap: () => showDeviceNameSheet(context, device: device, known: known[deviceId(device)]),
+        );
+      },
     );
   }
 }
@@ -166,9 +177,11 @@ class _Message extends StatelessWidget {
 }
 
 class _DeviceRow extends StatelessWidget {
-  const _DeviceRow({required this.device, required this.strings});
+  const _DeviceRow({required this.device, required this.known, required this.strings, required this.onTap});
   final LanDevice device;
+  final KnownDevice? known;
   final AppStrings strings;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -177,9 +190,14 @@ class _DeviceRow extends StatelessWidget {
         : device.isSelf
             ? AppColors.accentAlt
             : AppColors.onGlass;
-    final title = device.name ?? _kindLabel(device.kind, strings);
+    final kind = known?.kind ?? device.kind;
+    final title = known?.name ?? device.name ?? deviceKindLabel(kind, strings);
+    final isNew = !device.isSelf && known != null && known!.isNew(DateTime.now());
 
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: glassCard(radius: 16),
@@ -192,7 +210,7 @@ class _DeviceRow extends StatelessWidget {
               color: accent.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(11),
             ),
-            child: Icon(_kindIcon(device.kind), size: 20, color: accent),
+            child: Icon(deviceKindIcon(kind), size: 20, color: accent),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -230,8 +248,11 @@ class _DeviceRow extends StatelessWidget {
           if (device.isGateway)
             _Tag(text: strings.lanRouter, color: AppColors.sun)
           else if (device.isSelf)
-            _Tag(text: strings.lanThisDevice, color: AppColors.accentAlt),
+            _Tag(text: strings.lanThisDevice, color: AppColors.accentAlt)
+          else if (isNew)
+            _Tag(text: strings.lanNew, color: AppColors.green),
         ],
+      ),
       ),
     );
   }
@@ -261,7 +282,7 @@ class _Tag extends StatelessWidget {
       );
 }
 
-IconData _kindIcon(DeviceKind kind) => switch (kind) {
+IconData deviceKindIcon(DeviceKind kind) => switch (kind) {
       DeviceKind.router => Icons.router_rounded,
       DeviceKind.computer => Icons.computer_rounded,
       DeviceKind.phone => Icons.smartphone_rounded,
@@ -273,7 +294,7 @@ IconData _kindIcon(DeviceKind kind) => switch (kind) {
       DeviceKind.unknown => Icons.devices_other_rounded,
     };
 
-String _kindLabel(DeviceKind kind, AppStrings s) => switch (kind) {
+String deviceKindLabel(DeviceKind kind, AppStrings s) => switch (kind) {
       DeviceKind.router => s.lanRouter,
       DeviceKind.computer => s.lanKindComputer,
       DeviceKind.phone => s.lanKindPhone,

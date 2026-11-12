@@ -15,6 +15,12 @@ import '../speedtest/domain/entities/speed_grade.dart';
 import '../speedtest/presentation/providers/speedtest_history_provider.dart';
 import '../speedtest/presentation/providers/speedtest_provider.dart';
 import '../speedtest/presentation/widgets/result_summary.dart';
+import '../lan_scan/domain/known_device.dart';
+import '../lan_scan/domain/lan_device.dart';
+import '../lan_scan/presentation/lan_scan_sheet.dart';
+import '../lan_scan/presentation/network_watch_provider.dart';
+import '../traffic_monitor/domain/entities/app_traffic.dart';
+import '../traffic_monitor/presentation/providers/app_usage_tracker.dart';
 import '../traffic_monitor/presentation/providers/usage_stats_provider.dart';
 
 /// Keeps the Mac widgets (macos/NovaWidgets) up to date. They can't ask the
@@ -56,6 +62,10 @@ final widgetBridgeProvider = Provider<void>((ref) {
   });
   ref.listen(localeProvider, (_, _) => schedule());
   ref.listen(ipInfoProvider, (_, _) => schedule());
+  // A scan's summary changes at most every half hour. Today's apps change
+  // every few seconds, far more often than macOS lets widgets redraw, so
+  // they ride along with every other write and the half-hourly one.
+  ref.listen(networkWatchProvider, (_, _) => schedule());
   final periodic = Timer.periodic(const Duration(minutes: 30), (_) => schedule());
   ref.onDispose(() {
     pending?.cancel();
@@ -116,8 +126,72 @@ Map<String, Object?> widgetSnapshot(Ref ref) {
     ],
     'provider': isp,
     'running': ref.read(speedTestControllerProvider).isRunning,
+    'apps': _apps(ref),
+    'network': _network(ref, t),
     'labels': widgetLabels(t),
   };
+}
+
+/// Today's busiest apps for the apps widgets. Each app's icon goes along
+/// as the app bundle it comes from and a file name: the widgets may only
+/// read Nova's own folder, so the app saves the icon there under that name
+/// (WidgetStore in MainFlutterWindow.swift).
+Map<String, Object?>? _apps(Ref ref) {
+  final usage = ref.read(macAppUsageProvider);
+  if (!usage.loaded) return null;
+  final apps = usage.over(1);
+  final total = apps.fold<int>(0, (sum, a) => sum + a.total);
+  final top = apps.isEmpty ? 1 : apps.first.total;
+  return {
+    'total': formatBytes(total).toString(),
+    'count': apps.length,
+    'list': [
+      for (final app in apps.take(5))
+        {
+          'name': app.kind == AppTrafficKind.app ? app.name : ref.read(stringsProvider).appsSystemMac,
+          'kind': app.kind.name,
+          'bytes': formatBytes(app.total).toString(),
+          'share': top == 0 ? 0 : app.total / top,
+          if (app.iconSource != null) ...{
+            'bundle': app.iconSource,
+            'icon': widgetIconFile(app.key),
+          },
+        },
+    ],
+  };
+}
+
+/// The file an app's icon is saved under: its key, made safe for a file
+/// name, plus a hash of the key — macOS file names ignore case, and
+/// "claude" (Claude Code) and "Claude" (the app) are different apps.
+String widgetIconFile(String key) {
+  var hash = 0x811c9dc5; // FNV-1a
+  for (final unit in key.codeUnits) {
+    hash = ((hash ^ unit) * 0x01000193) & 0xffffffff;
+  }
+  final safe = key.replaceAll(RegExp('[^A-Za-z0-9]+'), '_').toLowerCase();
+  return '${safe}_${hash.toRadixString(16).padLeft(8, '0')}.png';
+}
+
+/// The last scan of the network, for the Network widget.
+Map<String, Object?>? _network(Ref ref, AppStrings t) {
+  final summary = ref.read(networkWatchProvider);
+  if (summary == null) return null;
+  final newest = summary.newest;
+  return {
+    'online': summary.online,
+    't': summary.at.millisecondsSinceEpoch,
+    if (newest != null) 'newest': knownDeviceTitle(newest, t),
+  };
+}
+
+/// What to call a device that isn't in front of us: the user's name for it,
+/// else what it called itself, else its maker and kind.
+String knownDeviceTitle(KnownDevice device, AppStrings t) {
+  if (device.name != null) return device.name!;
+  if (device.seenName != null) return device.seenName!;
+  final kind = deviceKindLabel(device.kind ?? device.seenKind ?? DeviceKind.unknown, t);
+  return device.vendor == null ? kind : '${device.vendor} · $kind';
 }
 
 /// The widgets' words, keyed the way NovaWidgets.swift asks for them.
@@ -146,4 +220,16 @@ Map<String, String> widgetLabels(AppStrings t) => {
       'dashDesc': t.widgetDashDesc,
       'trafficName': t.widgetTraffic,
       'trafficDesc': t.widgetTrafficDesc,
+      'appsToday': t.widgetAppsToday,
+      'appsMore': t.widgetAppsMore,
+      'appsEmpty': t.widgetAppsEmpty,
+      'appsTotal': t.widgetAppsTotal,
+      'appsName': t.widgetAppsToday,
+      'appsDesc': t.widgetAppsDesc,
+      'network': t.widgetNetwork,
+      'online': t.widgetOnline,
+      'newDevice': t.widgetNewDevice,
+      'networkEmpty': t.widgetNetworkEmpty,
+      'networkName': t.widgetNetwork,
+      'networkDesc': t.widgetNetworkDesc,
     };

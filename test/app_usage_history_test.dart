@@ -3,6 +3,7 @@ import 'package:net_pulse/features/traffic_monitor/data/datasources/app_traffic_
 import 'package:net_pulse/features/traffic_monitor/data/repositories/app_usage_repository.dart';
 import 'package:net_pulse/features/traffic_monitor/domain/entities/app_traffic.dart';
 import 'package:net_pulse/features/traffic_monitor/presentation/providers/app_usage_tracker.dart';
+import 'package:net_pulse/features/widgets/widget_bridge.dart';
 
 void main() {
   test('app keys survive the round trip, colons in names included', () {
@@ -58,5 +59,12 @@ void main() {
     );
     expect(MacAppTrafficSource.bundleFromPath('/usr/sbin/mDNSResponder'), isNull);
     expect(MacAppTrafficSource.bundleFromPath('/opt/homebrew/bin/node'), isNull);
+  });
+
+  test('icon files differ even where only the case does', () {
+    final a = widgetIconFile('app:claude');
+    final b = widgetIconFile('app:Claude');
+    expect(a.toLowerCase(), isNot(b.toLowerCase()));
+    expect(a, matches(RegExp(r'^[a-z0-9_]+\.png$')));
   });
 }

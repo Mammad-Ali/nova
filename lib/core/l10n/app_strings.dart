@@ -340,6 +340,22 @@ class AppStrings {
     required this.appsOverLimit,
     required this.appsLast7Days,
     required this.appsNoHistory,
+    required this.lanNew,
+    required this.lanNameTitle,
+    required this.lanNameField,
+    required this.lanKindField,
+    required this.lanSave,
+    required this.lanNameNote,
+    required this.widgetAppsToday,
+    required this.widgetAppsMore,
+    required this.widgetAppsEmpty,
+    required this.widgetAppsTotal,
+    required this.widgetAppsDesc,
+    required this.widgetNetwork,
+    required this.widgetOnline,
+    required this.widgetNewDevice,
+    required this.widgetNetworkEmpty,
+    required this.widgetNetworkDesc,
   });
 
   // Navigation and shared
@@ -714,6 +730,37 @@ class AppStrings {
   final String appsLast7Days;
   final String appsNoHistory;
 
+  /// Tag on a device first seen in the last day.
+  final String lanNew;
+  final String lanNameTitle;
+  final String lanNameField;
+  final String lanKindField;
+  final String lanSave;
+  final String lanNameNote;
+  final String widgetAppsToday;
+
+  /// {0} is a number of apps.
+  final String widgetAppsMore;
+  final String widgetAppsEmpty;
+  final String widgetAppsTotal;
+  final String widgetAppsDesc;
+  final String widgetNetwork;
+  final String widgetOnline;
+
+  /// {0} is a device's name.
+  final String widgetNewDevice;
+  final String widgetNetworkEmpty;
+  final String widgetNetworkDesc;
+
+
+
+
+
+
+
+
+
+
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
     var out = template;
@@ -1041,6 +1088,22 @@ const _en = AppStrings(
   appsOverLimit: 'Over limit',
   appsLast7Days: 'Last 7 days',
   appsNoHistory: "Nothing counted yet: Nova adds up each app's traffic while it runs.",
+  lanNew: 'New',
+  lanNameTitle: 'Name this device',
+  lanNameField: 'Name',
+  lanKindField: 'What it is',
+  lanSave: 'Save',
+  lanNameNote: "Names stay on this device. Where the system hides hardware addresses, a name follows the device's network address, which routers usually keep the same.",
+  widgetAppsToday: 'Apps today',
+  widgetAppsMore: '+{0} more',
+  widgetAppsEmpty: "Nova counts each app's traffic while it runs",
+  widgetAppsTotal: 'Total',
+  widgetAppsDesc: 'Which apps used the most data today.',
+  widgetNetwork: 'Network',
+  widgetOnline: 'devices online',
+  widgetNewDevice: 'New: {0}',
+  widgetNetworkEmpty: 'Nova scans your network every half hour',
+  widgetNetworkDesc: "How many devices are on your network, and who's new.",
 );
 
 const _az = AppStrings(
@@ -1352,6 +1415,22 @@ const _az = AppStrings(
   appsOverLimit: 'Limitdən çox',
   appsLast7Days: 'Son 7 gün',
   appsNoHistory: 'Hələ heç nə sayılmayıb: Nova işlədikcə hər tətbiqin trafikini toplayır.',
+  lanNew: 'Yeni',
+  lanNameTitle: 'Bu cihaza ad verin',
+  lanNameField: 'Ad',
+  lanKindField: 'Nədir',
+  lanSave: 'Yadda saxla',
+  lanNameNote: 'Adlar bu cihazda qalır. Sistem aparat ünvanlarını gizlədikdə ad cihazın şəbəkə ünvanına bağlanır — routerlər adətən onu dəyişmir.',
+  widgetAppsToday: 'Bu gün tətbiqlər',
+  widgetAppsMore: '+{0} daha',
+  widgetAppsEmpty: 'Nova işlədikcə hər tətbiqin trafikini sayır',
+  widgetAppsTotal: 'Cəmi',
+  widgetAppsDesc: 'Bu gün ən çox trafik işlədən tətbiqlər.',
+  widgetNetwork: 'Şəbəkə',
+  widgetOnline: 'cihaz şəbəkədə',
+  widgetNewDevice: 'Yeni: {0}',
+  widgetNetworkEmpty: 'Nova şəbəkənizi hər yarım saatdan bir yoxlayır',
+  widgetNetworkDesc: 'Şəbəkənizdə neçə cihaz var və kim yenidir.',
 );
 
 const _ru = AppStrings(
@@ -1663,6 +1742,22 @@ const _ru = AppStrings(
   appsOverLimit: 'Сверх лимита',
   appsLast7Days: 'Последние 7 дней',
   appsNoHistory: 'Пока ничего не посчитано: Nova суммирует трафик приложений, пока работает.',
+  lanNew: 'Новое',
+  lanNameTitle: 'Назовите устройство',
+  lanNameField: 'Имя',
+  lanKindField: 'Что это',
+  lanSave: 'Сохранить',
+  lanNameNote: 'Имена хранятся на этом устройстве. Если система скрывает аппаратные адреса, имя привязывается к сетевому адресу устройства — роутеры обычно его не меняют.',
+  widgetAppsToday: 'Приложения сегодня',
+  widgetAppsMore: 'ещё {0}',
+  widgetAppsEmpty: 'Nova считает трафик приложений, пока работает',
+  widgetAppsTotal: 'Всего',
+  widgetAppsDesc: 'Какие приложения израсходовали больше всего трафика сегодня.',
+  widgetNetwork: 'Сеть',
+  widgetOnline: 'устройств в сети',
+  widgetNewDevice: 'Новое: {0}',
+  widgetNetworkEmpty: 'Nova проверяет сеть каждые полчаса',
+  widgetNetworkDesc: 'Сколько устройств в вашей сети и кто появился недавно.',
 );
 
 const _de = AppStrings(
@@ -1968,6 +2063,22 @@ const _de = AppStrings(
   appsOverLimit: 'Über Limit',
   appsLast7Days: 'Letzte 7 Tage',
   appsNoHistory: 'Noch nichts gezählt: Nova zählt den Verbrauch jeder App, solange es läuft.',
+  lanNew: 'Neu',
+  lanNameTitle: 'Gerät benennen',
+  lanNameField: 'Name',
+  lanKindField: 'Was es ist',
+  lanSave: 'Speichern',
+  lanNameNote: 'Namen bleiben auf diesem Gerät. Wo das System Hardware-Adressen verbirgt, hängt ein Name an der Netzwerkadresse des Geräts – Router lassen sie meist gleich.',
+  widgetAppsToday: 'Apps heute',
+  widgetAppsMore: '+{0} weitere',
+  widgetAppsEmpty: 'Nova zählt den Verbrauch jeder App, solange es läuft',
+  widgetAppsTotal: 'Gesamt',
+  widgetAppsDesc: 'Welche Apps heute die meisten Daten verbraucht haben.',
+  widgetNetwork: 'Netzwerk',
+  widgetOnline: 'Geräte online',
+  widgetNewDevice: 'Neu: {0}',
+  widgetNetworkEmpty: 'Nova prüft dein Netzwerk jede halbe Stunde',
+  widgetNetworkDesc: 'Wie viele Geräte in deinem Netzwerk sind und wer neu ist.',
 );
 
 const _hu = AppStrings(
@@ -2273,4 +2384,20 @@ const _hu = AppStrings(
   appsOverLimit: 'Korlát felett',
   appsLast7Days: 'Utolsó 7 nap',
   appsNoHistory: 'Még nincs mit mutatni: a Nova futás közben összegzi az appok forgalmát.',
+  lanNew: 'Új',
+  lanNameTitle: 'Eszköz elnevezése',
+  lanNameField: 'Név',
+  lanKindField: 'Mi ez',
+  lanSave: 'Mentés',
+  lanNameNote: 'A nevek ezen az eszközön maradnak. Ahol a rendszer elrejti a hardvercímeket, a név az eszköz hálózati címéhez kötődik, amit a routerek általában nem változtatnak.',
+  widgetAppsToday: 'Appok ma',
+  widgetAppsMore: '+{0} további',
+  widgetAppsEmpty: 'A Nova futás közben számolja az appok forgalmát',
+  widgetAppsTotal: 'Összesen',
+  widgetAppsDesc: 'Mely appok forgalmaztak ma a legtöbbet.',
+  widgetNetwork: 'Hálózat',
+  widgetOnline: 'eszköz a hálózaton',
+  widgetNewDevice: 'Új: {0}',
+  widgetNetworkEmpty: 'A Nova félóránként átnézi a hálózatot',
+  widgetNetworkDesc: 'Hány eszköz van a hálózatodon, és ki az új.',
 );
