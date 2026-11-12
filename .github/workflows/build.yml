@@ -29,11 +29,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # The version Nova is built and tested with. A newer stable can
-          # change the rules under it (3.48 moved Material to its own
-          # package and wants a newer Gradle), so moving up is a change of
-          # its own, not something a build picks up by surprise.
-          flutter-version: 3.47.7
           cache: true
       - run: flutter pub get
       - run: flutter analyze
@@ -53,11 +48,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # The version Nova is built and tested with. A newer stable can
-          # change the rules under it (3.48 moved Material to its own
-          # package and wants a newer Gradle), so moving up is a change of
-          # its own, not something a build picks up by surprise.
-          flutter-version: 3.47.7
           cache: true
       - run: flutter pub get
 
@@ -149,11 +139,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # The version Nova is built and tested with. A newer stable can
-          # change the rules under it (3.48 moved Material to its own
-          # package and wants a newer Gradle), so moving up is a change of
-          # its own, not something a build picks up by surprise.
-          flutter-version: 3.47.7
           cache: true
       - run: flutter pub get
       # The Firebase project and Google sign-in clients, from the
@@ -206,11 +191,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # The version Nova is built and tested with. A newer stable can
-          # change the rules under it (3.48 moved Material to its own
-          # package and wants a newer Gradle), so moving up is a change of
-          # its own, not something a build picks up by surprise.
-          flutter-version: 3.47.7
           cache: true
       - run: flutter pub get
       # The Firebase project and Google sign-in clients, from the
@@ -302,11 +282,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          # The version Nova is built and tested with. A newer stable can
-          # change the rules under it (3.48 moved Material to its own
-          # package and wants a newer Gradle), so moving up is a change of
-          # its own, not something a build picks up by surprise.
-          flutter-version: 3.47.7
           cache: true
       - run: flutter pub get
       # The Firebase project and Google sign-in clients, from the
