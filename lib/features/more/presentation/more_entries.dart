@@ -6,6 +6,8 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../call_check/presentation/call_check_sheet.dart';
 import '../../diagnose/presentation/diagnosis_sheet.dart';
+import '../../dns_test/presentation/dns_sheet.dart';
+import '../../gaming/presentation/gaming_sheet.dart';
 import '../../leaderboard/domain/leaderboard_models.dart';
 import '../../leaderboard/presentation/leaderboard_sheet.dart';
 import '../../leaderboard/presentation/provider_ranking_sheet.dart';
@@ -27,6 +29,8 @@ enum MoreEntry {
   ranking,
   services,
   callCheck,
+  gaming,
+  dns,
   diagnose,
   about,
   privacy,
@@ -55,7 +59,10 @@ List<MoreSection> moreSections(AppStrings t) => [
         MoreEntry.ranking,
         MoreEntry.services,
         MoreEntry.callCheck,
-        // Needs the router and the system's name lookups: app only.
+        MoreEntry.gaming,
+        // These need the router, raw name lookups and the system's own
+        // settings: app only.
+        if (!kIsWeb) MoreEntry.dns,
         if (!kIsWeb) MoreEntry.diagnose,
       ]),
       MoreSection(t.secAbout, const [
@@ -80,6 +87,8 @@ String moreEntryLabel(MoreEntry entry, AppStrings t, NovaAccount? account) =>
       MoreEntry.ranking => t.toolsRanking,
       MoreEntry.services => t.servicesTitle,
       MoreEntry.callCheck => t.callCheckTitle,
+      MoreEntry.gaming => t.gamingTitle,
+      MoreEntry.dns => t.dnsTitle,
       MoreEntry.diagnose => t.diagTitle,
       MoreEntry.about => t.aboutNova,
       MoreEntry.privacy => t.aboutPrivacy,
@@ -100,6 +109,8 @@ IconData moreEntryIcon(MoreEntry entry) => switch (entry) {
       MoreEntry.ranking => Icons.leaderboard_rounded,
       MoreEntry.services => Icons.travel_explore_rounded,
       MoreEntry.callCheck => Icons.video_call_rounded,
+      MoreEntry.gaming => Icons.sports_esports_rounded,
+      MoreEntry.dns => Icons.dns_rounded,
       MoreEntry.diagnose => Icons.troubleshoot_rounded,
       MoreEntry.about => Icons.info_outline_rounded,
       MoreEntry.privacy => Icons.shield_outlined,
@@ -132,6 +143,10 @@ void openMoreEntry(BuildContext context, WidgetRef ref, MoreEntry entry) {
       showServicePingSheet(context);
     case MoreEntry.callCheck:
       showCallCheckSheet(context);
+    case MoreEntry.gaming:
+      showGamingSheet(context);
+    case MoreEntry.dns:
+      showDnsSheet(context);
     case MoreEntry.diagnose:
       showDiagnosisSheet(context);
     case MoreEntry.about:

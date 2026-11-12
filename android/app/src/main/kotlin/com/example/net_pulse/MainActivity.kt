@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.TrafficStats
 import android.net.wifi.WifiManager
+import android.os.Build
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -35,12 +36,22 @@ class MainActivity : FlutterActivity() {
         // The automatic test skips metered connections: mobile data, hotspots.
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, networkChannelName)
             .setMethodCallHandler { call, result ->
-                if (call.method == "isMetered") {
-                    val connectivity = applicationContext
-                        .getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
-                    result.success(connectivity?.isActiveNetworkMetered ?: false)
-                } else {
-                    result.notImplemented()
+                val connectivity = applicationContext
+                    .getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+                when (call.method) {
+                    "isMetered" -> result.success(connectivity?.isActiveNetworkMetered ?: false)
+                    // The DNS test compares the network's own DNS servers
+                    // with public ones.
+                    "dnsServers" -> {
+                        val servers = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            connectivity?.getLinkProperties(connectivity.activeNetwork)
+                                ?.dnsServers?.mapNotNull { it.hostAddress } ?: emptyList()
+                        } else {
+                            emptyList()
+                        }
+                        result.success(servers)
+                    }
+                    else -> result.notImplemented()
                 }
             }
 

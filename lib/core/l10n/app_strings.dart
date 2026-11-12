@@ -356,6 +356,39 @@ class AppStrings {
     required this.widgetNewDevice,
     required this.widgetNetworkEmpty,
     required this.widgetNetworkDesc,
+    required this.gamingTitle,
+    required this.gamingIntro,
+    required this.gamingWebNote,
+    required this.gamingRunning,
+    required this.gamingAgain,
+    required this.gamingBest,
+    required this.gamingGames,
+    required this.gamingJitter,
+    required this.gamingLoss,
+    required this.gamingGreat,
+    required this.gamingGood,
+    required this.gamingSlow,
+    required this.gamingFar,
+    required this.gamingLost,
+    required this.gamingCityFrankfurt,
+    required this.gamingCityStockholm,
+    required this.gamingCityLondon,
+    required this.gamingCityParis,
+    required this.gamingCityTelAviv,
+    required this.gamingCityUae,
+    required this.gamingCityMumbai,
+    required this.dnsTitle,
+    required this.dnsIntro,
+    required this.dnsCurrent,
+    required this.dnsAnswered,
+    required this.dnsKeep,
+    required this.dnsSwitch,
+    required this.dnsHowTo,
+    required this.dnsStepsMac,
+    required this.dnsStepsWindows,
+    required this.dnsStepsAndroid,
+    required this.dnsStepsAndroidNone,
+    required this.dnsStepsRouter,
   });
 
   // Navigation and shared
@@ -751,15 +784,57 @@ class AppStrings {
   final String widgetNewDevice;
   final String widgetNetworkEmpty;
   final String widgetNetworkDesc;
+  final String gamingTitle;
+  final String gamingIntro;
+  final String gamingWebNote;
+  final String gamingRunning;
+  final String gamingAgain;
+  final String gamingBest;
 
+  /// {0} lists games, like "CS2, Valorant".
+  final String gamingGames;
 
+  /// {0} is milliseconds.
+  final String gamingJitter;
 
+  /// {0} is a percentage.
+  final String gamingLoss;
+  final String gamingGreat;
+  final String gamingGood;
+  final String gamingSlow;
+  final String gamingFar;
+  final String gamingLost;
+  final String gamingCityFrankfurt;
+  final String gamingCityStockholm;
+  final String gamingCityLondon;
+  final String gamingCityParis;
+  final String gamingCityTelAviv;
+  final String gamingCityUae;
+  final String gamingCityMumbai;
+  final String dnsTitle;
+  final String dnsIntro;
+  final String dnsCurrent;
 
+  /// {0} of {1} lookups answered.
+  final String dnsAnswered;
+  final String dnsKeep;
 
+  /// {0} is a DNS service, {1} its time, {2} the current one's time, in ms.
+  final String dnsSwitch;
+  final String dnsHowTo;
 
+  /// {0} is the DNS server's address.
+  final String dnsStepsMac;
 
+  /// {0} is the DNS server's address.
+  final String dnsStepsWindows;
 
+  /// {0} is the service's Private DNS host name.
+  final String dnsStepsAndroid;
+  final String dnsStepsAndroidNone;
 
+  /// {0} is the DNS server's address.
+  final String dnsStepsRouter;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -1104,6 +1179,39 @@ const _en = AppStrings(
   widgetNewDevice: 'New: {0}',
   widgetNetworkEmpty: 'Nova scans your network every half hour',
   widgetNetworkDesc: "How many devices are on your network, and who's new.",
+  gamingTitle: 'Gaming check',
+  gamingIntro: "Ping, jitter and loss to the data centres online games run in. Game servers don't answer pings themselves; these sit right next to them.",
+  gamingWebNote: 'In the browser the times are approximate.',
+  gamingRunning: 'Checking…',
+  gamingAgain: 'Check again',
+  gamingBest: 'Best for you',
+  gamingGames: '{0} play here',
+  gamingJitter: 'jitter {0} ms',
+  gamingLoss: 'loss {0}%',
+  gamingGreat: 'Great for shooters',
+  gamingGood: 'Fine for most games',
+  gamingSlow: 'Playable, but not for shooters',
+  gamingFar: 'Too far for fast games',
+  gamingLost: 'No answer',
+  gamingCityFrankfurt: 'Frankfurt',
+  gamingCityStockholm: 'Stockholm',
+  gamingCityLondon: 'London',
+  gamingCityParis: 'Paris',
+  gamingCityTelAviv: 'Tel Aviv',
+  gamingCityUae: 'United Arab Emirates',
+  gamingCityMumbai: 'Mumbai',
+  dnsTitle: 'DNS speed test',
+  dnsIntro: 'Before a site starts loading, a DNS server turns its name into an address. Nova asks your DNS server and five public ones for popular sites and times the answers.',
+  dnsCurrent: 'Your DNS now',
+  dnsAnswered: '{0} of {1} answered',
+  dnsKeep: 'Your DNS is already among the fastest. Nothing to change.',
+  dnsSwitch: '{0} answers in {1} ms, your DNS in {2} ms. Switching could make sites start loading a little faster.',
+  dnsHowTo: 'How to switch',
+  dnsStepsMac: 'System Settings → Network → Wi-Fi → Details… → DNS: add {0} and remove the others.',
+  dnsStepsWindows: 'Settings → Network & internet → Wi-Fi → your network → DNS server assignment → Edit → Manual, IPv4 on, Preferred DNS {0}.',
+  dnsStepsAndroid: 'Settings → Network & internet → Private DNS → Private DNS provider hostname: {0}.',
+  dnsStepsAndroidNone: "Android's Private DNS needs a host name, which this service doesn't offer: change it on the router instead.",
+  dnsStepsRouter: "Or set {0} once in your router's settings, for every device at home.",
 );
 
 const _az = AppStrings(
@@ -1431,6 +1539,39 @@ const _az = AppStrings(
   widgetNewDevice: 'Yeni: {0}',
   widgetNetworkEmpty: 'Nova şəbəkənizi hər yarım saatdan bir yoxlayır',
   widgetNetworkDesc: 'Şəbəkənizdə neçə cihaz var və kim yenidir.',
+  gamingTitle: 'Oyun yoxlaması',
+  gamingIntro: 'Onlayn oyunların işlədiyi data mərkəzlərinə ping, jitter və itki. Oyun serverləri pingə cavab vermir; bunlar onların yanındadır.',
+  gamingWebNote: 'Brauzerdə vaxtlar təqribidir.',
+  gamingRunning: 'Yoxlanılır…',
+  gamingAgain: 'Yenidən yoxla',
+  gamingBest: 'Sizin üçün ən yaxşı',
+  gamingGames: 'Burada oynanır: {0}',
+  gamingJitter: 'jitter {0} ms',
+  gamingLoss: 'itki {0}%',
+  gamingGreat: 'Atıcı oyunlar üçün əla',
+  gamingGood: 'Əksər oyunlar üçün yaxşı',
+  gamingSlow: 'Oynamaq olar, amma atıcı oyunlar üçün deyil',
+  gamingFar: 'Sürətli oyunlar üçün çox uzaqdır',
+  gamingLost: 'Cavab yoxdur',
+  gamingCityFrankfurt: 'Frankfurt',
+  gamingCityStockholm: 'Stokholm',
+  gamingCityLondon: 'London',
+  gamingCityParis: 'Paris',
+  gamingCityTelAviv: 'Təl-Əviv',
+  gamingCityUae: 'Birləşmiş Ərəb Əmirlikləri',
+  gamingCityMumbai: 'Mumbay',
+  dnsTitle: 'DNS sürət testi',
+  dnsIntro: 'Sayt yüklənməzdən əvvəl DNS serveri onun adını ünvana çevirir. Nova sizin DNS serverinizdən və beş açıq serverdən populyar saytları soruşur və cavab vaxtını ölçür.',
+  dnsCurrent: 'Hazırkı DNS-iniz',
+  dnsAnswered: '{1} sorğudan {0}-na cavab',
+  dnsKeep: 'DNS-iniz artıq ən sürətlilərdəndir. Heç nəyi dəyişmək lazım deyil.',
+  dnsSwitch: '{0} {1} ms-də cavab verir, sizin DNS isə {2} ms-də. Dəyişsəniz, saytlar bir az daha tez açılmağa başlaya bilər.',
+  dnsHowTo: 'Necə dəyişmək olar',
+  dnsStepsMac: 'Sistem Ayarları → Şəbəkə → Wi-Fi → Ətraflı… → DNS: {0} əlavə edin, qalanlarını silin.',
+  dnsStepsWindows: 'Parametrlər → Şəbəkə və internet → Wi-Fi → şəbəkəniz → DNS server təyinatı → Redaktə → Əl ilə, IPv4 aktiv, Üstün DNS {0}.',
+  dnsStepsAndroid: 'Ayarlar → Şəbəkə və internet → Şəxsi DNS → Şəxsi DNS provayderinin host adı: {0}.',
+  dnsStepsAndroidNone: 'Android-in Şəxsi DNS-i host adı tələb edir, bu xidmət isə onu təklif etmir: onu routerdə dəyişin.',
+  dnsStepsRouter: 'Və ya {0}-u bir dəfə routerin ayarlarında təyin edin — evdəki bütün cihazlar üçün.',
 );
 
 const _ru = AppStrings(
@@ -1758,6 +1899,39 @@ const _ru = AppStrings(
   widgetNewDevice: 'Новое: {0}',
   widgetNetworkEmpty: 'Nova проверяет сеть каждые полчаса',
   widgetNetworkDesc: 'Сколько устройств в вашей сети и кто появился недавно.',
+  gamingTitle: 'Проверка для игр',
+  gamingIntro: 'Пинг, джиттер и потери до дата-центров, где работают онлайн-игры. Сами игровые серверы не отвечают на пинг; эти находятся рядом с ними.',
+  gamingWebNote: 'В браузере время приблизительное.',
+  gamingRunning: 'Проверяем…',
+  gamingAgain: 'Проверить снова',
+  gamingBest: 'Лучший для вас',
+  gamingGames: 'Здесь играют: {0}',
+  gamingJitter: 'джиттер {0} мс',
+  gamingLoss: 'потери {0}%',
+  gamingGreat: 'Отлично для шутеров',
+  gamingGood: 'Подходит для большинства игр',
+  gamingSlow: 'Играть можно, но не в шутеры',
+  gamingFar: 'Слишком далеко для быстрых игр',
+  gamingLost: 'Нет ответа',
+  gamingCityFrankfurt: 'Франкфурт',
+  gamingCityStockholm: 'Стокгольм',
+  gamingCityLondon: 'Лондон',
+  gamingCityParis: 'Париж',
+  gamingCityTelAviv: 'Тель-Авив',
+  gamingCityUae: 'ОАЭ',
+  gamingCityMumbai: 'Мумбаи',
+  dnsTitle: 'Тест скорости DNS',
+  dnsIntro: 'Прежде чем сайт начнёт загружаться, DNS-сервер превращает его имя в адрес. Nova спрашивает ваш DNS-сервер и пять публичных о популярных сайтах и замеряет время ответа.',
+  dnsCurrent: 'Ваш DNS сейчас',
+  dnsAnswered: 'Ответил на {0} из {1}',
+  dnsKeep: 'Ваш DNS и так среди самых быстрых. Менять ничего не нужно.',
+  dnsSwitch: '{0} отвечает за {1} мс, ваш DNS — за {2} мс. Если переключиться, сайты будут начинать загружаться чуть быстрее.',
+  dnsHowTo: 'Как переключиться',
+  dnsStepsMac: 'Системные настройки → Сеть → Wi-Fi → Подробнее… → DNS: добавьте {0} и удалите остальные.',
+  dnsStepsWindows: 'Параметры → Сеть и Интернет → Wi-Fi → ваша сеть → Назначение DNS-сервера → Изменить → Вручную, IPv4 вкл., Предпочитаемый DNS {0}.',
+  dnsStepsAndroid: 'Настройки → Сеть и Интернет → Персональный DNS-сервер → Имя хоста поставщика: {0}.',
+  dnsStepsAndroidNone: 'Персональному DNS в Android нужно имя хоста, а этот сервис его не даёт: поменяйте DNS на роутере.',
+  dnsStepsRouter: 'Или один раз укажите {0} в настройках роутера — для всех устройств дома.',
 );
 
 const _de = AppStrings(
@@ -2079,6 +2253,39 @@ const _de = AppStrings(
   widgetNewDevice: 'Neu: {0}',
   widgetNetworkEmpty: 'Nova prüft dein Netzwerk jede halbe Stunde',
   widgetNetworkDesc: 'Wie viele Geräte in deinem Netzwerk sind und wer neu ist.',
+  gamingTitle: 'Gaming-Check',
+  gamingIntro: 'Ping, Jitter und Verlust zu den Rechenzentren, in denen Online-Spiele laufen. Spielserver selbst antworten nicht auf Pings; diese stehen direkt daneben.',
+  gamingWebNote: 'Im Browser sind die Zeiten ungefähr.',
+  gamingRunning: 'Prüfe…',
+  gamingAgain: 'Erneut prüfen',
+  gamingBest: 'Am besten für dich',
+  gamingGames: 'Hier spielen: {0}',
+  gamingJitter: 'Jitter {0} ms',
+  gamingLoss: 'Verlust {0} %',
+  gamingGreat: 'Super für Shooter',
+  gamingGood: 'Gut für die meisten Spiele',
+  gamingSlow: 'Spielbar, aber nicht für Shooter',
+  gamingFar: 'Zu weit für schnelle Spiele',
+  gamingLost: 'Keine Antwort',
+  gamingCityFrankfurt: 'Frankfurt',
+  gamingCityStockholm: 'Stockholm',
+  gamingCityLondon: 'London',
+  gamingCityParis: 'Paris',
+  gamingCityTelAviv: 'Tel Aviv',
+  gamingCityUae: 'Vereinigte Arabische Emirate',
+  gamingCityMumbai: 'Mumbai',
+  dnsTitle: 'DNS-Geschwindigkeitstest',
+  dnsIntro: 'Bevor eine Seite lädt, macht ein DNS-Server aus ihrem Namen eine Adresse. Nova fragt deinen DNS-Server und fünf öffentliche nach beliebten Seiten und misst die Antwortzeit.',
+  dnsCurrent: 'Dein DNS jetzt',
+  dnsAnswered: '{0} von {1} beantwortet',
+  dnsKeep: 'Dein DNS gehört schon zu den schnellsten. Nichts zu ändern.',
+  dnsSwitch: '{0} antwortet in {1} ms, dein DNS in {2} ms. Ein Wechsel kann Seiten etwas schneller starten lassen.',
+  dnsHowTo: 'So wechselst du',
+  dnsStepsMac: 'Systemeinstellungen → Netzwerk → WLAN → Details… → DNS: {0} hinzufügen, die anderen entfernen.',
+  dnsStepsWindows: 'Einstellungen → Netzwerk und Internet → WLAN → dein Netzwerk → DNS-Serverzuweisung → Bearbeiten → Manuell, IPv4 ein, Bevorzugter DNS {0}.',
+  dnsStepsAndroid: 'Einstellungen → Netzwerk & Internet → Privates DNS → Hostname des privaten DNS-Anbieters: {0}.',
+  dnsStepsAndroidNone: 'Androids Privates DNS braucht einen Hostnamen, den dieser Dienst nicht anbietet: Ändere es stattdessen im Router.',
+  dnsStepsRouter: 'Oder trage {0} einmal im Router ein – für alle Geräte zu Hause.',
 );
 
 const _hu = AppStrings(
@@ -2400,4 +2607,37 @@ const _hu = AppStrings(
   widgetNewDevice: 'Új: {0}',
   widgetNetworkEmpty: 'A Nova félóránként átnézi a hálózatot',
   widgetNetworkDesc: 'Hány eszköz van a hálózatodon, és ki az új.',
+  gamingTitle: 'Játékteszt',
+  gamingIntro: 'Ping, jitter és csomagvesztés azokig az adatközpontokig, ahol az online játékok futnak. A játékszerverek maguk nem válaszolnak a pingre; ezek közvetlenül mellettük vannak.',
+  gamingWebNote: 'A böngészőben az idők hozzávetőlegesek.',
+  gamingRunning: 'Ellenőrzés…',
+  gamingAgain: 'Újra',
+  gamingBest: 'Neked a legjobb',
+  gamingGames: 'Itt fut: {0}',
+  gamingJitter: 'jitter {0} ms',
+  gamingLoss: 'vesztés {0}%',
+  gamingGreat: 'Lövöldözőshöz kiváló',
+  gamingGood: 'A legtöbb játékhoz jó',
+  gamingSlow: 'Játszható, de lövöldözőshöz nem',
+  gamingFar: 'Túl messze a gyors játékokhoz',
+  gamingLost: 'Nincs válasz',
+  gamingCityFrankfurt: 'Frankfurt',
+  gamingCityStockholm: 'Stockholm',
+  gamingCityLondon: 'London',
+  gamingCityParis: 'Párizs',
+  gamingCityTelAviv: 'Tel-Aviv',
+  gamingCityUae: 'Egyesült Arab Emírségek',
+  gamingCityMumbai: 'Mumbai',
+  dnsTitle: 'DNS-sebességteszt',
+  dnsIntro: 'Mielőtt egy oldal betöltődne, egy DNS-szerver a nevét címmé alakítja. A Nova a te DNS-szerveredet és öt nyilvánosat kérdez népszerű oldalakról, és méri a válaszidőt.',
+  dnsCurrent: 'A mostani DNS-ed',
+  dnsAnswered: '{1}-ból {0} válasz',
+  dnsKeep: 'A DNS-ed már most a leggyorsabbak között van. Nincs mit változtatni.',
+  dnsSwitch: 'A(z) {0} {1} ms alatt válaszol, a te DNS-ed {2} ms alatt. Váltással az oldalak kicsit hamarabb kezdhetnek betöltődni.',
+  dnsHowTo: 'Hogyan válts',
+  dnsStepsMac: 'Rendszerbeállítások → Hálózat → Wi-Fi → Részletek… → DNS: add hozzá a(z) {0} címet, a többit töröld.',
+  dnsStepsWindows: 'Gépház → Hálózat és internet → Wi-Fi → a hálózatod → DNS-kiszolgáló hozzárendelése → Szerkesztés → Manuális, IPv4 be, Elsődleges DNS {0}.',
+  dnsStepsAndroid: 'Beállítások → Hálózat és internet → Privát DNS → Privát DNS-szolgáltató gazdagépneve: {0}.',
+  dnsStepsAndroidNone: 'Az Android Privát DNS-éhez gazdagépnév kell, ezt a szolgáltatás nem kínálja: inkább a routeren állítsd át.',
+  dnsStepsRouter: 'Vagy állítsd be egyszer a(z) {0} címet a routeren, az otthoni összes eszközre.',
 );
