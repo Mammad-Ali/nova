@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Names in the widget picker. What the widgets show comes from the app,
+     in the app's own language (widget_bridge.dart). -->
+<resources>
+    <string name="widget_speed_name">Sürət</string>
+    <string name="widget_speed_desc">Son nəticəniz və bir toxunuşla test.</string>
+    <string name="widget_dash_name">Sürət və trafik</string>
+    <string name="widget_dash_desc">Son nəticəniz, bu günün və bu ayın trafiki.</string>
+</resources>

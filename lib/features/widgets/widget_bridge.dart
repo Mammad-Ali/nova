@@ -23,14 +23,20 @@ import '../traffic_monitor/domain/entities/app_traffic.dart';
 import '../traffic_monitor/presentation/providers/app_usage_tracker.dart';
 import '../traffic_monitor/presentation/providers/usage_stats_provider.dart';
 
-/// Keeps the Mac widgets (macos/NovaWidgets) up to date. They can't ask the
+/// Keeps the widgets up to date — the Mac's (macos/NovaWidgets) and the
+/// Android home screen's (NovaWidgets.kt). They can't ask the
 /// app anything, so the app hands them a snapshot: written when a test
 /// starts and finishes, when the latency to services is measured, when the
 /// language changes, and every half hour for the traffic totals. Each write redraws
 /// the widgets, and macOS limits how often that may happen, so nothing is
 /// sent twice.
 final widgetBridgeProvider = Provider<void>((ref) {
-  if (kIsWeb || defaultTargetPlatform != TargetPlatform.macOS) return;
+  // The Mac widgets (NovaWidgets.swift) and Android's (NovaWidgets.kt) read
+  // the same snapshot.
+  if (kIsWeb ||
+      (defaultTargetPlatform != TargetPlatform.macOS && defaultTargetPlatform != TargetPlatform.android)) {
+    return;
+  }
 
   const channel = MethodChannel('net_pulse/widgets');
   Timer? pending;

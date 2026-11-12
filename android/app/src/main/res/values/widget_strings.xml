@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Names in the widget picker. What the widgets show comes from the app,
+     in the app's own language (widget_bridge.dart). -->
+<resources>
+    <string name="widget_speed_name">Speed</string>
+    <string name="widget_speed_desc">Your last result, and a test in one tap.</string>
+    <string name="widget_dash_name">Speed and traffic</string>
+    <string name="widget_dash_desc">Your last result, and today\'s and this month\'s data.</string>
+</resources>

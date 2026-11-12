@@ -11,8 +11,8 @@ import '../diagnose/presentation/diagnosis_sheet.dart';
 import '../lan_scan/presentation/lan_scan_sheet.dart';
 import '../speedtest/presentation/providers/speedtest_provider.dart';
 
-/// Carries out a click on a Mac widget. Each one arrives as a nova:// link
-/// (NovaLinks in MainFlutterWindow.swift):
+/// Carries out a tap on a widget. Each one arrives as a nova:// link
+/// (NovaLinks in MainFlutterWindow.swift, takeLink in MainActivity.kt):
 ///
 ///   nova://test   bring Nova forward and start a speed test
 ///   nova://call   … and start the call check
@@ -33,7 +33,10 @@ class WidgetLinks {
   static const _channel = MethodChannel('net_pulse/links');
 
   Future<void> listen() async {
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.macOS) return;
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.macOS && defaultTargetPlatform != TargetPlatform.android)) {
+      return;
+    }
     _channel.setMethodCallHandler((call) async {
       if (call.method == 'open') await _handle(call.arguments as String);
     });
@@ -61,10 +64,13 @@ class WidgetLinks {
       return;
     }
 
-    // Out of the menu-bar panel and onto the speed test, in front.
-    final compact = _ref.read(compactModeProvider.notifier);
-    if (_ref.read(compactModeProvider)) await compact.exit();
-    await TrayService.instance.showWindow();
+    // Out of the menu-bar panel and onto the speed test, in front. On a
+    // phone the tap itself brought Nova up.
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      final compact = _ref.read(compactModeProvider.notifier);
+      if (_ref.read(compactModeProvider)) await compact.exit();
+      await TrayService.instance.showWindow();
+    }
     // The apps and network widgets open on the Monitor tab, the rest on
     // the speed test.
     _ref.read(homeTabProvider.notifier).show(action == 'apps' || action == 'lan' ? 1 : 0);

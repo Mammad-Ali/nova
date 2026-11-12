@@ -41,6 +41,29 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Home-screen widgets (NovaWidgets.kt). -->
+        <receiver
+            android:name=".SpeedWidget"
+            android:exported="false"
+            android:label="@string/widget_speed_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_speed_info" />
+        </receiver>
+        <receiver
+            android:name=".DashWidget"
+            android:exported="false"
+            android:label="@string/widget_dash_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_dash_info" />
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

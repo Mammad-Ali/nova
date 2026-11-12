@@ -1,6 +1,7 @@
 package com.example.net_pulse
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.TrafficStats
 import android.net.wifi.WifiManager
@@ -14,8 +15,40 @@ class MainActivity : FlutterActivity() {
     private val wifiChannelName = "net_pulse/wifi"
     private val networkChannelName = "net_pulse/network"
 
+    // nova:// links from the widgets. One can start the app before Dart
+    // listens, so links wait until Dart asks for them ("take") and go
+    // straight through ("open") after that — as on the Mac (NovaLinks).
+    private var links: MethodChannel? = null
+    private val pendingLinks = mutableListOf<String>()
+    private var dartListening = false
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
+        links = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "net_pulse/links").also {
+            it.setMethodCallHandler { call, result ->
+                if (call.method == "take") {
+                    dartListening = true
+                    result.success(pendingLinks.toList())
+                    pendingLinks.clear()
+                } else {
+                    result.notImplemented()
+                }
+            }
+        }
+        intent?.let(::takeLink)
+
+        // What the home-screen widgets show (widget_bridge.dart).
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "net_pulse/widgets")
+            .setMethodCallHandler { call, result ->
+                val json = call.arguments as? String
+                if (call.method == "update" && json != null) {
+                    NovaWidgets.save(applicationContext, json)
+                    result.success(true)
+                } else {
+                    result.notImplemented()
+                }
+            }
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, trafficChannelName)
             .setMethodCallHandler { call, result ->
@@ -66,6 +99,20 @@ class MainActivity : FlutterActivity() {
                     result.notImplemented()
                 }
             }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        takeLink(intent)
+    }
+
+    private fun takeLink(intent: Intent) {
+        val data = intent.data ?: return
+        if (data.scheme != "nova") return
+        // Handled once: the activity keeps its intent across rotations.
+        intent.data = null
+        val link = data.toString()
+        if (dartListening) links?.invokeMethod("open", link) else pendingLinks.add(link)
     }
 
     /**

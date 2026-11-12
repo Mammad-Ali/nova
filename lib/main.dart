@@ -71,8 +71,8 @@ class _NovaAppState extends ConsumerState<NovaApp> {
       // Which apps use the network, day by day (Mac: Nova counts itself).
       ref.read(macAppUsageProvider);
 
-      // The Mac widgets: what they show, and what a click on them asks for.
-      // Both stand down on every other platform.
+      // The widgets (Mac, Android): what they show, and what a tap on them
+      // asks for. Both stand down on every other platform.
       ref.read(widgetBridgeProvider);
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => WidgetLinks(ref, novaNavigatorKey).listen(),
