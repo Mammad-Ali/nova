@@ -160,6 +160,19 @@ class MainFlutterWindow: NSWindow {
         }
     }
 
+    // --- App icons ---
+    // The apps card (app_icon.dart) shows each app's own icon, which macOS
+    // keeps for every installed app: asked for by the app bundle's path.
+    FlutterMethodChannel(
+        name: "net_pulse/appicons",
+        binaryMessenger: flutterViewController.engine.binaryMessenger
+    ).setMethodCallHandler { call, result in
+        guard call.method == "icon", let path = call.arguments as? String else {
+            result(FlutterMethodNotImplemented); return
+        }
+        result(AppIcons.png(path: path).map { FlutterStandardTypedData(bytes: $0) })
+    }
+
     // --- In-app updates (Sparkle) ---
     // The update banner's "Update now" opens Sparkle's window: the release
     // notes, then download, signature check, install and restart. Nova
@@ -238,6 +251,25 @@ enum SandboxMigration {
     for (key, value) in old where key.hasPrefix("flutter.") {
       defaults.set(value, forKey: key)
     }
+  }
+}
+
+/// App icons as PNG, drawn at [side] pixels from what Finder shows.
+enum AppIcons {
+  static func png(path: String, side: Int = 128) -> Data? {
+    guard FileManager.default.fileExists(atPath: path),
+          let bitmap = NSBitmapImageRep(
+            bitmapDataPlanes: nil, pixelsWide: side, pixelsHigh: side,
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+            colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)
+    else { return nil }
+    let icon = NSWorkspace.shared.icon(forFile: path)
+    NSGraphicsContext.saveGraphicsState()
+    defer { NSGraphicsContext.restoreGraphicsState() }
+    NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
+    icon.draw(in: NSRect(x: 0, y: 0, width: side, height: side),
+              from: .zero, operation: .copy, fraction: 1)
+    return bitmap.representation(using: .png, properties: [:])
   }
 }
 

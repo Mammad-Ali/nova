@@ -13,10 +13,13 @@ import '../../domain/entities/app_traffic.dart';
 class MacAppTrafficSource {
   /// Process ID → the app it belongs to; null for macOS's own services.
   final _apps = <int, String?>{};
+
+  /// Process ID → the app bundle it runs from, for the app's icon.
+  final _bundles = <int, String?>{};
   Map<int, (int, int)> _last = {};
   DateTime? _lastAt;
 
-  Future<List<AppTraffic>> sample() async {
+  Future<MacAppSample> sample() async {
     final result = await Process.run(
       '/usr/bin/nettop',
       ['-P', '-L', '1', '-x', '-J', 'bytes_in,bytes_out'],
@@ -32,7 +35,11 @@ class MacAppTrafficSource {
       final ps = await Process.run('/bin/ps', ['-o', 'pid=,comm=', '-p', unknown.join(',')]);
       for (final line in '${ps.stdout}'.split('\n')) {
         final m = RegExp(r'^\s*(\d+)\s+(.+)$').firstMatch(line);
-        if (m != null) _apps[int.parse(m[1]!)] = appFromPath(m[2]!.trim());
+        if (m == null) continue;
+        final pid = int.parse(m[1]!);
+        final path = m[2]!.trim();
+        _apps[pid] = appFromPath(path);
+        _bundles[pid] = bundleFromPath(path);
       }
       // Gone before ps looked: nettop's (shortened) name will do.
       for (final pid in unknown) {
@@ -46,29 +53,37 @@ class MacAppTrafficSource {
       final sum = byApp.putIfAbsent(_apps[pid], _Sum.new)
         ..bytesIn += p.bytesIn
         ..bytesOut += p.bytesOut;
+      sum.bundle ??= _bundles[pid];
       final before = _last[pid];
-      if (before != null && seconds > 0) {
-        // A smaller count means the ID now belongs to a new process.
-        if (p.bytesIn >= before.$1) sum.rateIn += (p.bytesIn - before.$1) / seconds;
-        if (p.bytesOut >= before.$2) sum.rateOut += (p.bytesOut - before.$2) / seconds;
+      // A process seen for the first time brings its whole past with it,
+      // which may well be from yesterday: only what moves from here on is
+      // counted. A smaller count means the ID now belongs to a new process.
+      if (before != null) {
+        if (p.bytesIn >= before.$1) sum.newIn += p.bytesIn - before.$1;
+        if (p.bytesOut >= before.$2) sum.newOut += p.bytesOut - before.$2;
       }
     }
     _last = {for (final e in processes.entries) e.key: (e.value.bytesIn, e.value.bytesOut)};
     _lastAt = now;
     _apps.removeWhere((pid, _) => !processes.containsKey(pid));
+    _bundles.removeWhere((pid, _) => !processes.containsKey(pid));
 
-    return [
-      for (final MapEntry(key: app, value: sum) in byApp.entries)
-        if (sum.bytesIn + sum.bytesOut > 0)
-          AppTraffic(
-            name: app ?? '',
-            kind: app == null ? AppTrafficKind.system : AppTrafficKind.app,
-            bytesIn: sum.bytesIn,
-            bytesOut: sum.bytesOut,
-            rateIn: sum.rateIn,
-            rateOut: sum.rateOut,
-          ),
-    ];
+    final apps = <AppTraffic>[];
+    final moved = <String, (int, int)>{};
+    for (final MapEntry(key: app, value: sum) in byApp.entries) {
+      final traffic = AppTraffic(
+        name: app ?? '',
+        kind: app == null ? AppTrafficKind.system : AppTrafficKind.app,
+        bytesIn: sum.bytesIn,
+        bytesOut: sum.bytesOut,
+        rateIn: seconds > 0 ? sum.newIn / seconds : 0,
+        rateOut: seconds > 0 ? sum.newOut / seconds : 0,
+        iconSource: sum.bundle,
+      );
+      if (traffic.total > 0) apps.add(traffic);
+      if (sum.newIn + sum.newOut > 0) moved[traffic.key] = (sum.newIn, sum.newOut);
+    }
+    return MacAppSample(apps: apps, moved: moved);
   }
 
   /// nettop's `-P -x -J bytes_in,bytes_out` output — "Google Chrome
@@ -98,13 +113,32 @@ class MacAppTrafficSource {
     }
     return parts.last.isEmpty ? path : parts.last;
   }
+
+  /// The outermost app bundle in [path] — "/Applications/Google
+  /// Chrome.app" — whose icon stands for the app; null for macOS's own
+  /// services and for programs outside any bundle.
+  static String? bundleFromPath(String path) {
+    if (appFromPath(path) == null) return null;
+    final at = path.indexOf('.app/');
+    if (at > 0) return path.substring(0, at + 4);
+    return path.endsWith('.app') ? path : null;
+  }
+}
+
+/// One reading: every app's totals since it started and its speed, and
+/// what each moved since the reading before ("app:Telegram" → in, out).
+class MacAppSample {
+  const MacAppSample({required this.apps, required this.moved});
+  final List<AppTraffic> apps;
+  final Map<String, (int, int)> moved;
 }
 
 class _Sum {
   int bytesIn = 0;
   int bytesOut = 0;
-  double rateIn = 0;
-  double rateOut = 0;
+  int newIn = 0;
+  int newOut = 0;
+  String? bundle;
 }
 
 /// Traffic per app on Android, today, from the system's network
@@ -127,11 +161,15 @@ class AndroidAppTrafficSource {
     } catch (_) {}
   }
 
-  /// Null when the statistics can't be read (no access).
-  Future<List<AppTraffic>?> today() async {
-    final raw = await _channel.invokeListMethod<Map<Object?, Object?>>('today');
+  /// Each app's traffic from [from] to [to]; null when the statistics
+  /// can't be read (no access).
+  Future<List<AppTraffic>?> range(DateTime from, DateTime to) async {
+    final raw = await _channel.invokeListMethod<Map<Object?, Object?>>('range', {
+      'from': from.millisecondsSinceEpoch,
+      'to': to.millisecondsSinceEpoch,
+    });
     if (raw == null) return null;
-    final merged = <(AppTrafficKind, String), AppTraffic>{};
+    final merged = <String, AppTraffic>{};
     for (final entry in raw) {
       final kind = switch (entry['kind']) {
         'system' => AppTrafficKind.system,
@@ -140,14 +178,18 @@ class AndroidAppTrafficSource {
         _ => AppTrafficKind.app,
       };
       final name = '${entry['name'] ?? ''}';
-      final before = merged[(kind, name)];
-      merged[(kind, name)] = AppTraffic(
+      final key = appKey(kind, name);
+      final before = merged[key];
+      merged[key] = AppTraffic(
         name: name,
         kind: kind,
         bytesIn: (before?.bytesIn ?? 0) + ((entry['rx'] as num?)?.toInt() ?? 0),
         bytesOut: (before?.bytesOut ?? 0) + ((entry['tx'] as num?)?.toInt() ?? 0),
+        iconSource: before?.iconSource ?? _nonEmpty(entry['package'] as String?),
       );
     }
     return merged.values.toList();
   }
 }
+
+String? _nonEmpty(String? s) => s == null || s.isEmpty ? null : s;

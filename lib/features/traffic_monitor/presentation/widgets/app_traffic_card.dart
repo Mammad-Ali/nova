@@ -6,6 +6,9 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/byte_format.dart';
 import '../../domain/entities/app_traffic.dart';
 import '../providers/app_traffic_provider.dart';
+import '../providers/app_usage_tracker.dart';
+import 'app_badge.dart';
+import 'app_detail_sheet.dart';
 
 /// "Apps using the network": who took how much, and on the Mac who is
 /// taking it right now. Not shown where the system doesn't say (Windows,
@@ -28,9 +31,19 @@ class _AppTrafficCardState extends ConsumerState<AppTrafficCard> {
     final s = ref.watch(appTrafficProvider);
     if (s.mode == AppTrafficMode.unavailable) return const SizedBox.shrink();
 
-    final live = s.mode == AppTrafficMode.live;
+    final mac = s.mode == AppTrafficMode.mac;
+    final live = s.period == AppPeriod.now;
+    final limits = ref.watch(appLimitsProvider);
+    // Limits are per day: a 7-day total says nothing about them.
+    final limitsApply = s.period == AppPeriod.today;
     final shown = _expanded ? s.apps : s.apps.take(_collapsed).toList();
     final largest = s.apps.isEmpty ? 1 : s.apps.first.total;
+    final hint = switch ((mac, s.period)) {
+      (true, AppPeriod.now) => t.appsHintLive,
+      (true, _) => t.appsHintCounted,
+      (false, AppPeriod.week) => t.appsHintWeek,
+      (false, _) => t.appsHintToday,
+    };
 
     final card = Container(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
@@ -57,10 +70,15 @@ class _AppTrafficCardState extends ConsumerState<AppTrafficCard> {
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            live ? t.appsHintLive : t.appsHintToday,
-            style: TextStyle(color: AppColors.textLo, fontSize: 12),
+          const SizedBox(height: 10),
+          _PeriodPicker(
+            periods: s.periods,
+            selected: s.period,
+            strings: t,
+            onSelect: ref.read(appTrafficProvider.notifier).setPeriod,
           ),
+          const SizedBox(height: 8),
+          Text(hint, style: TextStyle(color: AppColors.textLo, fontSize: 12)),
           const SizedBox(height: 10),
           if (s.needsAccess)
             _AccessRequest(
@@ -81,11 +99,22 @@ class _AppTrafficCardState extends ConsumerState<AppTrafficCard> {
           else if (s.apps.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              child: Text(t.appsNone, style: TextStyle(color: AppColors.textMid, fontSize: 13)),
+              child: Text(
+                mac && !live ? t.appsNoHistory : t.appsNone,
+                style: TextStyle(color: AppColors.textMid, fontSize: 13),
+              ),
             )
           else ...[
             for (final app in shown)
-              _AppRow(app: app, largest: largest, live: live, strings: t),
+              _AppRow(
+                app: app,
+                largest: largest,
+                live: live,
+                mac: mac,
+                overLimit: limitsApply && limits[app.key] != null && app.total >= limits[app.key]!,
+                strings: t,
+                onTap: () => showAppDetailSheet(context, app: app, strings: t),
+              ),
             if (s.apps.length > _collapsed)
               Align(
                 alignment: Alignment.centerLeft,
@@ -112,31 +141,35 @@ class _AppRow extends StatelessWidget {
     required this.app,
     required this.largest,
     required this.live,
+    required this.mac,
+    required this.overLimit,
     required this.strings,
+    required this.onTap,
   });
   final AppTraffic app;
   final int largest;
   final bool live;
+  final bool mac;
+  final bool overLimit;
   final AppStrings strings;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final name = switch (app.kind) {
-      AppTrafficKind.app => app.name,
-      AppTrafficKind.system => live ? strings.appsSystemMac : strings.appsSystemAndroid,
-      AppTrafficKind.removed => strings.appsRemoved,
-      AppTrafficKind.hotspot => strings.appsHotspot,
-    };
-    final color = _colorFor(app);
+    final name = appDisplayName(app, strings, mac: mac);
+    final color = overLimit ? AppColors.red : appColor(app);
     final share = largest == 0 ? 0.0 : (app.total / largest).clamp(0.0, 1.0);
     // Below 1 KB/s is background chatter, not worth a number.
     final moving = live && app.rate >= 1024;
 
-    return Padding(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          _Badge(app: app, name: name, color: color),
+          AppBadge(app: app, name: name, color: appColor(app)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -156,6 +189,20 @@ class _AppRow extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (overLimit) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.red.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          strings.appsOverLimit,
+                          style: TextStyle(color: AppColors.red, fontSize: 11, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
                     if (moving) ...[
                       _Rate(icon: Icons.south_rounded, bytesPerSec: app.rateIn, color: AppColors.accentDown),
                       const SizedBox(width: 8),
@@ -188,40 +235,7 @@ class _AppRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// A letter in a colored square for apps; an icon for the rest.
-class _Badge extends StatelessWidget {
-  const _Badge({required this.app, required this.name, required this.color});
-  final AppTraffic app;
-  final String name;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final icon = switch (app.kind) {
-      AppTrafficKind.app => null,
-      AppTrafficKind.system => Icons.settings_rounded,
-      AppTrafficKind.removed => Icons.delete_outline_rounded,
-      AppTrafficKind.hotspot => Icons.wifi_tethering_rounded,
-    };
-    final letter = name.trim().isEmpty ? '?' : name.trim().characters.first.toUpperCase();
-    return Container(
-      width: 32,
-      height: 32,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(9),
       ),
-      child: icon != null
-          ? Icon(icon, size: 17, color: color)
-          : Text(
-              letter,
-              style: TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.w800),
-            ),
     );
   }
 }
@@ -269,22 +283,43 @@ class _AccessRequest extends StatelessWidget {
       );
 }
 
-/// The same color for an app every time: picked from its name.
-Color _colorFor(AppTraffic app) {
-  if (app.kind != AppTrafficKind.app) return AppColors.textMid;
-  const palette = [
-    AppColors.accentDown,
-    AppColors.accentUp,
-    AppColors.accentAlt,
-    AppColors.green,
-    AppColors.amber,
-    AppColors.red,
-    AppColors.sun,
-    AppColors.nebulaViolet,
-  ];
-  var hash = 0;
-  for (final unit in app.name.codeUnits) {
-    hash = (hash * 31 + unit) & 0x7fffffff;
-  }
-  return palette[hash % palette.length];
+/// Now · Today · 7 days.
+class _PeriodPicker extends StatelessWidget {
+  const _PeriodPicker({
+    required this.periods,
+    required this.selected,
+    required this.strings,
+    required this.onSelect,
+  });
+  final List<AppPeriod> periods;
+  final AppPeriod selected;
+  final AppStrings strings;
+  final ValueChanged<AppPeriod> onSelect;
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+        spacing: 6,
+        children: [
+          for (final period in periods)
+            ChoiceChip(
+              label: Text(switch (period) {
+                AppPeriod.now => strings.appsPeriodNow,
+                AppPeriod.today => strings.appsPeriodToday,
+                AppPeriod.week => strings.appsPeriodWeek,
+              }),
+              selected: period == selected,
+              onSelected: (_) => onSelect(period),
+              visualDensity: VisualDensity.compact,
+              showCheckmark: false,
+              labelStyle: TextStyle(
+                color: period == selected ? Colors.black : AppColors.onGlass,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              selectedColor: Colors.white,
+              backgroundColor: AppColors.onGlass.withValues(alpha: 0.06),
+              side: BorderSide(color: AppColors.onGlass.withValues(alpha: 0.14)),
+            ),
+        ],
+      );
 }

@@ -17,6 +17,7 @@ import 'features/speedtest/presentation/providers/history_sync_provider.dart';
 import 'features/traffic_monitor/presentation/providers/stability_provider.dart';
 import 'features/traffic_monitor/presentation/providers/traffic_provider.dart';
 import 'features/traffic_monitor/presentation/providers/usage_stats_provider.dart';
+import 'features/traffic_monitor/presentation/providers/app_usage_tracker.dart';
 import 'features/updates/update_provider.dart';
 import 'features/widgets/widget_bridge.dart';
 import 'features/widgets/widget_links.dart';
@@ -66,6 +67,9 @@ class _NovaAppState extends ConsumerState<NovaApp> {
 
       // Settings → Automatic tests.
       ref.read(autoTestProvider);
+
+      // Which apps use the network, day by day (Mac: Nova counts itself).
+      ref.read(macAppUsageProvider);
 
       // The Mac widgets: what they show, and what a click on them asks for.
       // Both stand down on every other platform.

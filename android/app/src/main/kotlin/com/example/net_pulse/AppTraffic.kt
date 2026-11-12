@@ -5,6 +5,8 @@ import android.app.usage.NetworkStats
 import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Handler
@@ -13,10 +15,10 @@ import android.os.Process
 import android.provider.Settings
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
-import java.util.Calendar
+import java.io.ByteArrayOutputStream
 
 /**
- * Which apps used the network today, for the Monitor tab
+ * Which apps used the network, today or over the past week, for the Monitor tab
  * (app_traffic_source.dart). Android keeps this in NetworkStatsManager and
  * shows it only to apps the user lets in under Settings → Usage access.
  */
@@ -32,16 +34,22 @@ class AppTraffic(private val context: Context) {
                     context.startActivity(intent)
                     result.success(true)
                 }
-                "today" -> {
+                "range" -> {
+                    val from = (call.argument<Number>("from") ?: 0).toLong()
+                    val to = (call.argument<Number>("to") ?: System.currentTimeMillis()).toLong()
                     // A query walks every app's buckets: off the main thread.
                     Thread {
                         val apps = try {
-                            today()
+                            range(from, to)
                         } catch (e: Exception) {
                             null
                         }
                         Handler(Looper.getMainLooper()).post { result.success(apps) }
                     }.start()
+                }
+                "icon" -> {
+                    val pkg = call.arguments as? String
+                    result.success(if (pkg == null) null else icon(pkg))
                 }
                 else -> result.notImplemented()
             }
@@ -64,17 +72,10 @@ class AppTraffic(private val context: Context) {
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
-    /** Bytes per app since midnight, over Wi-Fi and mobile data together. */
-    private fun today(): List<Map<String, Any>>? {
+    /** Bytes per app from [from] to [to], over Wi-Fi and mobile data together. */
+    private fun range(from: Long, to: Long): List<Map<String, Any>>? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || !hasAccess()) return null
         val stats = context.getSystemService(Context.NETWORK_STATS_SERVICE) as NetworkStatsManager
-        val midnight = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.timeInMillis
-        val now = System.currentTimeMillis()
 
         val byUid = HashMap<Int, LongArray>()
         @Suppress("DEPRECATION")
@@ -83,7 +84,7 @@ class AppTraffic(private val context: Context) {
                 // Mobile data before Android 10 wants the SIM's subscriber
                 // ID, which needs a phone permission Nova doesn't ask for:
                 // then only Wi-Fi is counted.
-                stats.querySummary(type, null, midnight, now)
+                stats.querySummary(type, null, from, to)
             } catch (e: Exception) {
                 continue
             }
@@ -99,27 +100,41 @@ class AppTraffic(private val context: Context) {
 
         return byUid.mapNotNull { (uid, bytes) ->
             if (bytes[0] + bytes[1] == 0L) return@mapNotNull null
-            val (name, kind) = describe(uid)
-            mapOf("name" to name, "kind" to kind, "rx" to bytes[0], "tx" to bytes[1])
+            val (name, kind, pkg) = describe(uid)
+            mapOf("name" to name, "kind" to kind, "package" to pkg, "rx" to bytes[0], "tx" to bytes[1])
         }
     }
 
-    /** An app's name, or what a special UID stands for. */
-    private fun describe(uid: Int): Pair<String, String> {
+    /** The app's launcher icon as a PNG, [side] pixels square. */
+    private fun icon(pkg: String, side: Int = 96): ByteArray? = try {
+        val drawable = context.packageManager.getApplicationIcon(pkg)
+        val bitmap = Bitmap.createBitmap(side, side, Bitmap.Config.ARGB_8888)
+        drawable.setBounds(0, 0, side, side)
+        drawable.draw(Canvas(bitmap))
+        ByteArrayOutputStream().use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            out.toByteArray()
+        }
+    } catch (e: Exception) {
+        null
+    }
+
+    /** An app's name, what it is, and its package (for the icon). */
+    private fun describe(uid: Int): Triple<String, String, String> {
         when (uid) {
-            NetworkStats.Bucket.UID_REMOVED -> return "" to "removed"
-            NetworkStats.Bucket.UID_TETHERING -> return "" to "hotspot"
-            Process.SYSTEM_UID, 0 -> return "" to "system"
+            NetworkStats.Bucket.UID_REMOVED -> return Triple("", "removed", "")
+            NetworkStats.Bucket.UID_TETHERING -> return Triple("", "hotspot", "")
+            Process.SYSTEM_UID, 0 -> return Triple("", "system", "")
         }
         val pm = context.packageManager
         val packages = pm.getPackagesForUid(uid)
-        if (packages.isNullOrEmpty()) return "" to "system"
+        if (packages.isNullOrEmpty()) return Triple("", "system", "")
         // Apps sharing a UID are named after the first one.
         val name = try {
             pm.getApplicationLabel(pm.getApplicationInfo(packages[0], 0)).toString()
         } catch (e: Exception) {
             packages[0]
         }
-        return name to "app"
+        return Triple(name, "app", packages[0])
     }
 }

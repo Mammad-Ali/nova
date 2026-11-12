@@ -326,6 +326,20 @@ class AppStrings {
     required this.appsShowAll,
     required this.appsShowLess,
     required this.appsNone,
+    required this.appsPeriodNow,
+    required this.appsPeriodToday,
+    required this.appsPeriodWeek,
+    required this.appsHintCounted,
+    required this.appsHintWeek,
+    required this.appsLimitTitle,
+    required this.appsLimitBody,
+    required this.appsLimit,
+    required this.appsLimitOff,
+    required this.appsLimitHintMac,
+    required this.appsLimitHintAndroid,
+    required this.appsOverLimit,
+    required this.appsLast7Days,
+    required this.appsNoHistory,
   });
 
   // Navigation and shared
@@ -679,6 +693,26 @@ class AppStrings {
   final String appsShowAll;
   final String appsShowLess;
   final String appsNone;
+  final String appsPeriodNow;
+  final String appsPeriodToday;
+  final String appsPeriodWeek;
+
+  /// Under the Mac's Today and 7 days: Nova counts only while it runs.
+  final String appsHintCounted;
+  final String appsHintWeek;
+
+  /// {0} is an app's name.
+  final String appsLimitTitle;
+
+  /// {0} is used today, {1} the limit, both like "2.1 GB".
+  final String appsLimitBody;
+  final String appsLimit;
+  final String appsLimitOff;
+  final String appsLimitHintMac;
+  final String appsLimitHintAndroid;
+  final String appsOverLimit;
+  final String appsLast7Days;
+  final String appsNoHistory;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -993,6 +1027,20 @@ const _en = AppStrings(
   appsShowAll: 'Show all {0}',
   appsShowLess: 'Show fewer',
   appsNone: 'No app has used the network yet.',
+  appsPeriodNow: 'Now',
+  appsPeriodToday: 'Today',
+  appsPeriodWeek: '7 days',
+  appsHintCounted: 'Counted while Nova runs, as in the menu bar',
+  appsHintWeek: 'The past 7 days, over Wi-Fi and mobile data',
+  appsLimitTitle: '{0} passed its daily limit',
+  appsLimitBody: '{0} today, more than the {1} you set.',
+  appsLimit: 'Daily limit',
+  appsLimitOff: 'Off',
+  appsLimitHintMac: 'Nova tells you when the app goes past it.',
+  appsLimitHintAndroid: 'The app is marked in the list when it goes past it.',
+  appsOverLimit: 'Over limit',
+  appsLast7Days: 'Last 7 days',
+  appsNoHistory: "Nothing counted yet: Nova adds up each app's traffic while it runs.",
 );
 
 const _az = AppStrings(
@@ -1290,6 +1338,20 @@ const _az = AppStrings(
   appsShowAll: 'Hamısını göstər ({0})',
   appsShowLess: 'Daha az göstər',
   appsNone: 'Hələ heç bir tətbiq şəbəkədən istifadə etməyib.',
+  appsPeriodNow: 'İndi',
+  appsPeriodToday: 'Bu gün',
+  appsPeriodWeek: '7 gün',
+  appsHintCounted: 'Nova işlədikcə sayılır, menyu sətrindəki kimi',
+  appsHintWeek: 'Son 7 gün, Wi-Fi və mobil internet üzrə',
+  appsLimitTitle: '{0} gündəlik limiti keçdi',
+  appsLimitBody: 'Bu gün {0} — təyin etdiyiniz {1}-dan çox.',
+  appsLimit: 'Gündəlik limit',
+  appsLimitOff: 'Yox',
+  appsLimitHintMac: 'Tətbiq onu keçəndə Nova xəbər verəcək.',
+  appsLimitHintAndroid: 'Tətbiq onu keçəndə siyahıda qeyd olunacaq.',
+  appsOverLimit: 'Limitdən çox',
+  appsLast7Days: 'Son 7 gün',
+  appsNoHistory: 'Hələ heç nə sayılmayıb: Nova işlədikcə hər tətbiqin trafikini toplayır.',
 );
 
 const _ru = AppStrings(
@@ -1587,6 +1649,20 @@ const _ru = AppStrings(
   appsShowAll: 'Показать все ({0})',
   appsShowLess: 'Свернуть',
   appsNone: 'Пока ни одно приложение не пользовалось сетью.',
+  appsPeriodNow: 'Сейчас',
+  appsPeriodToday: 'Сегодня',
+  appsPeriodWeek: '7 дней',
+  appsHintCounted: 'Считается, пока работает Nova, как в строке меню',
+  appsHintWeek: 'Последние 7 дней, по Wi-Fi и мобильному интернету',
+  appsLimitTitle: '{0}: превышен дневной лимит',
+  appsLimitBody: 'Сегодня {0} — больше заданных {1}.',
+  appsLimit: 'Дневной лимит',
+  appsLimitOff: 'Нет',
+  appsLimitHintMac: 'Nova сообщит, когда приложение его превысит.',
+  appsLimitHintAndroid: 'Когда приложение его превысит, оно будет отмечено в списке.',
+  appsOverLimit: 'Сверх лимита',
+  appsLast7Days: 'Последние 7 дней',
+  appsNoHistory: 'Пока ничего не посчитано: Nova суммирует трафик приложений, пока работает.',
 );
 
 const _de = AppStrings(
@@ -1878,6 +1954,20 @@ const _de = AppStrings(
   appsShowAll: 'Alle {0} zeigen',
   appsShowLess: 'Weniger zeigen',
   appsNone: 'Noch hat keine App das Netzwerk genutzt.',
+  appsPeriodNow: 'Jetzt',
+  appsPeriodToday: 'Heute',
+  appsPeriodWeek: '7 Tage',
+  appsHintCounted: 'Gezählt, solange Nova läuft – wie in der Menüleiste',
+  appsHintWeek: 'Die letzten 7 Tage, über WLAN und mobile Daten',
+  appsLimitTitle: '{0} hat sein Tageslimit überschritten',
+  appsLimitBody: 'Heute {0} – mehr als die eingestellten {1}.',
+  appsLimit: 'Tageslimit',
+  appsLimitOff: 'Aus',
+  appsLimitHintMac: 'Nova meldet sich, wenn die App darüber kommt.',
+  appsLimitHintAndroid: 'Die App wird in der Liste markiert, wenn sie darüber kommt.',
+  appsOverLimit: 'Über Limit',
+  appsLast7Days: 'Letzte 7 Tage',
+  appsNoHistory: 'Noch nichts gezählt: Nova zählt den Verbrauch jeder App, solange es läuft.',
 );
 
 const _hu = AppStrings(
@@ -2169,4 +2259,18 @@ const _hu = AppStrings(
   appsShowAll: 'Mind a(z) {0} mutatása',
   appsShowLess: 'Kevesebb mutatása',
   appsNone: 'Még egyetlen app sem használta a hálózatot.',
+  appsPeriodNow: 'Most',
+  appsPeriodToday: 'Ma',
+  appsPeriodWeek: '7 nap',
+  appsHintCounted: 'Akkor számol, amíg a Nova fut, mint a menüsorban',
+  appsHintWeek: 'Az elmúlt 7 nap, Wi-Fi-n és mobilneten',
+  appsLimitTitle: '{0} túllépte a napi korlátot',
+  appsLimitBody: 'Ma {0}, több a beállított {1}-nál.',
+  appsLimit: 'Napi korlát',
+  appsLimitOff: 'Ki',
+  appsLimitHintMac: 'A Nova szól, ha az app túllépi.',
+  appsLimitHintAndroid: 'Ha az app túllépi, a listában megjelölve látod.',
+  appsOverLimit: 'Korlát felett',
+  appsLast7Days: 'Utolsó 7 nap',
+  appsNoHistory: 'Még nincs mit mutatni: a Nova futás közben összegzi az appok forgalmát.',
 );
