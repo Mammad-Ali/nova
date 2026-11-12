@@ -19,6 +19,7 @@ class AppSettings {
     this.menuBarBits = false,
     this.autoTestEnabled = false,
     this.autoTestHours = 1,
+    this.planMbps,
   });
 
   /// Whether to show system notifications.
@@ -44,6 +45,10 @@ class AppSettings {
   final bool autoTestEnabled;
   final int autoTestHours;
 
+  /// The download speed the internet plan promises, for the report to the
+  /// provider. null until the user says.
+  final double? planMbps;
+
   AppSettings copyWith({
     bool? alertsEnabled,
     double? minSpeedMbps,
@@ -55,6 +60,8 @@ class AppSettings {
     bool? menuBarBits,
     bool? autoTestEnabled,
     int? autoTestHours,
+    double? planMbps,
+    bool clearPlan = false,
   }) {
     return AppSettings(
       alertsEnabled: alertsEnabled ?? this.alertsEnabled,
@@ -66,6 +73,7 @@ class AppSettings {
       menuBarBits: menuBarBits ?? this.menuBarBits,
       autoTestEnabled: autoTestEnabled ?? this.autoTestEnabled,
       autoTestHours: autoTestHours ?? this.autoTestHours,
+      planMbps: clearPlan ? null : (planMbps ?? this.planMbps),
     );
   }
 }
@@ -82,6 +90,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   static const _kMenuBarBits = 'menu_bar_bits';
   static const _kAutoTest = 'auto_test_enabled';
   static const _kAutoTestHours = 'auto_test_hours';
+  static const _kPlan = 'plan_mbps';
 
   @override
   AppSettings build() {
@@ -104,6 +113,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
         menuBarBits: p.getBool(_kMenuBarBits) ?? false,
         autoTestEnabled: p.getBool(_kAutoTest) ?? false,
         autoTestHours: autoTestIntervals.contains(hours) ? hours! : 1,
+        planMbps: p.getDouble(_kPlan),
       );
     } catch (_) {
       // Storage unavailable — keep the defaults.
@@ -129,6 +139,11 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
       await p.setBool(_kMenuBarBits, s.menuBarBits);
       await p.setBool(_kAutoTest, s.autoTestEnabled);
       await p.setInt(_kAutoTestHours, s.autoTestHours);
+      if (s.planMbps == null) {
+        await p.remove(_kPlan);
+      } else {
+        await p.setDouble(_kPlan, s.planMbps!);
+      }
     } catch (_) {}
   }
 
@@ -161,6 +176,9 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   void setAutoTestEnabled(bool v) => _set(state.copyWith(autoTestEnabled: v));
 
   void setAutoTestHours(int v) => _set(state.copyWith(autoTestHours: v));
+
+  void setPlan(double? mbps) =>
+      _set(mbps == null || mbps <= 0 ? state.copyWith(clearPlan: true) : state.copyWith(planMbps: mbps));
 
   void _set(AppSettings s) {
     state = s;

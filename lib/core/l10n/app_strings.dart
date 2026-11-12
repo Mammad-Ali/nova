@@ -389,6 +389,50 @@ class AppStrings {
     required this.dnsStepsAndroid,
     required this.dnsStepsAndroidNone,
     required this.dnsStepsRouter,
+    required this.reportMenu,
+    required this.reportIntro,
+    required this.reportPlan,
+    required this.reportPlanHint,
+    required this.reportWeek,
+    required this.reportMonth,
+    required this.reportAll,
+    required this.reportEmpty,
+    required this.reportSavePdf,
+    required this.reportSaveImage,
+    required this.reportSaved,
+    required this.reportDocTitle,
+    required this.reportGenerated,
+    required this.reportProvider,
+    required this.reportSummaryPlan,
+    required this.reportSummaryNoPlan,
+    required this.reportSummaryUnderHalf,
+    required this.reportSummarySlowPart,
+    required this.reportTests,
+    required this.reportAvgDown,
+    required this.reportAvgUp,
+    required this.reportAvgPing,
+    required this.reportSlowest,
+    required this.reportFastest,
+    required this.reportOfPlan,
+    required this.reportUnderHalf,
+    required this.reportChart,
+    required this.reportByTime,
+    required this.reportPart,
+    required this.reportNight,
+    required this.reportMorning,
+    required this.reportAfternoon,
+    required this.reportEvening,
+    required this.reportEveryTest,
+    required this.reportDate,
+    required this.reportDownload,
+    required this.reportUpload,
+    required this.reportPing,
+    required this.reportMethod,
+    required this.reportCardPlan,
+    required this.reportCardUnderHalf,
+    required this.reportCardAverages,
+    required this.reportCardSlowest,
+    required this.reportCardFooter,
   });
 
   // Navigation and shared
@@ -835,6 +879,74 @@ class AppStrings {
 
   /// {0} is the DNS server's address.
   final String dnsStepsRouter;
+  final String reportMenu;
+  final String reportIntro;
+  final String reportPlan;
+  final String reportPlanHint;
+  final String reportWeek;
+  final String reportMonth;
+  final String reportAll;
+  final String reportEmpty;
+  final String reportSavePdf;
+  final String reportSaveImage;
+
+  /// {0} is where the file went.
+  final String reportSaved;
+  final String reportDocTitle;
+
+  /// {0} is a date and time.
+  final String reportGenerated;
+
+  /// {0} is the internet provider.
+  final String reportProvider;
+
+  /// {0} average download, {1} percent, {2} the plan, in Mbps.
+  final String reportSummaryPlan;
+
+  /// {0} average download, {1} average upload, in Mbps.
+  final String reportSummaryNoPlan;
+
+  /// {0} tests of {1}.
+  final String reportSummaryUnderHalf;
+
+  /// {0} is a time of day, {1} its average in Mbps.
+  final String reportSummarySlowPart;
+  final String reportTests;
+  final String reportAvgDown;
+  final String reportAvgUp;
+  final String reportAvgPing;
+  final String reportSlowest;
+  final String reportFastest;
+  final String reportOfPlan;
+  final String reportUnderHalf;
+  final String reportChart;
+  final String reportByTime;
+  final String reportPart;
+  final String reportNight;
+  final String reportMorning;
+  final String reportAfternoon;
+  final String reportEvening;
+  final String reportEveryTest;
+  final String reportDate;
+  final String reportDownload;
+  final String reportUpload;
+  final String reportPing;
+
+  /// {0} is Nova's version.
+  final String reportMethod;
+
+  /// {0} is the plan in Mbps.
+  final String reportCardPlan;
+
+  /// {0} tests of {1}.
+  final String reportCardUnderHalf;
+
+  /// {0} average upload in Mbps, {1} average ping in ms.
+  final String reportCardAverages;
+
+  /// {0} is the date and time of the slowest test.
+  final String reportCardSlowest;
+  final String reportCardFooter;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -1212,6 +1324,50 @@ const _en = AppStrings(
   dnsStepsAndroid: 'Settings → Network & internet → Private DNS → Private DNS provider hostname: {0}.',
   dnsStepsAndroidNone: "Android's Private DNS needs a host name, which this service doesn't offer: change it on the router instead.",
   dnsStepsRouter: "Or set {0} once in your router's settings, for every device at home.",
+  reportMenu: 'Report for your provider',
+  reportIntro: 'Your tests summed up against the speed you pay for — a PDF to send with a complaint, or one image to share.',
+  reportPlan: 'Your plan',
+  reportPlanHint: 'The download speed your contract promises',
+  reportWeek: 'Last 7 days',
+  reportMonth: 'Last 30 days',
+  reportAll: 'All tests',
+  reportEmpty: 'No tests in this period. Turn on automatic tests in Settings, and Nova collects them for you.',
+  reportSavePdf: 'Save PDF',
+  reportSaveImage: 'Save image',
+  reportSaved: 'Saved: {0}',
+  reportDocTitle: 'Internet speed report',
+  reportGenerated: 'Made with Nova on {0}',
+  reportProvider: 'Provider: {0}',
+  reportSummaryPlan: 'On average the connection gave {0} Mbps — {1}% of the {2} Mbps plan.',
+  reportSummaryNoPlan: 'On average the connection gave {0} Mbps download and {1} Mbps upload.',
+  reportSummaryUnderHalf: '{0} of {1} tests came in under half the plan.',
+  reportSummarySlowPart: 'Slowest time of day: {0}, {1} Mbps on average.',
+  reportTests: 'Tests',
+  reportAvgDown: 'Average download',
+  reportAvgUp: 'Average upload',
+  reportAvgPing: 'Average ping',
+  reportSlowest: 'Slowest download',
+  reportFastest: 'Fastest download',
+  reportOfPlan: 'Of your plan',
+  reportUnderHalf: 'Under half the plan',
+  reportChart: 'Download over the period',
+  reportByTime: 'By time of day',
+  reportPart: 'Time of day',
+  reportNight: 'night (0–6)',
+  reportMorning: 'morning (6–12)',
+  reportAfternoon: 'afternoon (12–18)',
+  reportEvening: 'evening (18–24)',
+  reportEveryTest: 'Every test',
+  reportDate: 'Date',
+  reportDownload: 'Download, Mbps',
+  reportUpload: 'Upload, Mbps',
+  reportPing: 'Ping, ms',
+  reportMethod: "How it was measured: Nova {0} downloads and uploads over four connections at once against Cloudflare's speed test servers, and times round trips for the ping. Times are the device's local time.",
+  reportCardPlan: 'Of the {0} Mbps you pay for',
+  reportCardUnderHalf: '{0} of {1} tests under half the plan',
+  reportCardAverages: 'Upload {0} Mbps on average, ping {1} ms.',
+  reportCardSlowest: 'Slowest test: {0}.',
+  reportCardFooter: 'Measured with Nova · mammad-ali.github.io/nova',
 );
 
 const _az = AppStrings(
@@ -1572,6 +1728,50 @@ const _az = AppStrings(
   dnsStepsAndroid: 'Ayarlar → Şəbəkə və internet → Şəxsi DNS → Şəxsi DNS provayderinin host adı: {0}.',
   dnsStepsAndroidNone: 'Android-in Şəxsi DNS-i host adı tələb edir, bu xidmət isə onu təklif etmir: onu routerdə dəyişin.',
   dnsStepsRouter: 'Və ya {0}-u bir dəfə routerin ayarlarında təyin edin — evdəki bütün cihazlar üçün.',
+  reportMenu: 'Provayder üçün hesabat',
+  reportIntro: 'Testləriniz ödədiyiniz sürətlə müqayisədə — şikayətə əlavə etmək üçün PDF və ya paylaşmaq üçün bir şəkil.',
+  reportPlan: 'Tarifiniz',
+  reportPlanHint: 'Müqavilənizdə vəd edilən yükləmə sürəti',
+  reportWeek: 'Son 7 gün',
+  reportMonth: 'Son 30 gün',
+  reportAll: 'Bütün testlər',
+  reportEmpty: 'Bu dövrdə test yoxdur. Ayarlarda avtomatik testləri yandırın, Nova onları sizin üçün toplayacaq.',
+  reportSavePdf: 'PDF saxla',
+  reportSaveImage: 'Şəkli saxla',
+  reportSaved: 'Saxlanıldı: {0}',
+  reportDocTitle: 'İnternet sürəti hesabatı',
+  reportGenerated: 'Nova ilə hazırlanıb: {0}',
+  reportProvider: 'Provayder: {0}',
+  reportSummaryPlan: 'Bağlantı orta hesabla {0} Mbps verdi — {2} Mbps tarifin {1}%-i.',
+  reportSummaryNoPlan: 'Bağlantı orta hesabla {0} Mbps yükləmə və {1} Mbps göndərmə verdi.',
+  reportSummaryUnderHalf: '{1} testdən {0}-i tarifin yarısından aşağı oldu.',
+  reportSummarySlowPart: 'Günün ən yavaş vaxtı: {0}, orta hesabla {1} Mbps.',
+  reportTests: 'Testlər',
+  reportAvgDown: 'Orta yükləmə',
+  reportAvgUp: 'Orta göndərmə',
+  reportAvgPing: 'Orta ping',
+  reportSlowest: 'Ən yavaş yükləmə',
+  reportFastest: 'Ən sürətli yükləmə',
+  reportOfPlan: 'Tarifdən',
+  reportUnderHalf: 'Tarifin yarısından az',
+  reportChart: 'Dövr ərzində yükləmə',
+  reportByTime: 'Günün vaxtına görə',
+  reportPart: 'Günün vaxtı',
+  reportNight: 'gecə (0–6)',
+  reportMorning: 'səhər (6–12)',
+  reportAfternoon: 'gündüz (12–18)',
+  reportEvening: 'axşam (18–24)',
+  reportEveryTest: 'Bütün testlər',
+  reportDate: 'Tarix',
+  reportDownload: 'Yükləmə, Mbps',
+  reportUpload: 'Göndərmə, Mbps',
+  reportPing: 'Ping, ms',
+  reportMethod: 'Necə ölçülüb: Nova {0} Cloudflare-in sürət testi serverlərinə eyni anda dörd bağlantı ilə yükləyir və göndərir, ping üçün gediş-dönüş vaxtını ölçür. Vaxtlar cihazın yerli vaxtıdır.',
+  reportCardPlan: 'Ödədiyiniz {0} Mbps-dən',
+  reportCardUnderHalf: '{1} testdən {0}-i tarifin yarısından az',
+  reportCardAverages: 'Orta göndərmə {0} Mbps, ping {1} ms.',
+  reportCardSlowest: 'Ən yavaş test: {0}.',
+  reportCardFooter: 'Nova ilə ölçülüb · mammad-ali.github.io/nova',
 );
 
 const _ru = AppStrings(
@@ -1932,6 +2132,50 @@ const _ru = AppStrings(
   dnsStepsAndroid: 'Настройки → Сеть и Интернет → Персональный DNS-сервер → Имя хоста поставщика: {0}.',
   dnsStepsAndroidNone: 'Персональному DNS в Android нужно имя хоста, а этот сервис его не даёт: поменяйте DNS на роутере.',
   dnsStepsRouter: 'Или один раз укажите {0} в настройках роутера — для всех устройств дома.',
+  reportMenu: 'Отчёт для провайдера',
+  reportIntro: 'Ваши тесты в сравнении со скоростью, за которую вы платите: PDF для жалобы или одна картинка, чтобы поделиться.',
+  reportPlan: 'Ваш тариф',
+  reportPlanHint: 'Скорость загрузки, обещанная в договоре',
+  reportWeek: '7 дней',
+  reportMonth: '30 дней',
+  reportAll: 'Все тесты',
+  reportEmpty: 'За этот период тестов нет. Включите автоматические тесты в настройках, и Nova соберёт их за вас.',
+  reportSavePdf: 'Сохранить PDF',
+  reportSaveImage: 'Сохранить картинку',
+  reportSaved: 'Сохранено: {0}',
+  reportDocTitle: 'Отчёт о скорости интернета',
+  reportGenerated: 'Создано в Nova {0}',
+  reportProvider: 'Провайдер: {0}',
+  reportSummaryPlan: 'В среднем подключение давало {0} Мбит/с — {1}% от тарифа {2} Мбит/с.',
+  reportSummaryNoPlan: 'В среднем подключение давало {0} Мбит/с на загрузку и {1} Мбит/с на отдачу.',
+  reportSummaryUnderHalf: '{0} из {1} тестов показали меньше половины тарифа.',
+  reportSummarySlowPart: 'Самое медленное время суток: {0}, в среднем {1} Мбит/с.',
+  reportTests: 'Тестов',
+  reportAvgDown: 'Средняя загрузка',
+  reportAvgUp: 'Средняя отдача',
+  reportAvgPing: 'Средний пинг',
+  reportSlowest: 'Худшая загрузка',
+  reportFastest: 'Лучшая загрузка',
+  reportOfPlan: 'От тарифа',
+  reportUnderHalf: 'Меньше половины тарифа',
+  reportChart: 'Загрузка за период',
+  reportByTime: 'По времени суток',
+  reportPart: 'Время суток',
+  reportNight: 'ночь (0–6)',
+  reportMorning: 'утро (6–12)',
+  reportAfternoon: 'день (12–18)',
+  reportEvening: 'вечер (18–24)',
+  reportEveryTest: 'Все тесты',
+  reportDate: 'Дата',
+  reportDownload: 'Загрузка, Мбит/с',
+  reportUpload: 'Отдача, Мбит/с',
+  reportPing: 'Пинг, мс',
+  reportMethod: 'Как измерено: Nova {0} загружает и отдаёт данные по четырём соединениям сразу на серверы теста скорости Cloudflare и замеряет время отклика для пинга. Время указано по часам устройства.',
+  reportCardPlan: 'От оплаченных {0} Мбит/с',
+  reportCardUnderHalf: '{0} из {1} тестов — меньше половины тарифа',
+  reportCardAverages: 'Отдача в среднем {0} Мбит/с, пинг {1} мс.',
+  reportCardSlowest: 'Худший тест: {0}.',
+  reportCardFooter: 'Измерено в Nova · mammad-ali.github.io/nova',
 );
 
 const _de = AppStrings(
@@ -2286,6 +2530,50 @@ const _de = AppStrings(
   dnsStepsAndroid: 'Einstellungen → Netzwerk & Internet → Privates DNS → Hostname des privaten DNS-Anbieters: {0}.',
   dnsStepsAndroidNone: 'Androids Privates DNS braucht einen Hostnamen, den dieser Dienst nicht anbietet: Ändere es stattdessen im Router.',
   dnsStepsRouter: 'Oder trage {0} einmal im Router ein – für alle Geräte zu Hause.',
+  reportMenu: 'Bericht für deinen Anbieter',
+  reportIntro: 'Deine Tests im Vergleich zur bezahlten Geschwindigkeit – als PDF für eine Beschwerde oder als ein Bild zum Teilen.',
+  reportPlan: 'Dein Tarif',
+  reportPlanHint: 'Die Download-Geschwindigkeit laut Vertrag',
+  reportWeek: '7 Tage',
+  reportMonth: '30 Tage',
+  reportAll: 'Alle Tests',
+  reportEmpty: 'Keine Tests in diesem Zeitraum. Schalte in den Einstellungen automatische Tests ein, dann sammelt Nova sie für dich.',
+  reportSavePdf: 'PDF speichern',
+  reportSaveImage: 'Bild speichern',
+  reportSaved: 'Gespeichert: {0}',
+  reportDocTitle: 'Bericht zur Internetgeschwindigkeit',
+  reportGenerated: 'Erstellt mit Nova am {0}',
+  reportProvider: 'Anbieter: {0}',
+  reportSummaryPlan: 'Im Schnitt lieferte die Verbindung {0} Mbit/s – {1} % der gebuchten {2} Mbit/s.',
+  reportSummaryNoPlan: 'Im Schnitt lieferte die Verbindung {0} Mbit/s im Download und {1} Mbit/s im Upload.',
+  reportSummaryUnderHalf: '{0} von {1} Tests lagen unter der Hälfte des Tarifs.',
+  reportSummarySlowPart: 'Langsamste Tageszeit: {0}, im Schnitt {1} Mbit/s.',
+  reportTests: 'Tests',
+  reportAvgDown: 'Ø Download',
+  reportAvgUp: 'Ø Upload',
+  reportAvgPing: 'Ø Ping',
+  reportSlowest: 'Langsamster Download',
+  reportFastest: 'Schnellster Download',
+  reportOfPlan: 'Vom Tarif',
+  reportUnderHalf: 'Unter halbem Tarif',
+  reportChart: 'Download im Zeitraum',
+  reportByTime: 'Nach Tageszeit',
+  reportPart: 'Tageszeit',
+  reportNight: 'nachts (0–6)',
+  reportMorning: 'morgens (6–12)',
+  reportAfternoon: 'nachmittags (12–18)',
+  reportEvening: 'abends (18–24)',
+  reportEveryTest: 'Alle Tests',
+  reportDate: 'Datum',
+  reportDownload: 'Download, Mbit/s',
+  reportUpload: 'Upload, Mbit/s',
+  reportPing: 'Ping, ms',
+  reportMethod: 'So wurde gemessen: Nova {0} lädt über vier Verbindungen gleichzeitig von Cloudflares Speedtest-Servern herunter und hoch und misst für den Ping die Antwortzeiten. Zeiten in Ortszeit des Geräts.',
+  reportCardPlan: 'Von den bezahlten {0} Mbit/s',
+  reportCardUnderHalf: '{0} von {1} Tests unter dem halben Tarif',
+  reportCardAverages: 'Upload im Schnitt {0} Mbit/s, Ping {1} ms.',
+  reportCardSlowest: 'Langsamster Test: {0}.',
+  reportCardFooter: 'Gemessen mit Nova · mammad-ali.github.io/nova',
 );
 
 const _hu = AppStrings(
@@ -2640,4 +2928,48 @@ const _hu = AppStrings(
   dnsStepsAndroid: 'Beállítások → Hálózat és internet → Privát DNS → Privát DNS-szolgáltató gazdagépneve: {0}.',
   dnsStepsAndroidNone: 'Az Android Privát DNS-éhez gazdagépnév kell, ezt a szolgáltatás nem kínálja: inkább a routeren állítsd át.',
   dnsStepsRouter: 'Vagy állítsd be egyszer a(z) {0} címet a routeren, az otthoni összes eszközre.',
+  reportMenu: 'Jelentés a szolgáltatónak',
+  reportIntro: 'A tesztjeid összevetve azzal a sebességgel, amiért fizetsz – PDF egy panaszhoz, vagy egy kép megosztáshoz.',
+  reportPlan: 'A csomagod',
+  reportPlanHint: 'A szerződésben ígért letöltési sebesség',
+  reportWeek: '7 nap',
+  reportMonth: '30 nap',
+  reportAll: 'Összes teszt',
+  reportEmpty: 'Ebben az időszakban nincs teszt. Kapcsold be az automatikus teszteket a beállításokban, és a Nova összegyűjti őket.',
+  reportSavePdf: 'PDF mentése',
+  reportSaveImage: 'Kép mentése',
+  reportSaved: 'Mentve: {0}',
+  reportDocTitle: 'Internetsebesség-jelentés',
+  reportGenerated: 'Készült a Novával: {0}',
+  reportProvider: 'Szolgáltató: {0}',
+  reportSummaryPlan: 'A kapcsolat átlagosan {0} Mbps-ot adott – a {2} Mbps-os csomag {1}%-át.',
+  reportSummaryNoPlan: 'A kapcsolat átlagosan {0} Mbps letöltést és {1} Mbps feltöltést adott.',
+  reportSummaryUnderHalf: '{1} tesztből {0} a csomag felénél is kevesebbet mért.',
+  reportSummarySlowPart: 'A nap leglassabb része: {0}, átlagosan {1} Mbps.',
+  reportTests: 'Tesztek',
+  reportAvgDown: 'Átlagos letöltés',
+  reportAvgUp: 'Átlagos feltöltés',
+  reportAvgPing: 'Átlagos ping',
+  reportSlowest: 'Leglassabb letöltés',
+  reportFastest: 'Leggyorsabb letöltés',
+  reportOfPlan: 'A csomagból',
+  reportUnderHalf: 'A csomag fele alatt',
+  reportChart: 'Letöltés az időszakban',
+  reportByTime: 'Napszak szerint',
+  reportPart: 'Napszak',
+  reportNight: 'éjjel (0–6)',
+  reportMorning: 'reggel (6–12)',
+  reportAfternoon: 'délután (12–18)',
+  reportEvening: 'este (18–24)',
+  reportEveryTest: 'Minden teszt',
+  reportDate: 'Dátum',
+  reportDownload: 'Letöltés, Mbps',
+  reportUpload: 'Feltöltés, Mbps',
+  reportPing: 'Ping, ms',
+  reportMethod: 'Így mértünk: a Nova {0} egyszerre négy kapcsolaton tölt le és fel a Cloudflare sebességteszt-szervereire, a pinghez pedig a válaszidőt méri. Az idők az eszköz helyi idejét mutatják.',
+  reportCardPlan: 'A kifizetett {0} Mbps-ból',
+  reportCardUnderHalf: '{1} tesztből {0} a csomag fele alatt',
+  reportCardAverages: 'Feltöltés átlagosan {0} Mbps, ping {1} ms.',
+  reportCardSlowest: 'Leglassabb teszt: {0}.',
+  reportCardFooter: 'Mérve a Novával · mammad-ali.github.io/nova',
 );

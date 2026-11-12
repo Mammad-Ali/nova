@@ -25,6 +25,19 @@ class ExportService {
     return location.path;
   }
 
+  /// Saves a PDF (the report to the provider).
+  Future<String?> savePdf(Uint8List bytes, {required String suggestedName}) async {
+    final location = await getSaveLocation(
+      suggestedName: suggestedName,
+      acceptedTypeGroups: const [
+        XTypeGroup(label: 'PDF', extensions: ['pdf']),
+      ],
+    );
+    if (location == null) return null;
+    await File(location.path).writeAsBytes(bytes);
+    return location.path;
+  }
+
   /// Exports the test history as CSV.
   Future<String?> saveHistoryCsv(List<SpeedTestRecord> records) async {
     final location = await getSaveLocation(

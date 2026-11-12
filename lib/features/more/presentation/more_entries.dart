@@ -8,6 +8,7 @@ import '../../call_check/presentation/call_check_sheet.dart';
 import '../../diagnose/presentation/diagnosis_sheet.dart';
 import '../../dns_test/presentation/dns_sheet.dart';
 import '../../gaming/presentation/gaming_sheet.dart';
+import '../../report/presentation/report_sheet.dart';
 import '../../leaderboard/domain/leaderboard_models.dart';
 import '../../leaderboard/presentation/leaderboard_sheet.dart';
 import '../../leaderboard/presentation/provider_ranking_sheet.dart';
@@ -31,6 +32,7 @@ enum MoreEntry {
   callCheck,
   gaming,
   dns,
+  report,
   diagnose,
   about,
   privacy,
@@ -63,6 +65,7 @@ List<MoreSection> moreSections(AppStrings t) => [
         // These need the router, raw name lookups and the system's own
         // settings: app only.
         if (!kIsWeb) MoreEntry.dns,
+        MoreEntry.report,
         if (!kIsWeb) MoreEntry.diagnose,
       ]),
       MoreSection(t.secAbout, const [
@@ -89,6 +92,7 @@ String moreEntryLabel(MoreEntry entry, AppStrings t, NovaAccount? account) =>
       MoreEntry.callCheck => t.callCheckTitle,
       MoreEntry.gaming => t.gamingTitle,
       MoreEntry.dns => t.dnsTitle,
+      MoreEntry.report => t.reportMenu,
       MoreEntry.diagnose => t.diagTitle,
       MoreEntry.about => t.aboutNova,
       MoreEntry.privacy => t.aboutPrivacy,
@@ -111,6 +115,7 @@ IconData moreEntryIcon(MoreEntry entry) => switch (entry) {
       MoreEntry.callCheck => Icons.video_call_rounded,
       MoreEntry.gaming => Icons.sports_esports_rounded,
       MoreEntry.dns => Icons.dns_rounded,
+      MoreEntry.report => Icons.summarize_rounded,
       MoreEntry.diagnose => Icons.troubleshoot_rounded,
       MoreEntry.about => Icons.info_outline_rounded,
       MoreEntry.privacy => Icons.shield_outlined,
@@ -147,6 +152,8 @@ void openMoreEntry(BuildContext context, WidgetRef ref, MoreEntry entry) {
       showGamingSheet(context);
     case MoreEntry.dns:
       showDnsSheet(context);
+    case MoreEntry.report:
+      showReportSheet(context);
     case MoreEntry.diagnose:
       showDiagnosisSheet(context);
     case MoreEntry.about:

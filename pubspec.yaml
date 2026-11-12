@@ -63,6 +63,7 @@ dependencies:
   google_sign_in: ^7.2.0
   # SHA-256 for the PKCE step of the desktop Google sign-in.
   crypto: ^3.0.8
+  pdf: ^3.13.1
 
 dev_dependencies:
   flutter_test:
@@ -111,6 +112,7 @@ flutter:
     - assets/icon/
     - assets/tray/
     - assets/oui/ # MAC prefixes → makers, for the network scan
+    - assets/fonts/ # Roboto, for the report PDF (every letter of the five languages)
 
   # To add assets to your application, add an assets section, like this:
   # assets:

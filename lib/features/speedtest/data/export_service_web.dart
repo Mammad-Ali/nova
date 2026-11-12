@@ -19,6 +19,11 @@ class ExportService {
     return name;
   }
 
+  Future<String?> savePdf(Uint8List bytes, {required String suggestedName}) async {
+    _download(bytes, suggestedName, 'application/pdf');
+    return suggestedName;
+  }
+
   Future<String?> saveHistoryCsv(List<SpeedTestRecord> records) async {
     const name = 'nova-history.csv';
     _download(

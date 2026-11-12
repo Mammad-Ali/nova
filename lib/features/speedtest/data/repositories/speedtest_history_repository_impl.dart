@@ -14,8 +14,9 @@ final speedTestHistoryRepositoryProvider =
 class SpeedTestHistoryRepositoryImpl implements SpeedTestHistoryRepository {
   static const _key = 'speedtest_history_v1';
 
-  /// Caps the history so the settings file doesn't grow without bound.
-  static const maxEntries = 50;
+  /// About a month of hourly automatic tests, enough for a report to the
+  /// provider (report_sheet.dart); some 80 KB of settings.
+  static const maxEntries = 1000;
 
   @override
   Future<List<SpeedTestRecord>> loadAll() async {
