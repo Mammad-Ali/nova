@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Nova's palette: black space, white stars, a sun-yellow accent.
 ///
