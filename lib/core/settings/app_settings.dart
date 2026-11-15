@@ -21,6 +21,7 @@ class AppSettings {
     this.autoTestHours = 1,
     this.planMbps,
     this.serverId,
+    this.starfield3d = true,
   });
 
   /// Whether to show system notifications.
@@ -54,6 +55,10 @@ class AppSettings {
   /// (azerbaijan_servers.dart); null for "Automatic".
   final int? serverId;
 
+  /// The 3D starfield behind everything (macOS): stars flying toward you in
+  /// depth, following the mouse. On unless switched off.
+  final bool starfield3d;
+
   AppSettings copyWith({
     bool? alertsEnabled,
     double? minSpeedMbps,
@@ -69,6 +74,7 @@ class AppSettings {
     bool clearPlan = false,
     int? serverId,
     bool clearServer = false,
+    bool? starfield3d,
   }) {
     return AppSettings(
       alertsEnabled: alertsEnabled ?? this.alertsEnabled,
@@ -82,6 +88,7 @@ class AppSettings {
       autoTestHours: autoTestHours ?? this.autoTestHours,
       planMbps: clearPlan ? null : (planMbps ?? this.planMbps),
       serverId: clearServer ? null : (serverId ?? this.serverId),
+      starfield3d: starfield3d ?? this.starfield3d,
     );
   }
 }
@@ -100,6 +107,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   static const _kAutoTestHours = 'auto_test_hours';
   static const _kPlan = 'plan_mbps';
   static const _kServer = 'test_server';
+  static const _kStarfield3d = 'starfield_3d';
 
   @override
   AppSettings build() {
@@ -124,6 +132,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
         autoTestHours: autoTestIntervals.contains(hours) ? hours! : 1,
         planMbps: p.getDouble(_kPlan),
         serverId: p.getInt(_kServer),
+        starfield3d: p.getBool(_kStarfield3d) ?? true,
       );
     } catch (_) {
       // Storage unavailable — keep the defaults.
@@ -154,6 +163,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
       } else {
         await p.setDouble(_kPlan, s.planMbps!);
       }
+      await p.setBool(_kStarfield3d, s.starfield3d);
       if (s.serverId == null) {
         await p.remove(_kServer);
       } else {
@@ -191,6 +201,8 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   void setAutoTestEnabled(bool v) => _set(state.copyWith(autoTestEnabled: v));
 
   void setAutoTestHours(int v) => _set(state.copyWith(autoTestHours: v));
+
+  void setStarfield3d(bool v) => _set(state.copyWith(starfield3d: v));
 
   void setServer(int? id) =>
       _set(id == null ? state.copyWith(clearServer: true) : state.copyWith(serverId: id));

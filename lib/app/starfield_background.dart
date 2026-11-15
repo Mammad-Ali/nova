@@ -1,10 +1,12 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/app_activity.dart';
+import '../core/settings/app_settings.dart';
 import '../core/theme/app_theme.dart';
 import '../features/speedtest/presentation/providers/speedtest_provider.dart';
 import '../features/speedtest/presentation/widgets/speed_gauge.dart' show warpMbps;
@@ -18,6 +20,11 @@ import '../features/traffic_monitor/presentation/providers/traffic_provider.dart
 /// bubble of empty space follows it. Connection speed only brightens the
 /// particles — the backdrop itself stays colourless — until a test passes
 /// 500 Mbps: then the stars go to warp speed, streaking out from the centre.
+///
+/// On the Mac the sky can be 3D instead (Settings → Animations): stars in a
+/// volume, flying toward the viewer in perspective — faster with the speed,
+/// streaking at warp — while the camera leans toward the mouse, so near
+/// stars slide more than far ones.
 class StarfieldBackground extends ConsumerStatefulWidget {
   const StarfieldBackground({super.key});
 
@@ -72,6 +79,10 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
     final trafficFrac = (rate / (12.5 * 1024 * 1024)).clamp(0.0, 1.0);
     _sim.level = math.max(speedFrac, trafficFrac).toDouble();
     _sim.warpTarget = st.isRunning && st.displayMbps >= warpMbps ? 1 : 0;
+    final threeD = !kIsWeb &&
+        defaultTargetPlatform == TargetPlatform.macOS &&
+        ref.watch(appSettingsProvider.select((s) => s.starfield3d));
+    _sim.depthTarget = threeD ? 1 : 0;
 
     return Positioned.fill(
       child: MouseRegion(
@@ -108,6 +119,18 @@ class _Star {
 }
 
 /// An orbiting particle. Position and velocity are in pixels.
+/// A star in the 3D sky: x and y across, z the distance from the viewer
+/// (1 far, 0 at the eye). It flies toward the viewer and starts again far
+/// away when it passes.
+class _Star3 {
+  _Star3(this.x, this.y, this.z, this.size, this.twinkleRate, this.phase);
+
+  double x, y, z;
+  final double size;
+  final double twinkleRate;
+  final double phase;
+}
+
 class _Orbiter {
   _Orbiter(this.pos, this.vel, this.mass, this.hueShift);
 
@@ -139,6 +162,19 @@ class _SpaceSim extends ChangeNotifier {
   final math.Random _rnd = math.Random(11);
   final List<_Star> stars = [];
   final List<_Orbiter> orbiters = [];
+  final List<_Star3> stars3 = [];
+
+  static const _star3Count = 420;
+
+  /// How 3D the sky is, 0 flat to 1: eased towards [depthTarget] so
+  /// switching fades from one sky to the other.
+  double depth = 0;
+  double depthTarget = 0;
+
+  /// How fast the 3D stars come, in depth per second, and where the camera
+  /// looks: -1..1 on each axis, eased towards the mouse.
+  double flight = 0.06;
+  Offset look = Offset.zero;
 
   Size _size = Size.zero;
   double time = 0;
@@ -172,6 +208,36 @@ class _SpaceSim extends ChangeNotifier {
     }
   }
 
+  _Star3 _newStar3(double z) => _Star3(
+        (_rnd.nextDouble() * 2 - 1) * 1.6,
+        (_rnd.nextDouble() * 2 - 1) * 1.1,
+        z,
+        _rnd.nextDouble() < 0.1 ? 1.6 + _rnd.nextDouble() * 1.2 : 0.6 + _rnd.nextDouble() * 0.8,
+        0.4 + _rnd.nextDouble() * 2.0,
+        _rnd.nextDouble() * math.pi * 2,
+      );
+
+  void _step3d(double dt) {
+    if (stars3.isEmpty) {
+      for (var i = 0; i < _star3Count; i++) {
+        stars3.add(_newStar3(0.04 + _rnd.nextDouble() * 0.96));
+      }
+    }
+    // A slow drift at rest; the connection's speed and warp push it on.
+    flight = 0.06 + 0.42 * level + 2.4 * warp;
+    for (var i = 0; i < stars3.length; i++) {
+      final s = stars3[i];
+      s.z -= flight * dt;
+      if (s.z <= 0.035) stars3[i] = _newStar3(1 + _rnd.nextDouble() * 0.04);
+    }
+    // The camera leans toward the cursor, and back to the middle without it.
+    final c = cursor;
+    final target = c == null || _size == Size.zero
+        ? Offset.zero
+        : Offset(c.dx / _size.width * 2 - 1, c.dy / _size.height * 2 - 1);
+    look += (target - look) * (1 - math.exp(-dt * 2.2));
+  }
+
   /// Per-layer drift speed — the basis of the parallax: far layers barely move.
   static double layerSpeed(int layer) => switch (layer) {
         0 => 0.25,
@@ -183,6 +249,8 @@ class _SpaceSim extends ChangeNotifier {
     time += dt;
     drift += dt * (0.006 + level * 0.02);
     warp += (warpTarget - warp) * (1 - math.exp(-dt * 2.5));
+    depth += (depthTarget - depth) * (1 - math.exp(-dt * 2.0));
+    if (depth > 0.001) _step3d(dt);
     if (warp > 0.001) warpClock += dt * (0.3 + 0.9 * warp);
 
     if (_size != Size.zero) {
@@ -272,14 +340,15 @@ class _SpacePainter extends CustomPainter {
     // Pure black backdrop, like a real night sky.
     canvas.drawRect(Offset.zero & size, Paint()..color = AppColors.bg0);
 
-    _drawStars(canvas, size);
+    if (sim.depth < 0.999) _drawStars(canvas, size, 1 - sim.depth);
+    if (sim.depth > 0.001) _drawStars3d(canvas, size, sim.depth);
     _drawOrbiters(canvas, size);
   }
 
   /// Three star layers: far ones nearly still, near ones visibly drifting.
   /// In warp every star flies out from the centre along its own ray, nearer
   /// layers faster, trailing a streak that grows as it comes closer.
-  void _drawStars(Canvas canvas, Size size) {
+  void _drawStars(Canvas canvas, Size size, double opacity) {
     final paint = Paint();
     final streak = Paint()..strokeCap = StrokeCap.round;
     final warp = sim.warp;
@@ -295,7 +364,7 @@ class _SpacePainter extends CustomPainter {
 
       if (warp < 0.01) {
         paint.color =
-            AppColors.starColor.withValues(alpha: (0.30 + 0.55 * tw) * depth);
+            AppColors.starColor.withValues(alpha: (0.30 + 0.55 * tw) * depth * opacity);
         canvas.drawCircle(base, s.size * (0.9 + 0.2 * tw), paint);
         continue;
       }
@@ -310,9 +379,49 @@ class _SpacePainter extends CustomPainter {
       // into a burst behind the number.
       final emerge = ((out - 0.08) / 0.45).clamp(0.0, 1.0);
       streak
-        ..color = AppColors.starColor.withValues(alpha: ((0.35 + 0.6 * t) * depth * emerge).clamp(0.0, 1.0))
+        ..color = AppColors.starColor.withValues(alpha: ((0.35 + 0.6 * t) * depth * emerge * opacity).clamp(0.0, 1.0))
         ..strokeWidth = s.size * (0.6 + 1.3 * t);
       canvas.drawLine(tail, head, streak);
+    }
+  }
+
+  /// The 3D sky: each star projected through a camera at the eye, so a
+  /// near star is bigger, brighter and moves faster across the screen. The
+  /// camera sits a little off centre toward the mouse — near stars slide
+  /// more than far ones. Fast enough, a star leaves a streak: where it was a
+  /// moment ago, joined to where it is.
+  void _drawStars3d(Canvas canvas, Size size, double opacity) {
+    final paint = Paint();
+    final streak = Paint()..strokeCap = StrokeCap.round;
+    final center = Offset(size.width / 2, size.height * 0.42);
+    final focal = size.shortestSide * 0.55;
+    final camera = Offset(sim.look.dx * 0.22, sim.look.dy * 0.14);
+    // How far back along its path the streak reaches, in depth.
+    final trail = sim.flight * 0.05;
+
+    Offset project(double x, double y, double z) =>
+        center + Offset((x - camera.dx) / z * focal, (y - camera.dy) / z * focal);
+
+    for (final s in sim.stars3) {
+      final head = project(s.x, s.y, s.z);
+      if (head.dx < -40 || head.dx > size.width + 40 || head.dy < -40 || head.dy > size.height + 40) continue;
+      final near = 1 - s.z;
+      final tw = 0.7 + 0.3 * math.sin(sim.time * s.twinkleRate + s.phase);
+      // Born far away and faint, so none pops in.
+      final appear = ((1.0 - s.z) / 0.3).clamp(0.0, 1.0);
+      final alpha = ((0.18 + 0.82 * near) * tw * appear * opacity).clamp(0.0, 1.0);
+      final radius = (s.size * 0.16 / s.z).clamp(0.35, 3.4);
+
+      final tail = project(s.x, s.y, s.z + trail);
+      if ((head - tail).distanceSquared > 2.5) {
+        streak
+          ..color = AppColors.starColor.withValues(alpha: alpha)
+          ..strokeWidth = radius * 1.2;
+        canvas.drawLine(tail, head, streak);
+      } else {
+        paint.color = AppColors.starColor.withValues(alpha: alpha);
+        canvas.drawCircle(head, radius, paint);
+      }
     }
   }
 

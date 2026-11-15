@@ -440,6 +440,9 @@ class AppStrings {
     required this.serverSection,
     required this.serverYours,
     required this.serverSilent,
+    required this.settingsAnimations,
+    required this.starfield3d,
+    required this.starfield3dHint,
   });
 
   // Navigation and shared
@@ -963,6 +966,9 @@ class AppStrings {
 
   /// {0} is a number of servers.
   final String serverSilent;
+  final String settingsAnimations;
+  final String starfield3d;
+  final String starfield3dHint;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -1391,6 +1397,9 @@ const _en = AppStrings(
   serverSection: 'Servers in Azerbaijan',
   serverYours: 'Your provider',
   serverSilent: "{0} more don't answer from your network — some serve only their own provider's customers.",
+  settingsAnimations: 'Animations',
+  starfield3d: '3D starfield',
+  starfield3dHint: 'Stars fly toward you in depth — faster as the speed climbs — and the sky follows the mouse. Off: the flat sky.',
 );
 
 const _az = AppStrings(
@@ -1802,6 +1811,9 @@ const _az = AppStrings(
   serverSection: 'Azərbaycandakı serverlər',
   serverYours: 'Sizin provayder',
   serverSilent: 'Daha {0} server şəbəkənizdən cavab vermir — bəziləri yalnız öz provayderinin abunəçilərinə xidmət edir.',
+  settingsAnimations: 'Animasiyalar',
+  starfield3d: '3D ulduz səması',
+  starfield3dHint: 'Ulduzlar dərinlikdən sizə doğru uçur — sürət artdıqca daha tez — və səma siçanın ardınca hərəkət edir. Söndürüləndə: düz səma.',
 );
 
 const _ru = AppStrings(
@@ -2213,6 +2225,9 @@ const _ru = AppStrings(
   serverSection: 'Серверы в Азербайджане',
   serverYours: 'Ваш провайдер',
   serverSilent: 'Ещё {0} не отвечают из вашей сети — некоторые обслуживают только абонентов своего провайдера.',
+  settingsAnimations: 'Анимации',
+  starfield3d: '3D звёздное небо',
+  starfield3dHint: 'Звёзды летят на вас из глубины — тем быстрее, чем выше скорость, — а небо следует за мышью. Выключено: плоское небо.',
 );
 
 const _de = AppStrings(
@@ -2618,6 +2633,9 @@ const _de = AppStrings(
   serverSection: 'Server in Aserbaidschan',
   serverYours: 'Dein Anbieter',
   serverSilent: '{0} weitere antworten aus deinem Netz nicht – manche bedienen nur Kunden ihres eigenen Anbieters.',
+  settingsAnimations: 'Animationen',
+  starfield3d: '3D-Sternenhimmel',
+  starfield3dHint: 'Sterne fliegen aus der Tiefe auf dich zu – schneller, je höher die Geschwindigkeit – und der Himmel folgt der Maus. Aus: der flache Himmel.',
 );
 
 const _hu = AppStrings(
@@ -3023,4 +3041,7 @@ const _hu = AppStrings(
   serverSection: 'Szerverek Azerbajdzsánban',
   serverYours: 'A szolgáltatód',
   serverSilent: 'További {0} nem válaszol a hálózatodról – némelyik csak a saját szolgáltatója ügyfeleit szolgálja ki.',
+  settingsAnimations: 'Animációk',
+  starfield3d: '3D csillagos ég',
+  starfield3dHint: 'A csillagok a mélyből repülnek feléd – annál gyorsabban, minél nagyobb a sebesség –, és az ég követi az egeret. Kikapcsolva: a sík ég.',
 );

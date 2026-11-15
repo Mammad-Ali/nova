@@ -115,6 +115,11 @@ class _SettingsSheet extends ConsumerWidget {
                     Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                     _AutoTestSettings(settings: s),
                   ],
+                  // The 3D starfield is the Mac's.
+                  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.macOS) ...[
+                    Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
+                    _AnimationSettings(settings: s),
+                  ],
                   Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                   ListTile(
                     leading: Icon(Icons.table_view_rounded,
@@ -361,6 +366,32 @@ class _MenuBarSettings extends ConsumerWidget {
 
 /// Settings → Automatic tests: off until switched on, then every 1, 3 or 6
 /// hours (auto_test_provider.dart does the running).
+class _AnimationSettings extends ConsumerWidget {
+  const _AnimationSettings({required this.settings});
+  final AppSettings settings;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(stringsProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionTitle(t.settingsAnimations),
+        SwitchListTile(
+          value: settings.starfield3d,
+          onChanged: ref.read(appSettingsProvider.notifier).setStarfield3d,
+          activeThumbColor: AppColors.nebulaViolet,
+          title: Text(t.starfield3d, style: TextStyle(color: AppColors.onGlass, fontSize: 14)),
+          subtitle: Text(
+            t.starfield3dHint,
+            style: TextStyle(color: AppColors.textLo, fontSize: 12, height: 1.4),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _AutoTestSettings extends ConsumerWidget {
   const _AutoTestSettings({required this.settings});
   final AppSettings settings;
