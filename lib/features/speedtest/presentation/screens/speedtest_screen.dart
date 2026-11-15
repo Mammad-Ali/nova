@@ -242,7 +242,7 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                 wide ? 40 : 20,
                 24,
                 wide ? 40 : 20,
-                kIsWeb ? 40 : 120,
+                120,
               ),
               child: Center(
                 child: ConstrainedBox(
@@ -314,8 +314,8 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
                         const SizedBox(height: 16),
                         const ServicesCard(),
                       ],
-                      // The browser has no tab bar: what the app keeps under
-                      // Monitor and More appears here instead, below the test.
+                      // The website's front page: below the test, what the app
+                      // adds and where to get it.
                       if (kIsWeb) const WebExtras(),
                     ],
                   ),
@@ -392,6 +392,7 @@ class _Title extends StatelessWidget {
             onPressed: () => showSettingsSheet(context),
             icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
             tooltip: switch (defaultTargetPlatform) {
+              _ when kIsWeb => strings.settings,
               TargetPlatform.macOS => '${strings.settings}   ⌘,',
               TargetPlatform.windows || TargetPlatform.linux => '${strings.settings}   Ctrl+,',
               _ => strings.settings,

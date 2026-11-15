@@ -444,6 +444,25 @@ class AppStrings {
     required this.starfield3d,
     required this.starfield3dHint,
     required this.starfield3dHintTouch,
+    required this.webMonitorSubtitle,
+    required this.connTitle,
+    required this.connType,
+    required this.connWifi,
+    required this.connCellular,
+    required this.connEthernet,
+    required this.connSpeed,
+    required this.connLatency,
+    required this.connSaveData,
+    required this.connEstimateNote,
+    required this.connNoApi,
+    required this.testsTitle,
+    required this.testsNone,
+    required this.testsLast,
+    required this.inAppTitle,
+    required this.inAppText,
+    required this.appOnlyAppsText,
+    required this.appOnlyServersText,
+    required this.appOnlyDnsText,
   });
 
   // Navigation and shared
@@ -971,6 +990,27 @@ class AppStrings {
   final String starfield3d;
   final String starfield3dHint;
   final String starfield3dHintTouch;
+  final String webMonitorSubtitle;
+  final String connTitle;
+  final String connType;
+  final String connWifi;
+  final String connCellular;
+  final String connEthernet;
+  final String connSpeed;
+  final String connLatency;
+  final String connSaveData;
+  final String connEstimateNote;
+  final String connNoApi;
+  final String testsTitle;
+  final String testsNone;
+
+  /// {0} is a number of tests.
+  final String testsLast;
+  final String inAppTitle;
+  final String inAppText;
+  final String appOnlyAppsText;
+  final String appOnlyServersText;
+  final String appOnlyDnsText;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -1403,6 +1443,25 @@ const _en = AppStrings(
   starfield3d: '3D starfield',
   starfield3dHint: 'Stars fly toward you in depth — faster as the speed climbs — and the sky follows the mouse. Off: the flat sky.',
   starfield3dHintTouch: 'Stars fly toward you in depth — faster as the speed climbs — and the sky follows your finger. Off: the flat sky, a little lighter on the battery.',
+  webMonitorSubtitle: 'Your connection, live — from this browser',
+  connTitle: 'Your connection',
+  connType: 'Connection',
+  connWifi: 'Wi-Fi',
+  connCellular: 'Mobile data',
+  connEthernet: 'Cable',
+  connSpeed: 'Speed, as the browser guesses',
+  connLatency: 'Latency, as the browser guesses',
+  connSaveData: 'Data saver is on',
+  connEstimateNote: 'Rough figures from your browser — Chrome stops counting at 10 Mbps. A speed test gives the real ones.',
+  connNoApi: "This browser doesn't share connection details (Chrome and Edge do). The speed test and the stability check below work everywhere.",
+  testsTitle: 'Your tests',
+  testsNone: 'No tests yet — run one on the Speed tab, and your results gather here.',
+  testsLast: 'The last {0}',
+  inAppTitle: 'In the app as well',
+  inAppText: "Live traffic every second, totals by hour, day and month, which apps use the network, every device on your Wi-Fi, signal strength, a DNS test and servers in Azerbaijan. A browser doesn't let a page see any of it.",
+  appOnlyAppsText: 'Which apps take your traffic, with their logos, a week of history and a daily limit for each.',
+  appOnlyServersText: 'Test against Aztelekom, Azercell, Bakcell, Nar and other servers in Baku and the regions — each timed as you pick.',
+  appOnlyDnsText: 'How fast your DNS answers next to Cloudflare, Google and Quad9 — and which one to switch to.',
 );
 
 const _az = AppStrings(
@@ -1818,6 +1877,25 @@ const _az = AppStrings(
   starfield3d: '3D ulduz səması',
   starfield3dHint: 'Ulduzlar dərinlikdən sizə doğru uçur — sürət artdıqca daha tez — və səma siçanın ardınca hərəkət edir. Söndürüləndə: düz səma.',
   starfield3dHintTouch: 'Ulduzlar dərinlikdən sizə doğru uçur — sürət artdıqca daha tez — və səma barmağınızın ardınca hərəkət edir. Söndürüləndə: düz səma, batareyaya bir az daha qənaətcil.',
+  webMonitorSubtitle: 'Bağlantınız, canlı — bu brauzerdən',
+  connTitle: 'Bağlantınız',
+  connType: 'Bağlantı',
+  connWifi: 'Wi-Fi',
+  connCellular: 'Mobil internet',
+  connEthernet: 'Kabel',
+  connSpeed: 'Sürət, brauzerin təxminincə',
+  connLatency: 'Gecikmə, brauzerin təxminincə',
+  connSaveData: 'Trafikə qənaət rejimi aktivdir',
+  connEstimateNote: 'Brauzerinizdən təxmini rəqəmlər — Chrome 10 Mbps-dən yuxarı saymır. Həqiqi rəqəmləri sürət testi verir.',
+  connNoApi: 'Bu brauzer bağlantı məlumatlarını paylaşmır (Chrome və Edge paylaşır). Sürət testi və aşağıdakı sabitlik yoxlaması hər yerdə işləyir.',
+  testsTitle: 'Testləriniz',
+  testsNone: 'Hələ test yoxdur — Sürət bölməsində birini başladın, nəticələr burada toplanacaq.',
+  testsLast: 'Son {0}',
+  inAppTitle: 'Tətbiqdə həmçinin',
+  inAppText: 'Hər saniyə canlı trafik, saat, gün və ay üzrə cəmlər, şəbəkədən istifadə edən tətbiqlər, Wi-Fi-dakı bütün cihazlar, siqnal gücü, DNS testi və Azərbaycandakı serverlər. Brauzer saytın bunların heç birini görməsinə icazə vermir.',
+  appOnlyAppsText: 'Trafikinizi hansı tətbiqlərin apardığı — loqoları, bir həftəlik tarixçəsi və hər biri üçün günlük limitlə.',
+  appOnlyServersText: 'Aztelekom, Azercell, Bakcell, Nar və Bakı ilə regionlardakı digər serverlərlə test — hər biri seçərkən ölçülür.',
+  appOnlyDnsText: 'DNS-inizin Cloudflare, Google və Quad9 ilə müqayisədə nə qədər tez cavab verdiyi — və hansına keçmək lazım olduğu.',
 );
 
 const _ru = AppStrings(
@@ -2233,6 +2311,25 @@ const _ru = AppStrings(
   starfield3d: '3D звёздное небо',
   starfield3dHint: 'Звёзды летят на вас из глубины — тем быстрее, чем выше скорость, — а небо следует за мышью. Выключено: плоское небо.',
   starfield3dHintTouch: 'Звёзды летят на вас из глубины — тем быстрее, чем выше скорость, — а небо следует за пальцем. Выключено: плоское небо, чуть экономнее для батареи.',
+  webMonitorSubtitle: 'Ваше подключение вживую — из этого браузера',
+  connTitle: 'Ваше подключение',
+  connType: 'Подключение',
+  connWifi: 'Wi-Fi',
+  connCellular: 'Мобильный интернет',
+  connEthernet: 'Кабель',
+  connSpeed: 'Скорость по оценке браузера',
+  connLatency: 'Задержка по оценке браузера',
+  connSaveData: 'Включена экономия трафика',
+  connEstimateNote: 'Грубые цифры от браузера — Chrome не считает выше 10 Мбит/с. Настоящие даст тест скорости.',
+  connNoApi: 'Этот браузер не сообщает данные о подключении (Chrome и Edge сообщают). Тест скорости и проверка стабильности ниже работают везде.',
+  testsTitle: 'Ваши тесты',
+  testsNone: 'Тестов пока нет — запустите тест на вкладке «Скорость», и результаты появятся здесь.',
+  testsLast: 'Последние {0}',
+  inAppTitle: 'А в приложении ещё',
+  inAppText: 'Живой трафик каждую секунду, итоги за час, день и месяц, какие приложения пользуются сетью, все устройства в вашем Wi-Fi, уровень сигнала, тест DNS и серверы в Азербайджане. Браузер не даёт сайту увидеть ничего из этого.',
+  appOnlyAppsText: 'Какие приложения забирают трафик — с логотипами, историей за неделю и дневным лимитом для каждого.',
+  appOnlyServersText: 'Тест на серверах Aztelekom, Azercell, Bakcell, Nar и других в Баку и регионах — каждый замеряется при выборе.',
+  appOnlyDnsText: 'Как быстро отвечает ваш DNS по сравнению с Cloudflare, Google и Quad9 — и на какой стоит перейти.',
 );
 
 const _de = AppStrings(
@@ -2642,6 +2739,25 @@ const _de = AppStrings(
   starfield3d: '3D-Sternenhimmel',
   starfield3dHint: 'Sterne fliegen aus der Tiefe auf dich zu – schneller, je höher die Geschwindigkeit – und der Himmel folgt der Maus. Aus: der flache Himmel.',
   starfield3dHintTouch: 'Sterne fliegen aus der Tiefe auf dich zu – schneller, je höher die Geschwindigkeit – und der Himmel folgt deinem Finger. Aus: der flache Himmel, etwas sparsamer für den Akku.',
+  webMonitorSubtitle: 'Deine Verbindung, live – aus diesem Browser',
+  connTitle: 'Deine Verbindung',
+  connType: 'Verbindung',
+  connWifi: 'WLAN',
+  connCellular: 'Mobile Daten',
+  connEthernet: 'Kabel',
+  connSpeed: 'Tempo laut Browser-Schätzung',
+  connLatency: 'Latenz laut Browser-Schätzung',
+  connSaveData: 'Datensparmodus ist an',
+  connEstimateNote: 'Grobe Werte deines Browsers – Chrome zählt nur bis 10 Mbit/s. Echte Werte liefert ein Speedtest.',
+  connNoApi: 'Dieser Browser teilt keine Verbindungsdetails (Chrome und Edge schon). Der Speedtest und die Stabilitätsprüfung unten funktionieren überall.',
+  testsTitle: 'Deine Tests',
+  testsNone: 'Noch keine Tests – starte einen im Tab Geschwindigkeit, dann sammeln sich die Ergebnisse hier.',
+  testsLast: 'Die letzten {0}',
+  inAppTitle: 'In der App außerdem',
+  inAppText: 'Live-Verkehr jede Sekunde, Summen pro Stunde, Tag und Monat, welche Apps das Netz nutzen, jedes Gerät in deinem WLAN, Signalstärke, ein DNS-Test und Server in Aserbaidschan. Ein Browser lässt eine Seite nichts davon sehen.',
+  appOnlyAppsText: 'Welche Apps deinen Verkehr nutzen – mit Logos, einer Woche Verlauf und einem Tageslimit für jede.',
+  appOnlyServersText: 'Teste gegen Aztelekom, Azercell, Bakcell, Nar und weitere Server in Baku und den Regionen – jeder wird bei der Auswahl gemessen.',
+  appOnlyDnsText: 'Wie schnell dein DNS neben Cloudflare, Google und Quad9 antwortet – und zu welchem du wechseln solltest.',
 );
 
 const _hu = AppStrings(
@@ -3051,4 +3167,23 @@ const _hu = AppStrings(
   starfield3d: '3D csillagos ég',
   starfield3dHint: 'A csillagok a mélyből repülnek feléd – annál gyorsabban, minél nagyobb a sebesség –, és az ég követi az egeret. Kikapcsolva: a sík ég.',
   starfield3dHintTouch: 'A csillagok a mélyből repülnek feléd – annál gyorsabban, minél nagyobb a sebesség –, és az ég követi az ujjadat. Kikapcsolva: a sík ég, kicsit kíméletesebb az akkuval.',
+  webMonitorSubtitle: 'A kapcsolatod élőben – ebből a böngészőből',
+  connTitle: 'A kapcsolatod',
+  connType: 'Kapcsolat',
+  connWifi: 'Wi-Fi',
+  connCellular: 'Mobilnet',
+  connEthernet: 'Kábel',
+  connSpeed: 'Sebesség a böngésző becslése szerint',
+  connLatency: 'Késleltetés a böngésző becslése szerint',
+  connSaveData: 'Adatforgalom-csökkentő bekapcsolva',
+  connEstimateNote: 'Durva becslés a böngésződtől – a Chrome 10 Mbps felett nem számol. A valódi értékeket a sebességteszt adja.',
+  connNoApi: 'Ez a böngésző nem árulja el a kapcsolat adatait (a Chrome és az Edge igen). A sebességteszt és a lenti stabilitásmérés mindenhol működik.',
+  testsTitle: 'A tesztjeid',
+  testsNone: 'Még nincs teszt – indíts egyet a Sebesség lapon, és itt gyűlnek az eredmények.',
+  testsLast: 'Az utolsó {0}',
+  inAppTitle: 'Az appban még',
+  inAppText: 'Élő forgalom másodpercenként, órás, napi és havi összesítők, mely appok használják a hálózatot, minden eszköz a Wi-Fi-den, jelerősség, DNS-teszt és szerverek Azerbajdzsánban. A böngésző ezek egyikét sem engedi egy oldalnak látni.',
+  appOnlyAppsText: 'Mely appok viszik a forgalmadat – logóval, egyheti előzménnyel és napi limittel mindegyikhez.',
+  appOnlyServersText: 'Tesztelj az Aztelekom, az Azercell, a Bakcell, a Nar és más bakui és vidéki szerverek ellen – mindegyiket méri választáskor.',
+  appOnlyDnsText: 'Milyen gyorsan válaszol a DNS-ed a Cloudflare, a Google és a Quad9 mellett – és melyikre érdemes váltani.',
 );

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../call_check/data/rtt_probe.dart';
 import '../../domain/entities/ping_sample.dart';
 
 /// Connection stability over roughly the last two minutes.
@@ -79,18 +79,18 @@ class StabilityStats {
 final stabilityProvider =
     NotifierProvider<StabilityNotifier, StabilityStats>(StabilityNotifier.new);
 
-/// Fires a tiny HTTPS request every two seconds and records the latency.
+/// Fires a tiny HTTPS request every two seconds and records the latency —
+/// with the call check's probe, which works in the browser too.
 /// A failure counts as a lost packet, which is how brief outages get caught —
 /// they never show up on the traffic chart.
 class StabilityNotifier extends Notifier<StabilityStats> {
   /// 60 samples × 2 s = a two-minute window.
   static const capacity = 60;
   static const _interval = Duration(seconds: 2);
-  static final _probeUrl = Uri.parse('https://speed.cloudflare.com/__down?bytes=0');
 
   final ListQueue<PingSample> _buffer = ListQueue<PingSample>(capacity);
   Timer? _timer;
-  HttpClient? _client;
+  RttProbe? _client;
   bool _inFlight = false;
 
   @override
@@ -101,9 +101,7 @@ class StabilityNotifier extends Notifier<StabilityStats> {
   }
 
   void _start() {
-    _client = HttpClient()
-      ..connectionTimeout = const Duration(seconds: 4)
-      ..idleTimeout = const Duration(seconds: 30);
+    _client = RttProbe();
     _timer = Timer.periodic(_interval, (_) => _probe());
     _probe(); // probe immediately instead of waiting two seconds
   }
@@ -111,7 +109,7 @@ class StabilityNotifier extends Notifier<StabilityStats> {
   void _stopTimer() {
     _timer?.cancel();
     _timer = null;
-    _client?.close(force: true);
+    _client?.close();
     _client = null;
   }
 
@@ -136,19 +134,9 @@ class StabilityNotifier extends Notifier<StabilityStats> {
     if (client == null || _inFlight) return; // never overlap requests
     _inFlight = true;
 
-    double? rtt;
-    try {
-      final sw = Stopwatch()..start();
-      final req = await client.getUrl(_probeUrl);
-      final resp = await req.close().timeout(const Duration(seconds: 4));
-      await resp.drain<void>().timeout(const Duration(seconds: 4));
-      sw.stop();
-      if (resp.statusCode == 200) rtt = sw.elapsedMicroseconds / 1000.0;
-    } catch (_) {
-      rtt = null; // timeout or drop counts as a loss
-    } finally {
-      _inFlight = false;
-    }
+    // Null when lost: a timeout or a drop counts as a lost packet.
+    final rtt = await client.once();
+    _inFlight = false;
 
     _append(PingSample(timestamp: DateTime.now(), rttMs: rtt));
   }

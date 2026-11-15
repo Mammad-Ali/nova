@@ -6,12 +6,14 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/l10n/locale_provider.dart';
+import '../core/settings/app_settings.dart';
 import '../core/theme/app_theme.dart';
 import '../features/more/presentation/more_screen.dart';
 import '../features/settings/settings_sheet.dart';
 import '../features/speedtest/presentation/providers/speedtest_provider.dart';
 import '../features/speedtest/presentation/screens/speedtest_screen.dart';
 import '../features/traffic_monitor/presentation/screens/traffic_monitor_screen.dart';
+import '../features/traffic_monitor/presentation/screens/web_monitor_screen.dart';
 import '../shell/compact_mode.dart';
 import '../shell/compact_panel.dart';
 import 'starfield_background.dart';
@@ -36,16 +38,24 @@ class HomeShell extends ConsumerStatefulWidget {
 }
 
 class _HomeShellState extends ConsumerState<HomeShell> {
-  static const _pages = [SpeedTestScreen(), TrafficMonitorScreen(), MoreScreen()];
+  // A browser can't read the system's traffic counters: the website's
+  // Monitor shows what a page can see instead.
+  static const _pages = [
+    SpeedTestScreen(),
+    kIsWeb ? WebMonitorScreen() : TrafficMonitorScreen(),
+    MoreScreen(),
+  ];
+
+  /// The tab shown before the current one: the page turn goes its way.
+  var _previous = 0;
 
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(stringsProvider);
-
-    // The monitor tab needs system traffic counters, which a browser has no
-    // way to read — on the web the speed test is the whole app, so the tab
-    // bar has nothing to switch between.
-    final index = kIsWeb ? 0 : ref.watch(homeTabProvider);
+    ref.listen(homeTabProvider, (from, _) => _previous = from ?? 0);
+    final index = ref.watch(homeTabProvider);
+    final turn = ref.watch(appSettingsProvider.select((s) => s.starfield3d)) &&
+        !MediaQuery.of(context).disableAnimations;
 
     // In compact mode the window becomes a small panel under the menu-bar
     // icon: the same data, without tabs or a frame.
@@ -65,15 +75,17 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           SafeArea(
             bottom: false,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 320),
+              duration: Duration(milliseconds: turn ? 460 : 320),
               switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
               transitionBuilder: (child, anim) => FadeTransition(
                 opacity: anim,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.02),
-                    end: Offset.zero,
-                  ).animate(anim),
+                // The new page comes in from the side of its tab, the old
+                // one leaves the other way; with 3D off, a small rise.
+                child: _PageTurn(
+                  animation: anim,
+                  flat: !turn,
+                  side: (index > _previous ? 1 : -1) * (child.key == ValueKey<int>(index) ? 1 : -1),
                   child: child,
                 ),
               ),
@@ -87,17 +99,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ),
         ],
       ),
-      bottomNavigationBar: kIsWeb
-          ? null
-          : _GlassNavBar(
-              index: index,
-              items: [
-                (Icons.speed_rounded, t.tabSpeed),
-                (Icons.show_chart_rounded, t.tabMonitor),
-                (Icons.apps_rounded, t.tabMore),
-              ],
-              onTap: ref.read(homeTabProvider.notifier).show,
-            ),
+      bottomNavigationBar: _GlassNavBar(
+        index: index,
+        items: [
+          (Icons.speed_rounded, t.tabSpeed),
+          (Icons.show_chart_rounded, t.tabMonitor),
+          (Icons.apps_rounded, t.tabMore),
+        ],
+        onTap: ref.read(homeTabProvider.notifier).show,
+      ),
     );
 
     // Android's back button steps back to the speed test before it leaves
@@ -162,6 +172,44 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   }
 }
 
+/// Switching tabs turns the page a little in 3D, like a card on a carousel:
+/// [side] 1 swings it in from (or out to) the right, -1 the left. Settled,
+/// the transform is the identity: it stays in the tree all the same, since
+/// taking it out would rebuild the whole page from scratch.
+class _PageTurn extends AnimatedWidget {
+  const _PageTurn({
+    required Animation<double> animation,
+    required this.side,
+    required this.flat,
+    required this.child,
+  }) : super(listenable: animation);
+
+  final int side;
+
+  /// 3D animations are off: the page only rises a little into place.
+  final bool flat;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final away = 1 - (listenable as Animation<double>).value;
+    final size = MediaQuery.sizeOf(context);
+    if (flat) {
+      return Transform.translate(offset: Offset(0, away * size.height * 0.02), child: child);
+    }
+    final width = size.width;
+    return Transform(
+      alignment: side > 0 ? Alignment.centerLeft : Alignment.centerRight,
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.0009)
+        ..translateByDouble(side * away * width * 0.18, 0, 0, 1)
+        ..rotateY(-side * away * 0.42)
+        ..scaleByDouble(1 - 0.06 * away, 1 - 0.06 * away, 1, 1),
+      child: child,
+    );
+  }
+}
+
 class _GlassNavBar extends StatelessWidget {
   const _GlassNavBar({
     required this.index,
@@ -177,9 +225,7 @@ class _GlassNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
+    Widget bar = Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(22),
@@ -240,12 +286,23 @@ class _GlassNavBar extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
+    // A browser window can be two metres of glass wide: there the bar keeps
+    // to a size a thumb or a mouse can travel.
+    if (kIsWeb) {
+      bar = Align(
+        alignment: Alignment.bottomCenter,
+        heightFactor: 1,
+        child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 560), child: bar),
+      );
+    }
+    return SafeArea(top: false, child: bar);
   }
 
-  /// "⌘1" on a Mac, "Ctrl+1" on Windows and Linux; nothing on a phone.
+  /// "⌘1" on a Mac, "Ctrl+1" on Windows and Linux; nothing on a phone or
+  /// in a browser, which keeps those keys for its own tabs.
   static String? _shortcutLabel(int i) => switch (defaultTargetPlatform) {
+        _ when kIsWeb => null,
         TargetPlatform.macOS => '⌘${i + 1}',
         TargetPlatform.windows || TargetPlatform.linux => 'Ctrl+${i + 1}',
         _ => null,

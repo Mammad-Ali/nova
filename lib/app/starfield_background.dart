@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -79,7 +78,7 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
     final trafficFrac = (rate / (12.5 * 1024 * 1024)).clamp(0.0, 1.0);
     _sim.level = math.max(speedFrac, trafficFrac).toDouble();
     _sim.warpTarget = st.isRunning && st.displayMbps >= warpMbps ? 1 : 0;
-    final threeD = !kIsWeb && ref.watch(appSettingsProvider.select((s) => s.starfield3d));
+    final threeD = ref.watch(appSettingsProvider.select((s) => s.starfield3d));
     _sim.depthTarget = threeD ? 1 : 0;
 
     return Positioned.fill(

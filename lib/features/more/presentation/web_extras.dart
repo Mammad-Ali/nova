@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/reveal.dart';
 import '../../leaderboard/presentation/leaderboard_providers.dart';
 import 'more_entries.dart';
 import 'more_links.dart';
@@ -25,7 +26,7 @@ class _WebExtrasState extends ConsumerState<WebExtras> {
   void _getApp() {
     final mine = visitorDownload();
     if (mine != null) {
-      _download(context, ref.read(stringsProvider), mine);
+      downloadWithNotice(context, ref.read(stringsProvider), mine);
     } else {
       _scrollToDownloads();
     }
@@ -50,9 +51,9 @@ class _WebExtrasState extends ConsumerState<WebExtras> {
         const SizedBox(height: 40),
         _AppOnly(onGetApp: _getApp),
         const SizedBox(height: 28),
-        _GetTheApp(key: _downloads),
+        Reveal(child: _GetTheApp(key: _downloads)),
         const SizedBox(height: 40),
-        const _Footer(),
+        const Reveal(child: _Footer()),
       ],
     );
   }
@@ -61,7 +62,7 @@ class _WebExtrasState extends ConsumerState<WebExtras> {
 /// Starts the download and says so. The page itself does not change and
 /// Safari's only other sign is a small toolbar animation, so without a
 /// message a working download looks like a button that does nothing.
-void _download(BuildContext context, AppStrings t, DownloadTarget target) {
+void downloadWithNotice(BuildContext context, AppStrings t, DownloadTarget target) {
   startDownload(target);
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
@@ -85,8 +86,11 @@ class _AppOnly extends ConsumerWidget {
     final t = ref.watch(stringsProvider);
     final features = [
       (Icons.show_chart_rounded, t.appOnlyMonitorTitle, t.appOnlyMonitorText),
+      (Icons.apps_rounded, t.appsTitle, t.appOnlyAppsText),
       (Icons.devices_rounded, t.lanTitle, t.appOnlyLanText),
       (Icons.wifi_rounded, t.appOnlyWifiTitle, t.appOnlyWifiText),
+      (Icons.dns_rounded, t.serverSection, t.appOnlyServersText),
+      (Icons.travel_explore_rounded, t.dnsTitle, t.appOnlyDnsText),
       (Icons.ondemand_video_rounded, t.throttleTitle, t.appOnlyThrottleText),
       (Icons.troubleshoot_rounded, t.diagTitle, t.appOnlyCauseText),
     ];
@@ -110,30 +114,32 @@ class _AppOnly extends ConsumerWidget {
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, box) {
-            // All five in a row on a large screen, three on a laptop, two on
-            // a tablet, one on a phone.
-            final columns = box.maxWidth >= 1180
-                ? 5
-                : box.maxWidth >= 760
-                    ? 3
-                    : box.maxWidth >= 520
-                        ? 2
-                        : 1;
+            // Two rows of four on a laptop or larger, pairs on a tablet,
+            // one by one on a phone.
+            final columns = box.maxWidth >= 900
+                ? 4
+                : box.maxWidth >= 520
+                    ? 2
+                    : 1;
             const gap = 12.0;
             final width = (box.maxWidth - gap * (columns - 1)) / columns;
             return Wrap(
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (final (icon, title, text) in features)
+                for (final (i, (icon, title, text)) in features.indexed)
                   SizedBox(
                     width: width,
-                    child: _FeatureCard(
-                      icon: icon,
-                      title: title,
-                      text: text,
-                      action: t.getApp,
-                      onAction: onGetApp,
+                    // A row arrives card by card, left to right.
+                    child: Reveal(
+                      delay: Duration(milliseconds: 80 * (i % columns)),
+                      child: _FeatureCard(
+                        icon: icon,
+                        title: title,
+                        text: text,
+                        action: t.getApp,
+                        onAction: onGetApp,
+                      ),
                     ),
                   ),
               ],
@@ -233,7 +239,7 @@ class _GetTheApp extends ConsumerWidget {
         SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
-            onPressed: () => _download(context, t, mine),
+            onPressed: () => downloadWithNotice(context, t, mine),
             icon: Icon(mine.icon, size: 20),
             label: Text(AppStrings.fill(t.getAppFor, [mine.label])),
             style: FilledButton.styleFrom(
@@ -260,7 +266,7 @@ class _GetTheApp extends ConsumerWidget {
         children: [
           for (final target in others)
             OutlinedButton.icon(
-              onPressed: () => _download(context, t, target),
+              onPressed: () => downloadWithNotice(context, t, target),
               icon: Icon(target.icon, size: 18),
               label: Text(target.label),
               style: OutlinedButton.styleFrom(

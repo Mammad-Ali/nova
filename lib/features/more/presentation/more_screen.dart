@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/language_button.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/reveal.dart';
 import '../../leaderboard/presentation/leaderboard_providers.dart';
 import 'more_entries.dart';
 import 'more_links.dart';
@@ -21,92 +23,107 @@ class MoreScreen extends ConsumerWidget {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+      // In a wide browser window the list keeps to a readable width.
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: kIsWeb ? 720 : double.infinity),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      t.tabMore,
-                      style: TextStyle(
-                        color: AppColors.sun,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      t.moreSubtitle,
-                      style: TextStyle(color: AppColors.onGlass, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-              const LanguageButton(),
-            ],
-          ),
-          const SizedBox(height: 20),
-          for (final section in moreSections(t)) ...[
-            Container(
-              padding: const EdgeInsets.fromLTRB(6, 14, 6, 6),
-              decoration: glassCard(radius: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
-                    child: Text(
-                      section.title.toUpperCase(),
-                      style: TextStyle(
-                        color: AppColors.textLo,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          t.tabMore,
+                          style: TextStyle(
+                            color: AppColors.sun,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          t.moreSubtitle,
+                          style: TextStyle(color: AppColors.onGlass, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const LanguageButton(),
+                ],
+              ),
+              const SizedBox(height: 20),
+              for (final (i, section) in moreSections(t).indexed) ...[
+                // The sections arrive one after another as the tab opens.
+                Reveal(
+                  delay: Duration(milliseconds: 70 * i),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(6, 14, 6, 6),
+                    decoration: glassCard(radius: 20),
+                    // The rows paint their tap ripple on this, above the
+                    // glass, rather than on the page under it.
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                            child: Text(
+                              section.title.toUpperCase(),
+                              style: TextStyle(
+                                color: AppColors.textLo,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                          for (final entry in section.entries)
+                            ListTile(
+                              dense: true,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              leading: Icon(moreEntryIcon(entry),
+                                  size: 21, color: AppColors.textMid),
+                              title: Text(
+                                moreEntryLabel(entry, t, account),
+                                style: TextStyle(color: AppColors.onGlass, fontSize: 14.5),
+                              ),
+                              trailing: Icon(
+                                moreEntryIsLink(entry)
+                                    ? Icons.open_in_new_rounded
+                                    : Icons.chevron_right_rounded,
+                                size: 20,
+                                color: AppColors.textLo,
+                              ),
+                              onTap: () => openMoreEntry(context, ref, entry),
+                            ),
+                        ],
                       ),
                     ),
                   ),
-                  for (final entry in section.entries)
-                    ListTile(
-                      dense: true,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      leading: Icon(moreEntryIcon(entry),
-                          size: 21, color: AppColors.textMid),
-                      title: Text(
-                        moreEntryLabel(entry, t, account),
-                        style: TextStyle(color: AppColors.onGlass, fontSize: 14.5),
-                      ),
-                      trailing: Icon(
-                        moreEntryIsLink(entry)
-                            ? Icons.open_in_new_rounded
-                            : Icons.chevron_right_rounded,
-                        size: 20,
-                        color: AppColors.textLo,
-                      ),
-                      onTap: () => openMoreEntry(context, ref, entry),
-                    ),
-                ],
+                ),
+                const SizedBox(height: 14),
+              ],
+              const SizedBox(height: 6),
+              Text(
+                [
+                  'Nova',
+                  if (version != null) '${t.versionLabel} $version',
+                  t.footerLicense,
+                ].join(' · '),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppColors.textLo, fontSize: 12),
               ),
-            ),
-            const SizedBox(height: 14),
-          ],
-          const SizedBox(height: 6),
-          Text(
-            [
-              'Nova',
-              if (version != null) '${t.versionLabel} $version',
-              t.footerLicense,
-            ].join(' · '),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textLo, fontSize: 12),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -115,11 +115,9 @@ class _SettingsSheet extends ConsumerWidget {
                     Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                     _AutoTestSettings(settings: s),
                   ],
-                  // The 3D starfield: every app, not the website.
-                  if (!kIsWeb) ...[
-                    Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
-                    _AnimationSettings(settings: s),
-                  ],
+                  // The 3D starfield and page turns: every app and the website.
+                  Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
+                  _AnimationSettings(settings: s),
                   Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                   ListTile(
                     leading: Icon(Icons.table_view_rounded,
@@ -383,7 +381,7 @@ class _AnimationSettings extends ConsumerWidget {
           activeThumbColor: AppColors.nebulaViolet,
           title: Text(t.starfield3d, style: TextStyle(color: AppColors.onGlass, fontSize: 14)),
           subtitle: Text(
-            defaultTargetPlatform == TargetPlatform.android ? t.starfield3dHintTouch : t.starfield3dHint,
+            defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS ? t.starfield3dHintTouch : t.starfield3dHint,
             style: TextStyle(color: AppColors.textLo, fontSize: 12, height: 1.4),
           ),
         ),
