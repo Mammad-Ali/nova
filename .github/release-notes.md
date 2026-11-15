@@ -1,3 +1,14 @@
+## What's new in 1.6.1
+
+- **Speed test servers in Azerbaijan.** Tap the line under the speedometer to
+  pick where the test runs: *Automatic* (Cloudflare's nearest data centre —
+  for Azerbaijan, the one in Baku) or one of 56 servers that Azerbaijani
+  internet providers run, from Baku to Nakhchivan — Aztelekom, Azercell,
+  Bakcell, Nar, Delta Telecom, Azeronline and more. Nova times them all, puts
+  your own provider's first, and measures ping the way these servers do.
+  In the apps; the website keeps using Cloudflare.
+- Built on Flutter 3.50.
+
 ## What's new in 1.6
 
 - **Apps using the network, day by day.** *Now*, *Today* and *7 days*, every
