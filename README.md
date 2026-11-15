@@ -66,6 +66,7 @@ things that actually decide how the connection **feels**:
 | **Download / upload / ping / jitter** | Measured over four parallel connections against public CDNs |
 | **Latency under load** | Bufferbloat rating A–D, the metric that predicts lag |
 | **Automatic server failover** | Cloudflare → Cachefly → Hetzner; a rate-limited source never breaks a run |
+| **Servers in Azerbaijan** | 56 servers run by Azerbaijani providers — Aztelekom, Azercell, Bakcell, Nar and more — each timed as you pick, your own provider's first (apps only) |
 | **Connection grade** | A single A+…E score, plus a plain-language tier |
 | **Comfort scale** | Whether the speed suits 4K, gaming, calls, streaming and large downloads |
 | **ISP throttling detector** | Compares a neutral CDN against Netflix's CDN to spot video throttling |
@@ -109,6 +110,9 @@ things that actually decide how the connection **feels**:
 - Click the icon for a **compact panel** — full readings without opening the app
 - Closing the window keeps monitoring in the background
 - Notifications when speed drops below a threshold or a daily limit is reached
+- **Keyboard shortcuts**: ⌘/Ctrl + 1, 2, 3 for the tabs, ⌘/Ctrl + R to start or
+  stop a test, ⌘/Ctrl + , for Settings — matched by the key's place, so they work
+  with any keyboard layout
 - Animations pause automatically when the window is hidden, to spare the battery
 
 ### Everywhere
@@ -117,7 +121,11 @@ things that actually decide how the connection **feels**:
 - A **More** tab with four sections — *Learn* (key terms, guides, FAQ),
   *Tools* (leaderboard, provider ranking, latency to services), *About*
   (about Nova, privacy, source code) and *Profile* (history, settings, help,
-  account). The website shows the same four sections as its footer.
+  account). The website has the same three tabs, and its footer repeats the
+  four sections.
+- A **3D starfield** behind everything: stars fly toward you, faster as the speed
+  climbs, and the sky follows the mouse or a finger. Switching tabs turns the
+  page slightly in 3D. *Settings → Animations* turns it off
 - A single dark theme built for readability against the animated backdrop
 
 ## Install
@@ -127,9 +135,13 @@ things that actually decide how the connection **feels**:
 **[mammad-ali.github.io/nova](https://mammad-ali.github.io/nova/)** runs the
 speed test right in the page, together with everything a browser can do: the
 history with CSV and image export, latency to services, the call check, the
-leaderboard and provider ranking, and the Learn, About and Help pages. A
-browser cannot read system traffic counters, scan the local network, see
-Wi-Fi details, run the throttling check or "Find the cause", so those live in
+gaming check, the report for your provider, the leaderboard and provider
+ranking, and the Learn, About and Help pages. Its **Monitor** tab shows live
+connection stability, the connection as the browser describes it (type,
+estimated speed and latency) with the provider, and your tests on a chart.
+A browser cannot read system traffic counters, see which apps use the network,
+scan the local network, see Wi-Fi details, run the DNS test, reach the servers
+in Azerbaijan, run the throttling check or "Find the cause", so those live in
 the app — the site lists them and offers the download for the visitor's own
 system. On a laptop or desktop screen the page spreads into two columns.
 

@@ -1,37 +1,27 @@
-## What's new in 1.6.1
+## What's new in 1.7
 
-- **Speed test servers in Azerbaijan.** Tap the line under the speedometer to
-  pick where the test runs: *Automatic* (Cloudflare's nearest data centre —
-  for Azerbaijan, the one in Baku) or one of 56 servers that Azerbaijani
-  internet providers run, from Baku to Nakhchivan — Aztelekom, Azercell,
-  Bakcell, Nar, Delta Telecom, Azeronline and more. Nova times them all, puts
-  your own provider's first, and measures ping the way these servers do.
-  In the apps; the website keeps using Cloudflare.
-- Built on Flutter 3.50.
-
-## What's new in 1.6
-
-- **Apps using the network, day by day.** *Now*, *Today* and *7 days*, every
-  app with its real icon. Tap an app for its week and a daily limit: past it,
-  the Mac sends a notification and Android marks the app.
-- **New Mac widgets.** *Apps today* (small and medium) and *Network* — devices
-  online and who's new. The Dashboard widget gets a row of today's top apps.
-- **Widgets on Android.** *Speed*, and *Speed and traffic*, with a Start test
-  button.
-- **Name your devices.** Tap one in "Who's on my network" to name it and say
-  what it is. Newcomers are marked *New*.
-- **Gaming check.** Ping and jitter to the data centres games run in —
-  Frankfurt, Stockholm, London, Paris and more — and which suits shooters.
-- **DNS speed test.** Your DNS against Cloudflare, Google, Quad9, AdGuard and
-  OpenDNS, and how to switch when one is clearly faster.
-- **Report for your provider.** Enter the speed you pay for; Nova makes a PDF of
-  your tests to send with a complaint — or one image to share.
+- **A 3D starfield.** The sky behind Nova gets depth: stars fly toward you in
+  perspective, faster as the speed climbs and streaking past at warp, and the
+  sky leans after the mouse — or your finger on a phone. On the Mac, Windows,
+  Android and the website; *Settings → Animations* turns it off.
+- **Livelier tabs.** The white pill glides to the tab you pick, switching tabs
+  turns the page slightly in 3D, and cards rise into view as you scroll.
+- **Keyboard shortcuts on the Mac and Windows.** ⌘/Ctrl + 1, 2, 3 for the tabs,
+  ⌘/Ctrl + R to start or stop a test, ⌘/Ctrl + , for Settings — they work with
+  Russian and Azerbaijani layouts too. Hover a tab to see its shortcut.
+- **Android's back button** returns to the speed test before leaving Nova.
+- **A bigger website.** The site now has the Speed, Monitor and More tabs. Its
+  Monitor shows live connection stability, your connection as the browser
+  sees it (type, estimated speed and latency) with your provider, and your
+  tests on a chart.
 
 ## Use it in the browser — nothing to install
 
 **[Open Nova](https://mammad-ali.github.io/nova/)** — the speed test, latency to
-services and the call check run right in the page. The traffic monitor, the
-network scan, Wi-Fi details, "Find the cause" and the Mac widgets need the app.
+services, the call check, the gaming check and connection stability run right
+in the page. The traffic monitor, apps using the network, the network scan,
+Wi-Fi details, the DNS test, the servers in Azerbaijan, "Find the cause" and
+the widgets need the app.
 
 ## Install the app
 
