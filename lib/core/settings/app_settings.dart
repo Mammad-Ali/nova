@@ -55,8 +55,8 @@ class AppSettings {
   /// (azerbaijan_servers.dart); null for "Automatic".
   final int? serverId;
 
-  /// The 3D starfield behind everything (macOS): stars flying toward you in
-  /// depth, following the mouse. On unless switched off.
+  /// The 3D starfield behind everything (the apps): stars flying toward you
+  /// in depth, following the mouse or a finger. On unless switched off.
   final bool starfield3d;
 
   AppSettings copyWith({

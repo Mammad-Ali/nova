@@ -443,6 +443,7 @@ class AppStrings {
     required this.settingsAnimations,
     required this.starfield3d,
     required this.starfield3dHint,
+    required this.starfield3dHintTouch,
   });
 
   // Navigation and shared
@@ -969,6 +970,7 @@ class AppStrings {
   final String settingsAnimations;
   final String starfield3d;
   final String starfield3dHint;
+  final String starfield3dHintTouch;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -1400,6 +1402,7 @@ const _en = AppStrings(
   settingsAnimations: 'Animations',
   starfield3d: '3D starfield',
   starfield3dHint: 'Stars fly toward you in depth — faster as the speed climbs — and the sky follows the mouse. Off: the flat sky.',
+  starfield3dHintTouch: 'Stars fly toward you in depth — faster as the speed climbs — and the sky follows your finger. Off: the flat sky, a little lighter on the battery.',
 );
 
 const _az = AppStrings(
@@ -1814,6 +1817,7 @@ const _az = AppStrings(
   settingsAnimations: 'Animasiyalar',
   starfield3d: '3D ulduz səması',
   starfield3dHint: 'Ulduzlar dərinlikdən sizə doğru uçur — sürət artdıqca daha tez — və səma siçanın ardınca hərəkət edir. Söndürüləndə: düz səma.',
+  starfield3dHintTouch: 'Ulduzlar dərinlikdən sizə doğru uçur — sürət artdıqca daha tez — və səma barmağınızın ardınca hərəkət edir. Söndürüləndə: düz səma, batareyaya bir az daha qənaətcil.',
 );
 
 const _ru = AppStrings(
@@ -2228,6 +2232,7 @@ const _ru = AppStrings(
   settingsAnimations: 'Анимации',
   starfield3d: '3D звёздное небо',
   starfield3dHint: 'Звёзды летят на вас из глубины — тем быстрее, чем выше скорость, — а небо следует за мышью. Выключено: плоское небо.',
+  starfield3dHintTouch: 'Звёзды летят на вас из глубины — тем быстрее, чем выше скорость, — а небо следует за пальцем. Выключено: плоское небо, чуть экономнее для батареи.',
 );
 
 const _de = AppStrings(
@@ -2636,6 +2641,7 @@ const _de = AppStrings(
   settingsAnimations: 'Animationen',
   starfield3d: '3D-Sternenhimmel',
   starfield3dHint: 'Sterne fliegen aus der Tiefe auf dich zu – schneller, je höher die Geschwindigkeit – und der Himmel folgt der Maus. Aus: der flache Himmel.',
+  starfield3dHintTouch: 'Sterne fliegen aus der Tiefe auf dich zu – schneller, je höher die Geschwindigkeit – und der Himmel folgt deinem Finger. Aus: der flache Himmel, etwas sparsamer für den Akku.',
 );
 
 const _hu = AppStrings(
@@ -3044,4 +3050,5 @@ const _hu = AppStrings(
   settingsAnimations: 'Animációk',
   starfield3d: '3D csillagos ég',
   starfield3dHint: 'A csillagok a mélyből repülnek feléd – annál gyorsabban, minél nagyobb a sebesség –, és az ég követi az egeret. Kikapcsolva: a sík ég.',
+  starfield3dHintTouch: 'A csillagok a mélyből repülnek feléd – annál gyorsabban, minél nagyobb a sebesség –, és az ég követi az ujjadat. Kikapcsolva: a sík ég, kicsit kíméletesebb az akkuval.',
 );

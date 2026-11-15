@@ -21,10 +21,10 @@ import '../features/traffic_monitor/presentation/providers/traffic_provider.dart
 /// particles — the backdrop itself stays colourless — until a test passes
 /// 500 Mbps: then the stars go to warp speed, streaking out from the centre.
 ///
-/// On the Mac the sky can be 3D instead (Settings → Animations): stars in a
-/// volume, flying toward the viewer in perspective — faster with the speed,
-/// streaking at warp — while the camera leans toward the mouse, so near
-/// stars slide more than far ones.
+/// In the apps the sky can be 3D instead (Settings → Animations): stars in
+/// a volume, flying toward the viewer in perspective — faster with the
+/// speed, streaking at warp — while the camera leans toward the mouse (or a
+/// finger on a phone), so near stars slide more than far ones.
 class StarfieldBackground extends ConsumerStatefulWidget {
   const StarfieldBackground({super.key});
 
@@ -79,9 +79,7 @@ class _StarfieldBackgroundState extends ConsumerState<StarfieldBackground>
     final trafficFrac = (rate / (12.5 * 1024 * 1024)).clamp(0.0, 1.0);
     _sim.level = math.max(speedFrac, trafficFrac).toDouble();
     _sim.warpTarget = st.isRunning && st.displayMbps >= warpMbps ? 1 : 0;
-    final threeD = !kIsWeb &&
-        defaultTargetPlatform == TargetPlatform.macOS &&
-        ref.watch(appSettingsProvider.select((s) => s.starfield3d));
+    final threeD = !kIsWeb && ref.watch(appSettingsProvider.select((s) => s.starfield3d));
     _sim.depthTarget = threeD ? 1 : 0;
 
     return Positioned.fill(

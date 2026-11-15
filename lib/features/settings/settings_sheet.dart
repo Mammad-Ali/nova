@@ -115,8 +115,8 @@ class _SettingsSheet extends ConsumerWidget {
                     Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                     _AutoTestSettings(settings: s),
                   ],
-                  // The 3D starfield is the Mac's.
-                  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.macOS) ...[
+                  // The 3D starfield: every app, not the website.
+                  if (!kIsWeb) ...[
                     Divider(color: AppColors.onGlass.withValues(alpha: 0.12), height: 28),
                     _AnimationSettings(settings: s),
                   ],
@@ -383,7 +383,7 @@ class _AnimationSettings extends ConsumerWidget {
           activeThumbColor: AppColors.nebulaViolet,
           title: Text(t.starfield3d, style: TextStyle(color: AppColors.onGlass, fontSize: 14)),
           subtitle: Text(
-            t.starfield3dHint,
+            defaultTargetPlatform == TargetPlatform.android ? t.starfield3dHintTouch : t.starfield3dHint,
             style: TextStyle(color: AppColors.textLo, fontSize: 12, height: 1.4),
           ),
         ),
