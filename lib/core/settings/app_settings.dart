@@ -20,6 +20,7 @@ class AppSettings {
     this.autoTestEnabled = false,
     this.autoTestHours = 1,
     this.planMbps,
+    this.serverId,
   });
 
   /// Whether to show system notifications.
@@ -49,6 +50,10 @@ class AppSettings {
   /// provider. null until the user says.
   final double? planMbps;
 
+  /// The test server picked by the user — a provider server's Speedtest id
+  /// (azerbaijan_servers.dart); null for "Automatic".
+  final int? serverId;
+
   AppSettings copyWith({
     bool? alertsEnabled,
     double? minSpeedMbps,
@@ -62,6 +67,8 @@ class AppSettings {
     int? autoTestHours,
     double? planMbps,
     bool clearPlan = false,
+    int? serverId,
+    bool clearServer = false,
   }) {
     return AppSettings(
       alertsEnabled: alertsEnabled ?? this.alertsEnabled,
@@ -74,6 +81,7 @@ class AppSettings {
       autoTestEnabled: autoTestEnabled ?? this.autoTestEnabled,
       autoTestHours: autoTestHours ?? this.autoTestHours,
       planMbps: clearPlan ? null : (planMbps ?? this.planMbps),
+      serverId: clearServer ? null : (serverId ?? this.serverId),
     );
   }
 }
@@ -91,6 +99,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   static const _kAutoTest = 'auto_test_enabled';
   static const _kAutoTestHours = 'auto_test_hours';
   static const _kPlan = 'plan_mbps';
+  static const _kServer = 'test_server';
 
   @override
   AppSettings build() {
@@ -114,6 +123,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
         autoTestEnabled: p.getBool(_kAutoTest) ?? false,
         autoTestHours: autoTestIntervals.contains(hours) ? hours! : 1,
         planMbps: p.getDouble(_kPlan),
+        serverId: p.getInt(_kServer),
       );
     } catch (_) {
       // Storage unavailable — keep the defaults.
@@ -143,6 +153,11 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
         await p.remove(_kPlan);
       } else {
         await p.setDouble(_kPlan, s.planMbps!);
+      }
+      if (s.serverId == null) {
+        await p.remove(_kServer);
+      } else {
+        await p.setInt(_kServer, s.serverId!);
       }
     } catch (_) {}
   }
@@ -176,6 +191,9 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   void setAutoTestEnabled(bool v) => _set(state.copyWith(autoTestEnabled: v));
 
   void setAutoTestHours(int v) => _set(state.copyWith(autoTestHours: v));
+
+  void setServer(int? id) =>
+      _set(id == null ? state.copyWith(clearServer: true) : state.copyWith(serverId: id));
 
   void setPlan(double? mbps) =>
       _set(mbps == null || mbps <= 0 ? state.copyWith(clearPlan: true) : state.copyWith(planMbps: mbps));

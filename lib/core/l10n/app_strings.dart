@@ -433,6 +433,13 @@ class AppStrings {
     required this.reportCardAverages,
     required this.reportCardSlowest,
     required this.reportCardFooter,
+    required this.serverTitle,
+    required this.serverIntro,
+    required this.serverAuto,
+    required this.serverAutoHint,
+    required this.serverSection,
+    required this.serverYours,
+    required this.serverSilent,
   });
 
   // Navigation and shared
@@ -947,6 +954,15 @@ class AppStrings {
   /// {0} is the date and time of the slowest test.
   final String reportCardSlowest;
   final String reportCardFooter;
+  final String serverTitle;
+  final String serverIntro;
+  final String serverAuto;
+  final String serverAutoHint;
+  final String serverSection;
+  final String serverYours;
+
+  /// {0} is a number of servers.
+  final String serverSilent;
 
   /// Substitutes values into a template: `fill('{0} of {1}', ['2', '5'])`.
   static String fill(String template, List<String> args) {
@@ -1368,6 +1384,13 @@ const _en = AppStrings(
   reportCardAverages: 'Upload {0} Mbps on average, ping {1} ms.',
   reportCardSlowest: 'Slowest test: {0}.',
   reportCardFooter: 'Measured with Nova · mammad-ali.github.io/nova',
+  serverTitle: 'Test server',
+  serverIntro: "Automatic tests against Cloudflare's nearest data centre — in Azerbaijan, the one in Baku. Or pick a server run by an internet provider in Azerbaijan, to measure inside the country or inside your provider's own network.",
+  serverAuto: 'Automatic',
+  serverAutoHint: 'Cloudflare, nearest data centre',
+  serverSection: 'Servers in Azerbaijan',
+  serverYours: 'Your provider',
+  serverSilent: "{0} more don't answer from your network — some serve only their own provider's customers.",
 );
 
 const _az = AppStrings(
@@ -1772,6 +1795,13 @@ const _az = AppStrings(
   reportCardAverages: 'Orta göndərmə {0} Mbps, ping {1} ms.',
   reportCardSlowest: 'Ən yavaş test: {0}.',
   reportCardFooter: 'Nova ilə ölçülüb · mammad-ali.github.io/nova',
+  serverTitle: 'Test serveri',
+  serverIntro: 'Avtomatik rejimdə test Cloudflare-in ən yaxın data mərkəzinə qarşı aparılır — Azərbaycanda Bakıdakına. Və ya ölkə daxilində, yaxud öz provayderinizin şəbəkəsində ölçmək üçün Azərbaycan provayderlərinin serverlərindən birini seçin.',
+  serverAuto: 'Avtomatik',
+  serverAutoHint: 'Cloudflare, ən yaxın data mərkəzi',
+  serverSection: 'Azərbaycandakı serverlər',
+  serverYours: 'Sizin provayder',
+  serverSilent: 'Daha {0} server şəbəkənizdən cavab vermir — bəziləri yalnız öz provayderinin abunəçilərinə xidmət edir.',
 );
 
 const _ru = AppStrings(
@@ -2176,6 +2206,13 @@ const _ru = AppStrings(
   reportCardAverages: 'Отдача в среднем {0} Мбит/с, пинг {1} мс.',
   reportCardSlowest: 'Худший тест: {0}.',
   reportCardFooter: 'Измерено в Nova · mammad-ali.github.io/nova',
+  serverTitle: 'Сервер для теста',
+  serverIntro: 'В автоматическом режиме тест идёт до ближайшего дата-центра Cloudflare — в Азербайджане это Баку. Или выберите сервер азербайджанского провайдера, чтобы измерить скорость внутри страны или внутри сети вашего провайдера.',
+  serverAuto: 'Автоматически',
+  serverAutoHint: 'Cloudflare, ближайший дата-центр',
+  serverSection: 'Серверы в Азербайджане',
+  serverYours: 'Ваш провайдер',
+  serverSilent: 'Ещё {0} не отвечают из вашей сети — некоторые обслуживают только абонентов своего провайдера.',
 );
 
 const _de = AppStrings(
@@ -2574,6 +2611,13 @@ const _de = AppStrings(
   reportCardAverages: 'Upload im Schnitt {0} Mbit/s, Ping {1} ms.',
   reportCardSlowest: 'Langsamster Test: {0}.',
   reportCardFooter: 'Gemessen mit Nova · mammad-ali.github.io/nova',
+  serverTitle: 'Testserver',
+  serverIntro: 'Automatisch testet Nova gegen Cloudflares nächstes Rechenzentrum – in Aserbaidschan das in Baku. Oder wähle einen Server eines Internetanbieters in Aserbaidschan, um im Land oder im Netz deines Anbieters zu messen.',
+  serverAuto: 'Automatisch',
+  serverAutoHint: 'Cloudflare, nächstes Rechenzentrum',
+  serverSection: 'Server in Aserbaidschan',
+  serverYours: 'Dein Anbieter',
+  serverSilent: '{0} weitere antworten aus deinem Netz nicht – manche bedienen nur Kunden ihres eigenen Anbieters.',
 );
 
 const _hu = AppStrings(
@@ -2972,4 +3016,11 @@ const _hu = AppStrings(
   reportCardAverages: 'Feltöltés átlagosan {0} Mbps, ping {1} ms.',
   reportCardSlowest: 'Leglassabb teszt: {0}.',
   reportCardFooter: 'Mérve a Novával · mammad-ali.github.io/nova',
+  serverTitle: 'Tesztszerver',
+  serverIntro: 'Automatikusan a Cloudflare legközelebbi adatközpontjához mérünk – Azerbajdzsánban ez Bakuban van. Vagy válassz egy azerbajdzsáni internetszolgáltató szerverét, hogy az országon vagy a saját szolgáltatód hálózatán belül mérj.',
+  serverAuto: 'Automatikus',
+  serverAutoHint: 'Cloudflare, legközelebbi adatközpont',
+  serverSection: 'Szerverek Azerbajdzsánban',
+  serverYours: 'A szolgáltatód',
+  serverSilent: 'További {0} nem válaszol a hálózatodról – némelyik csak a saját szolgáltatója ügyfeleit szolgálja ki.',
 );

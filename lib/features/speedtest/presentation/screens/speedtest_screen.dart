@@ -18,6 +18,8 @@ import '../../../settings/settings_sheet.dart';
 import '../../../throttling/presentation/throttle_card.dart';
 import '../../../updates/update_banner.dart';
 import '../../../wifi/wifi_chip.dart';
+import '../../../../core/settings/app_settings.dart';
+import '../../data/datasources/azerbaijan_servers.dart';
 import '../../data/datasources/ip_info.dart';
 import '../../domain/entities/speedtest_models.dart';
 import '../providers/speedtest_history_provider.dart';
@@ -28,6 +30,7 @@ import '../widgets/confetti_overlay.dart';
 import '../widgets/history_sheet.dart';
 import '../widgets/odometer_text.dart';
 import '../widgets/result_summary.dart';
+import '../widgets/server_picker_sheet.dart';
 import '../widgets/speed_gauge.dart';
 
 /// The active speed test tab — measures the connection's peak throughput.
@@ -613,14 +616,22 @@ class _ProviderRow extends ConsumerWidget {
           ? '${data.isp} · ${data.location}'
           : data.isp!;
     }
-    if (serverName != null) {
-      final srv = '${strings.serverLabel}: $serverName';
+    // The server: the one a test used, or before any test the one picked
+    // (the app only: the providers' servers don't let web pages in).
+    final picked = providerServerById(ref.watch(appSettingsProvider).serverId);
+    final server = serverName ??
+        (kIsWeb
+            ? null
+            : picked == null
+                ? strings.serverAuto
+                : '${picked.name} · ${cityName(picked.city!, ref.watch(localeProvider))}');
+    if (server != null) {
+      final srv = '${strings.serverLabel}: $server';
       text = text.isEmpty ? srv : '$text · $srv';
     }
     if (text.isEmpty) return const SizedBox.shrink();
 
-    return Center(
-      child: Container(
+    final chip = Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: AppColors.onGlass.withValues(alpha: 0.04),
@@ -648,9 +659,23 @@ class _ProviderRow extends ConsumerWidget {
                 ),
               ),
             ),
+            if (!kIsWeb) ...[
+              const SizedBox(width: 4),
+              Icon(Icons.expand_more_rounded, size: 16, color: AppColors.textLo),
+            ],
           ],
         ),
-      ),
+      );
+
+    // A tap picks the test server.
+    return Center(
+      child: kIsWeb
+          ? chip
+          : InkWell(
+              onTap: () => showServerPicker(context),
+              borderRadius: BorderRadius.circular(30),
+              child: chip,
+            ),
     );
   }
 }

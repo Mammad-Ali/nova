@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/settings/app_settings.dart';
+
 import '../../data/datasources/speedtest_engine.dart';
 import '../../domain/entities/speedtest_models.dart';
 import '../../domain/entities/speedtest_record.dart';
@@ -119,7 +121,7 @@ class SpeedTestController extends Notifier<SpeedTestState> {
     state = SpeedTestState(phase: TestPhase.ping, scale: GaugeScale.fitting(lastBest));
 
     final engine = _engine = SpeedTestEngine();
-    _sub = engine.run().listen(
+    _sub = engine.run(serverId: ref.read(appSettingsProvider).serverId).listen(
       (p) {
         final observed = [
           p.displayMbps,

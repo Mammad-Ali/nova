@@ -38,7 +38,9 @@ class SpeedTestEngine {
   /// Smoothing for the gauge needle, matching the native engine.
   static const _alpha = 0.25;
 
-  Stream<SpeedTestProgress> run() {
+  /// [serverId] is the app's: the providers' servers don't let web pages
+  /// in, so the browser always tests against the built-in list.
+  Stream<SpeedTestProgress> run({int? serverId}) {
     final out = _out = StreamController<SpeedTestProgress>();
     out.onCancel = cancel;
     unawaited(_run());

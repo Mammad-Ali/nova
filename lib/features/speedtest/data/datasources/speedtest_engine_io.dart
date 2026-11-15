@@ -5,6 +5,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import '../../domain/entities/speedtest_models.dart';
+import 'azerbaijan_servers.dart';
+import 'provider_ping.dart';
 import 'speedtest_servers.dart';
 
 /// Drives a background isolate that runs the full speed test and streams
@@ -16,8 +18,9 @@ class SpeedTestEngine {
   SendPort? _control;
   StreamController<SpeedTestProgress>? _out;
 
-  /// Starts the test and returns a stream of progress events.
-  Stream<SpeedTestProgress> run() {
+  /// Starts the test and returns a stream of progress events. With
+  /// [serverId], that provider server is tried first (azerbaijan_servers.dart).
+  Stream<SpeedTestProgress> run({int? serverId}) {
     final out = _out = StreamController<SpeedTestProgress>();
 
     _fromIsolate = ReceivePort()
@@ -33,7 +36,7 @@ class SpeedTestEngine {
         }
       });
 
-    Isolate.spawn(_isolateEntry, _fromIsolate!.sendPort).then(
+    Isolate.spawn(_isolateEntry, (_fromIsolate!.sendPort, serverId)).then(
       (iso) => _isolate = iso,
       onError: (Object e) {
         if (!out.isClosed) {
@@ -69,7 +72,8 @@ class SpeedTestEngine {
 // ─────────────────────────── isolate side ───────────────────────────
 
 /// Isolate entry point. Sets up the control port and starts the run.
-Future<void> _isolateEntry(SendPort toMain) async {
+Future<void> _isolateEntry((SendPort, int?) start) async {
+  final (toMain, serverId) = start;
   final control = ReceivePort();
   toMain.send(control.sendPort); // hand over the port for 'cancel'
 
@@ -78,7 +82,11 @@ Future<void> _isolateEntry(SendPort toMain) async {
     if (m == 'cancel') cancelled = true;
   });
 
-  final runner = _Runner(emit: toMain.send, cancelled: () => cancelled);
+  final runner = _Runner(
+    emit: toMain.send,
+    cancelled: () => cancelled,
+    preferred: providerServerById(serverId),
+  );
 
   try {
     await runner.run();
@@ -99,10 +107,13 @@ class _ServerUnavailable implements Exception {
 
 /// All the test's network logic. Runs entirely inside the background isolate.
 class _Runner {
-  _Runner({required this.emit, required this.cancelled});
+  _Runner({required this.emit, required this.cancelled, this.preferred});
 
   final void Function(SpeedTestProgress) emit;
   final bool Function() cancelled;
+
+  /// The server the user picked; the automatic list stands behind it.
+  final SpeedTestServer? preferred;
 
   static const _connections = 4; // parallel connections
   static const _ewmaAlpha = 0.25; // needle smoothing
@@ -154,7 +165,7 @@ class _Runner {
       downloadMbps: _download,
       uploadMbps: _upload,
       loadedPingMs: _loadedPing,
-      serverName: _server?.name,
+      serverName: _server?.label,
     ));
   }
 
@@ -163,7 +174,7 @@ class _Runner {
   // Probe each source with a tiny request. The first one answering 200/206
   // wins, so the test survives rate limits such as HTTP 429.
   Future<SpeedTestServer?> _selectServer() async {
-    for (final server in kSpeedTestServers) {
+    for (final server in [?preferred, ...kSpeedTestServers]) {
       if (cancelled()) return null;
       final client = HttpClient()
         ..connectionTimeout = const Duration(seconds: 6);
@@ -192,28 +203,32 @@ class _Runner {
   // ── Ping and jitter ───────────────────────────────────────────────
   Future<(double, double)> _measurePing() async {
     emit(SpeedTestProgress(
-        phase: TestPhase.ping, serverName: _server?.name));
+        phase: TestPhase.ping, serverName: _server?.label));
     final server = _server!;
     final client = HttpClient()
       ..connectionTimeout = const Duration(seconds: 6);
+    // Provider servers answer PING on a plain connection: truer than HTTP.
+    final pinger = server.pingHost == null ? null : await ProviderPinger.connect(server.pingHost!);
+    Future<double?> probe() => pinger != null ? pinger.once() : _probe(client, server);
 
-    await _probe(client, server); // warm-up: absorbs DNS + TLS handshake
+    await probe(); // warm-up: absorbs DNS + TLS handshake
 
     const samples = 18;
     final rtts = <double>[];
     for (var i = 0; i < samples && !cancelled(); i++) {
-      final rtt = await _probe(client, server);
+      final rtt = await probe();
       if (rtt != null) rtts.add(rtt);
 
       emit(SpeedTestProgress(
         phase: TestPhase.ping,
         phaseProgress: (i + 1) / samples,
         pingMs: rtts.isEmpty ? null : _median(List.of(rtts)),
-        serverName: server.name,
+        serverName: server.label,
       ));
       await Future<void>.delayed(const Duration(milliseconds: 25));
     }
     client.close(force: true);
+    pinger?.close();
 
     if (rtts.isEmpty) return (0.0, 0.0);
     return (_median(List.of(rtts)), _meanAbsDeviation(rtts));
@@ -250,7 +265,7 @@ class _Runner {
       pingMs: _ping,
       jitterMs: _jitter,
       downloadMbps: isUpload ? _download : null,
-      serverName: server.name,
+      serverName: server.label,
     ));
 
     final started = DateTime.now();
@@ -294,7 +309,7 @@ class _Runner {
         pingMs: _ping,
         jitterMs: _jitter,
         downloadMbps: isUpload ? _download : null,
-        serverName: server.name,
+        serverName: server.label,
       ));
     });
 
@@ -302,12 +317,17 @@ class _Runner {
     // how much the link swells under load.
     Timer? bloatProbe;
     HttpClient? probeClient;
+    ProviderPinger? pinger;
     if (!isUpload) {
       probeClient = HttpClient()
         ..connectionTimeout = const Duration(seconds: 5);
+      if (server.pingHost != null) pinger = await ProviderPinger.connect(server.pingHost!);
+      var probing = false;
       bloatProbe = Timer.periodic(const Duration(milliseconds: 350), (_) async {
-        if (DateTime.now().isBefore(measureFrom)) return; // wait for ramp-up
-        final rtt = await _probe(probeClient!, server);
+        if (DateTime.now().isBefore(measureFrom) || probing) return; // wait for ramp-up
+        probing = true;
+        final rtt = pinger != null ? await pinger.once() : await _probe(probeClient!, server);
+        probing = false;
         if (rtt != null) _loadedRtts.add(rtt);
       });
     }
@@ -336,6 +356,7 @@ class _Runner {
     sampler.cancel();
     bloatProbe?.cancel();
     probeClient?.close(force: true);
+    pinger?.close();
 
     final elapsed = measuredStart == null
         ? 1.0
@@ -376,7 +397,7 @@ class _Runner {
   ) async {
     const chunksPerReq = 8; // 8 MB per request
     final buf = _uploadBuffer;
-    final req = await c.postUrl(Uri.parse(server.uploadUrl!));
+    final req = await c.postUrl(Uri.parse(server.uploadTarget()!));
     req.headers.contentType = ContentType.binary;
     req.contentLength = buf.length * chunksPerReq;
 
