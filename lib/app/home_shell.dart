@@ -1,12 +1,15 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/l10n/locale_provider.dart';
 import '../core/theme/app_theme.dart';
 import '../features/more/presentation/more_screen.dart';
+import '../features/settings/settings_sheet.dart';
+import '../features/speedtest/presentation/providers/speedtest_provider.dart';
 import '../features/speedtest/presentation/screens/speedtest_screen.dart';
 import '../features/traffic_monitor/presentation/screens/traffic_monitor_screen.dart';
 import '../shell/compact_mode.dart';
@@ -53,7 +56,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       );
     }
 
-    return Scaffold(
+    final shell = Scaffold(
       extendBody: true,
       backgroundColor: AppColors.bg0,
       body: Stack(
@@ -96,6 +99,66 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               onTap: ref.read(homeTabProvider.notifier).show,
             ),
     );
+
+    // Android's back button steps back to the speed test before it leaves
+    // Nova, as most apps' tabs do.
+    return PopScope(
+      canPop: index == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) ref.read(homeTabProvider.notifier).show(0);
+      },
+      child: _desktop ? _withShortcuts(context, shell) : shell,
+    );
+  }
+
+  static bool get _desktop =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.macOS ||
+          defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux);
+
+  /// The keyboard on a Mac or PC: ⌘/Ctrl+1, 2, 3 for the tabs (each tab
+  /// shows its shortcut on hover), ⌘/Ctrl+R to start or stop a test, and
+  /// ⌘/Ctrl+, for the settings, where Mac apps keep them.
+  ///
+  /// Matched by where the key sits, not by the letter it types: with a
+  /// Russian or Azerbaijani layout, the R key types "к" or "r"-less letters,
+  /// and shortcuts matched by letter would never fire.
+  Widget _withShortcuts(BuildContext context, Widget child) {
+    final mac = defaultTargetPlatform == TargetPlatform.macOS;
+    final tabs = ref.read(homeTabProvider.notifier);
+
+    void startOrStop() {
+      final test = ref.read(speedTestControllerProvider.notifier);
+      if (ref.read(speedTestControllerProvider).isRunning) {
+        test.stop();
+      } else {
+        tabs.show(0);
+        test.start();
+      }
+    }
+
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is! KeyDownEvent) return KeyEventResult.ignored;
+        final keys = HardwareKeyboard.instance;
+        final command = mac ? keys.isMetaPressed : keys.isControlPressed;
+        if (!command || keys.isAltPressed || keys.isShiftPressed) return KeyEventResult.ignored;
+        final VoidCallback? action = switch (event.physicalKey) {
+          PhysicalKeyboardKey.digit1 => () => tabs.show(0),
+          PhysicalKeyboardKey.digit2 => () => tabs.show(1),
+          PhysicalKeyboardKey.digit3 => () => tabs.show(2),
+          PhysicalKeyboardKey.keyR => startOrStop,
+          PhysicalKeyboardKey.comma => () => showSettingsSheet(context),
+          _ => null,
+        };
+        if (action == null) return KeyEventResult.ignored;
+        action();
+        return KeyEventResult.handled;
+      },
+      child: child,
+    );
   }
 }
 
@@ -132,16 +195,47 @@ class _GlassNavBar extends StatelessWidget {
                   color: AppColors.onGlass.withValues(alpha: 0.10),
                 ),
               ),
-              child: Row(
-                children: [
-                  for (var i = 0; i < items.length; i++)
-                    _NavItem(
-                      selected: index == i,
-                      icon: items[i].$1,
-                      label: items[i].$2,
-                      onTap: () => onTap(i),
-                    ),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth / items.length;
+                  return Stack(
+                    children: [
+                      // One white pill that glides to the chosen tab, with a
+                      // touch of overshoot, rather than one fading in place.
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 420),
+                        curve: const Cubic(0.3, 1.25, 0.45, 1),
+                        left: width * index,
+                        top: 0,
+                        bottom: 0,
+                        width: width,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                      // The full height of the bar: each tab centres its
+                      // label on the pill, and the whole tab takes the
+                      // mouse and taps, not a strip along its top.
+                      Positioned.fill(
+                        child: Row(
+                          children: [
+                            for (var i = 0; i < items.length; i++)
+                              _NavItem(
+                                selected: index == i,
+                                icon: items[i].$1,
+                                label: items[i].$2,
+                                shortcut: _shortcutLabel(i),
+                                onTap: () => onTap(i),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -149,60 +243,103 @@ class _GlassNavBar extends StatelessWidget {
       ),
     );
   }
+
+  /// "⌘1" on a Mac, "Ctrl+1" on Windows and Linux; nothing on a phone.
+  static String? _shortcutLabel(int i) => switch (defaultTargetPlatform) {
+        TargetPlatform.macOS => '⌘${i + 1}',
+        TargetPlatform.windows || TargetPlatform.linux => 'Ctrl+${i + 1}',
+        _ => null,
+      };
 }
 
-class _NavItem extends StatelessWidget {
+class _NavItem extends StatefulWidget {
   const _NavItem({
     required this.selected,
     required this.icon,
     required this.label,
+    required this.shortcut,
     required this.onTap,
   });
 
   final bool selected;
   final IconData icon;
   final String label;
+
+  /// Its keyboard shortcut, shown on hover (desktop).
+  final String? shortcut;
   final VoidCallback onTap;
 
   @override
+  State<_NavItem> createState() => _NavItemState();
+}
+
+class _NavItemState extends State<_NavItem> {
+  var _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 260),
-          curve: Curves.easeOut,
-          // The active tab is a white pill with black text and no glow.
-          decoration: BoxDecoration(
-            color: selected ? Colors.white : null,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 20,
-                color: selected ? Colors.black : AppColors.textLo,
-              ),
-              const SizedBox(width: 8),
-              // Three tabs share a phone's width, and some languages have
-              // long words for them: let a label shrink rather than overflow.
-              Flexible(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 260),
-                  style: TextStyle(
-                    color: selected ? Colors.black : AppColors.textLo,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                  child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-                ),
-              ),
-            ],
-          ),
+    final selected = widget.selected;
+    // Black on the white pill; brighter under the mouse.
+    final color = selected
+        ? Colors.black
+        : _hovered
+            ? AppColors.onGlass
+            : AppColors.textLo;
+
+    Widget item = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: widget.onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        // A faint glass highlight under the mouse, for the other tabs.
+        decoration: BoxDecoration(
+          color: !selected && _hovered ? AppColors.onGlass.withValues(alpha: 0.07) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
         ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // The icon gives a small bounce as its tab is chosen.
+            TweenAnimationBuilder<double>(
+              key: ValueKey(selected),
+              tween: Tween(begin: selected ? 0.7 : 1, end: 1),
+              duration: const Duration(milliseconds: 520),
+              curve: Curves.elasticOut,
+              builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: Icon(widget.icon, key: ValueKey(color), size: 20, color: color),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Three tabs share a phone's width, and some languages have
+            // long words for them: let a label shrink rather than overflow.
+            Flexible(
+              child: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 220),
+                style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 13),
+                child: Text(widget.label, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (widget.shortcut != null) {
+      item = Tooltip(
+        message: '${widget.label}   ${widget.shortcut}',
+        waitDuration: const Duration(milliseconds: 600),
+        child: item,
+      );
+    }
+    return Expanded(
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: item,
       ),
     );
   }

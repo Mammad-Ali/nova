@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -213,11 +213,25 @@ class _SpeedTestScreenState extends ConsumerState<SpeedTestScreen> {
             _ErrorBanner(message: s.error ?? t.errorGeneric),
           ],
         ];
-        final action = _ActionButton(
+        final button = _ActionButton(
           label: s.isRunning ? t.stopTest : t.startTest,
           running: s.isRunning,
           onTap: s.isRunning ? ctrl.stop : ctrl.start,
         );
+        // On a Mac or PC the button names its shortcut (home_shell.dart).
+        final keys = switch (defaultTargetPlatform) {
+          _ when kIsWeb => null,
+          TargetPlatform.macOS => '⌘R',
+          TargetPlatform.windows || TargetPlatform.linux => 'Ctrl+R',
+          _ => null,
+        };
+        final Widget action = keys == null
+            ? button
+            : Tooltip(
+                message: '${s.isRunning ? t.stopTest : t.startTest}   $keys',
+                waitDuration: const Duration(milliseconds: 600),
+                child: button,
+              );
 
         return Stack(
           children: [
@@ -377,7 +391,11 @@ class _Title extends StatelessWidget {
           IconButton(
             onPressed: () => showSettingsSheet(context),
             icon: Icon(Icons.tune_rounded, color: AppColors.textMid),
-            tooltip: strings.settings,
+            tooltip: switch (defaultTargetPlatform) {
+              TargetPlatform.macOS => '${strings.settings}   ⌘,',
+              TargetPlatform.windows || TargetPlatform.linux => '${strings.settings}   Ctrl+,',
+              _ => strings.settings,
+            },
           ),
           AccountButton(compact: compact),
         ];
